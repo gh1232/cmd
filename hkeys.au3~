@@ -1,0 +1,6 @@
+msgbox ("hi","","")
+hotkeyset ("!{F6}" , "expl")
+func expl() 
+ run ("explore")
+
+endfunc

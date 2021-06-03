@@ -1,0 +1,1 @@
+Get-EventLog -LogName System | where { ($_.InstanceId -bAnd 0xFFFF) -eq 6006 } 
