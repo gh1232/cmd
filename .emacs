@@ -13,7 +13,7 @@
  ;; If there is more than one, they won't work right.
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(slime govc go helm company-php imenu-anywhere ecb smex auto-complete company spacemacs-theme evil ## magit gited))
+   '(mu4e-views phps-mode slime govc go helm company-php imenu-anywhere ecb smex auto-complete company spacemacs-theme evil ## magit gited))
  '(tool-bar-mode nil))
 
 ;(custom-set-faces
@@ -164,5 +164,209 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
   (setq inferior-lisp-program "sbcl")
   ;(setq slime-lisp-implementations '(("sbcl" ("sbcl" "--dynamic-space-size" "1024")) ("clisp" ("clisp")) ("ecl" ("ecl")) ("cmucl" ("cmucl"))))
 ;(setq slime-lisp-implementations '((sbcl ("sbcl" "--dynamic-space-size" "1024"))))
+(when (not (package-installed-p 'use-package))
+  (package-refresh-contents)
+  (package-install 'use-package))
+(use-package recentf
+  :config
+  (setq recentf-auto-cleanup 'never
+        recentf-max-saved-items 1000
+        recentf-save-file (concat user-emacs-directory ".recentf"))
+  (recentf-mode t)
+  :diminish nil)
+
+;; Display possible completions at all places
+;; Enhance M-x to allow easier execution of commands
+(use-package smex
+  :ensure t
+  ;; Using counsel-M-x for now. Remove this permanently if counsel-M-x works better.
+  :disabled t
+  :config
+  (setq smex-save-file (concat user-emacs-directory ".smex-items"))
+  (smex-initialize)
+  :bind ("M-x" . smex))
+
+;; Git integration for Emacs
+(use-package magit
+  :ensure t
+  :bind ("C-x g" . magit-status))
+
+;; Better handling of paranthesis when writing Lisps.
+(use-package paredit
+  :ensure t
+  :init
+  (add-hook 'clojure-mode-hook #'enable-paredit-mode)
+  (add-hook 'cider-repl-mode-hook #'enable-paredit-mode)
+  (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
+  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+  (add-hook 'ielm-mode-hook #'enable-paredit-mode)
+  (add-hook 'lisp-mode-hook #'enable-paredit-mode)
+  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+  (add-hook 'scheme-mode-hook #'enable-paredit-mode)
+  :config
+  (show-paren-mode t)
+  :bind (("M-[" . paredit-wrap-square)
+         ("M-{" . paredit-wrap-curly))
+  :diminish nil)
+
+(use-package company
+  :bind (:map company-active-map
+         ("C-n" . company-select-next)
+         ("C-p" . company-select-previous))
+  :config
+  (setq company-idle-delay 0.3)
+  (global-company-mode t))
+
+   (use-package magit
+  :ensure t
+  :bind ("C-x g" . magit-status))
+
+(use-package auto-complete)
+(use-package flycheck
+  :ensure t
+  :init
+  (global-flycheck-mode t))
+e have to add the following lines of code:
+(use-package try :ensure t)
+(use-package which-key :ensure t :config (which-key-mode))
 
 
+
+(use-package evil
+  :ensure t
+  :defer .1 ;; don't block emacs when starting, load evil immediately after startup
+  :init
+  (setq evil-want-integration nil) ;; required by evil-collection
+  (setq evil-search-module 'evil-search)
+  (setq evil-ex-complete-emacs-commands nil)
+  (setq evil-vsplit-window-right t) ;; like vim's 'splitright'
+  (setq evil-split-window-below t) ;; like vim's 'splitbelow'
+  (setq evil-shift-round nil)
+  (setq evil-want-C-u-scroll t)
+  :config
+  (evil-mode)
+
+  ;; vim-like keybindings everywhere in emacs
+  (use-package evil-collection
+    :after evil
+    :ensure t
+    :config
+    (evil-collection-init))
+
+  ;; gl and gL operators, like vim-lion
+  (use-package evil-lion
+    :ensure t
+    :bind (:map evil-normal-state-map
+                ("g l " . evil-lion-left)
+                ("g L " . evil-lion-right)
+                :map evil-visual-state-map
+                ("g l " . evil-lion-left)
+                ("g L " . evil-lion-right)))
+
+  ;; gc operator, like vim-commentary
+  (use-package evil-commentary
+    :ensure t
+    :bind (:map evil-normal-state-map
+                ("gc" . evil-commentary)))
+
+  ;; gx operator, like vim-exchange
+  ;; NOTE using cx like vim-exchange is possible but not as straightforward
+  (use-package evil-exchange
+    :ensure t
+    :bind (:map evil-normal-state-map
+                ("gx" . evil-exchange)
+                ("gX" . evil-exchange-cancel)))
+
+  ;; gr operator, like vim's ReplaceWithRegister
+  (use-package evil-replace-with-register
+    :ensure t
+    :bind (:map evil-normal-state-map
+                ("gr" . evil-replace-with-register)
+                :map evil-visual-state-map
+                ("gr" . evil-replace-with-register)))
+
+  ;; * operator in vusual mode
+  (use-package evil-visualstar
+    :ensure t
+    :bind (:map evil-visual-state-map
+                ("*" . evil-visualstar/begin-search-forward)
+                ("#" . evil-visualstar/begin-search-backward)))
+
+  ;; ex commands, which a vim user is likely to be familiar with
+  (use-package evil-expat
+    :ensure t
+    :defer t)
+
+  ;; visual hints while editing
+  (use-package evil-goggles
+    :ensure t
+    :config
+    (evil-goggles-use-diff-faces)
+    (evil-goggles-mode))
+
+  ;; like vim-surround
+  (use-package evil-surround
+    :ensure t
+    :commands
+    (evil-surround-edit
+     evil-Surround-edit
+     evil-surround-region
+     evil-Surround-region)
+    :init
+    (evil-define-key 'operator global-map "s" 'evil-surround-edit)
+    (evil-define-key 'operator global-map "S" 'evil-Surround-edit)
+    (evil-define-key 'visual global-map "S" 'evil-surround-region)
+    (evil-define-key 'visual global-map "gS" 'evil-Surround-region))
+
+  (message "Loading evil-mode...done"))
+
+
+(use-package evil
+  :ensure t
+  :defer .1 ;; don't block emacs when starting, load evil immediately after startup
+  :init
+  (setq evil-want-integration nil) ;; required by evil-collection
+  (setq evil-search-module 'evil-search)
+  (setq evil-ex-complete-emacs-commands nil)
+  (setq evil-vsplit-window-right t) ;; like vim's 'splitright'
+  (setq evil-split-window-below t) ;; like vim's 'splitbelow'
+  (setq evil-shift-round nil)
+  (setq evil-want-C-u-scroll t)
+  :config
+  (evil-mode)
+
+  (use-package general :ensure t
+  :config
+  (general-evil-setup t)
+
+  (general-define-key
+   :states '(normal insert emacs)
+   :prefix "C-\\"
+   :non-normal-prefix "C-\\"
+   "l" '(avy-goto-line)
+   "a" 'align-regexp
+   )
+
+  (general-define-key
+   :states '(normal motion insert emacs)
+   :prefix "\\"
+   "ar" '(ranger :which-key "call ranger")
+   "g"  '(:ignore t :which-key "Git")
+   "gs" '(magit-status :which-key "git status")
+   )
+)
+
+(use-package ido-completing-read+
+  :ensure t
+  :config
+  ;; This enables ido in all contexts where it could be useful, not just
+  ;; for selecting buffer and file names
+  (ido-mode t)
+  (ido-everywhere t)
+  ;; This allows partial matches, e.g. "uzh" will match "Ustad Zakir Hussain"
+  (setq ido-enable-flex-matching t)
+  (setq ido-use-filename-at-point nil)
+  ;; Includes buffer names of recently opened files, even if they're not open now.
+  (setq ido-use-virtual-buffers t)
+  :diminish nil)
+   
