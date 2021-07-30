@@ -6,7 +6,7 @@ set pinged2=github.com
 set ssi=dl
 set intf=Wi-Fi
 set nam=dl
-set msg=wr:
+set msg=
 if not "[%1]" == "[]" (
 netsh wlan show networks
 pause
@@ -22,6 +22,7 @@ if "[%1]" == "[]" (
     REM Restart Wireless Connection
     REM Don’t restart if ping works.
     ping -n 1 %pinged2%
+    echo wifi.restarted: %date% %time% ghping  >> c:\a\wifi.restarted
     if %errorlevel% EQU 0 goto end
     msg=%msg% ghping
     rem netsh wlan disconnect ssid=%ssi% Name=%nam%  
@@ -29,7 +30,7 @@ if "[%1]" == "[]" (
     TIMEOUT %to%
     netsh wlan connect ssid=%ssi% Name=%nam% 
    rem  Interface=%intf%
-    echo wifi.restarted: %date% %time% %msg% wd wc  >> c:\a\wifi.restarted
+    echo wifi.restarted: %date% %time% %msg% wc  >> c:\a\wifi.restarted
 
     TIMEOUT %to%
     ping -n 1 %pinged2%

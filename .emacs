@@ -13,7 +13,7 @@
  ;; If there is more than one, they won't work right.
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(mu4e-views phps-mode slime govc go helm company-php imenu-anywhere ecb smex auto-complete company spacemacs-theme evil ## magit gited))
+   '(mu4e-views phps-mode slime govc go helm company-php imenu-anywhere ecb smex auto-complete company spacemacs-theme evil))
  '(tool-bar-mode nil))
 
 ;(custom-set-faces
@@ -63,9 +63,9 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
 
 
 ;;(toggle-full-screen)
-;(add-hook 'window-setup-hook 'toggle-frame-fullscreen t)
+(add-hook 'window-setup-hook 'toggle-frame-fullscreen t)
 
-;(add-to-list 'default-frame-alist '(fullscreen . maximized))
+(add-to-list 'default-frame-alist '(fullscreen . maximized))
   (scroll-bar-mode -1) ;; no scroll bar
     (add-hook 'emacs-startup-hook 'toggle-frame-maximized)
 
@@ -84,12 +84,12 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
 
 
 
-(custom-set-faces
+;(custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ ;)
 
 
 (require 'package)
@@ -111,8 +111,8 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
 ;; and `package-pinned-packages`. Most users will not need or want to do this.
 ;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
-  (global-set-key (kbd "C-S-p") 'package-refresh-contents) 
-  (global-set-key (kbd "C-S-i") 'package-install) 
+;  (global-set-key (kbd "C-S-p") 'package-refresh-contents) 
+ ; (global-set-key (kbd "C-S-i") 'package-install) 
 
 
 (auto-complete-mode 1)

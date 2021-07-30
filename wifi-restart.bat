@@ -3,9 +3,9 @@ rem run taskshed maybe admin too
 set to=9
 set pinged=192.168.1.1
 set pinged2=github.com
-set ssi=dl
+set ssi=dlr
 set intf=Wi-Fi
-set nam=dl
+set nam=dlr
 set msg=
 if not "[%1]" == "[]" (
 netsh wlan show networks

@@ -1,4 +1,10 @@
 @ECHO OFF
 ECHO Starting PHP FastCGI...
 set PATH=C:\a\PHP8;%PATH%
+taskkill /im php-cgi.exe /f
 c:\a\runhiddenconsole\RunHiddenConsole.exe C:\a\PHP8\php-cgi.exe -b 127.0.0.1:9123
+IF %ERRORLEVEL% NEQ 0 (
+  echo failed
+  pause
+)
+
