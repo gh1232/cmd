@@ -1,3 +1,4 @@
+set nocompatible
 :set guioptions=+M
 syntax on
 let mapleader = "\\"

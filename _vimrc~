@@ -41,5 +41,5 @@ function MyDiff()
     let &shellxquote=l:shxq_sav
   endif
 endfunction
-source /home/user/cmd/vimkeys.vim
+source /home/users/user/cmd/vimkeys.vim
 

@@ -1,7 +1,13 @@
-
-;(setq spacemacs-start-directory "~/.emacs.d/.spacemacs.d/")
-;(load-file (concat spacemacs-start-directory "init.el"))
-
+(setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
+(require 'package)
+(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
+(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
+(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
+(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;  (package-refresh-contents)
+(package-initialize)
+(package-install 'use-package)
 ;(set-default-font "Lucinda 24")
 (set-face-attribute 'default nil :height 300)
 
@@ -70,6 +76,8 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
     (add-hook 'emacs-startup-hook 'toggle-frame-maximized)
 
 
+(load-file "cmd/fkey.el")
+(load-file "cmd/f5key.el")
 ;(add-to-list 'load-path "~/.emacs.d/evil/evil-master/")
 ;(require 'evil)
 ;(evil-mode 1)
@@ -77,12 +85,13 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
 
 ;(load-file "~/.emacs.d/emacskeys.el")
 
-(load-file "~/.emacs.d/elpa/which-key/which-key.el")
-(require 'which-key)
-(which-key-mode)
+;(load-file "~/.emacs.d/elpa/which-key/which-key.el")
 
-
-
+  (use-package which-key
+   :ensure t
+   :demand t
+   :config 
+(which-key-mode))
 
 ;(custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -91,36 +100,11 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
  ;; If there is more than one, they won't work right.
  ;)
 
-
-(require 'package)
-(add-to-list 'package-archives '("melpa-stable" . "https://melpa.org/packages/") t)
-;(package-refresh-contents)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
-;(package-refresh-contents)
-;; If you want to use last tagged version
-(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-;(package-refresh-contents)
-;(add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
-;(package-refresh-contents)
-
-(add-to-list 'package-archives '("org" . "http://orgmode.org/elpa/") t)
-;(package-refresh-contents)
-(add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
-;(package-refresh-contents)
-;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
-;; and `package-pinned-packages`. Most users will not need or want to do this.
-;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
-(package-initialize)
-;  (global-set-key (kbd "C-S-p") 'package-refresh-contents) 
- ; (global-set-key (kbd "C-S-i") 'package-install) 
-
-
-(auto-complete-mode 1)
-(company-mode 1)
+;(auto-complete-mode 1)
+;(auto-complete-mode 1)
+;(company-mode 1)
 (add-hook 'after-init-hook 'global-company-mode)
 
-(load-file "c:/cmd/fkey.el")
-(load-file "c:/cmd/f5key.el")
 
 (require 'helm)
 (require 'helm-config)
@@ -131,6 +115,28 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
 (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
 (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
 (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+
+(company-mode 1)
+(add-hook 'after-init-hook 'global-company-mode)
+
+
+(require 'helm)
+(require 'helm-config)
+
+(global-set-key (kbd "C-c h") 'helm-command-prefix)
+(global-unset-key (kbd "C-x c"))
+
+(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
+(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
+(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+
+;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
+;; and `package-pinned-packages`. Most users will not need or want to do this.
+;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
+(package-initialize)
+;  (global-set-key (kbd "C-S-p") 'package-refresh-contents) 
+ ; (global-set-key (kbd "C-S-i") 'package-install) 
+
 
 (when (executable-find "curl")
   (setq helm-google-suggest-use-curl-p t))
@@ -368,5 +374,20 @@ e have to add the following lines of code:
   (setq ido-use-filename-at-point nil)
   ;; Includes buffer names of recently opened files, even if they're not open now.
   (setq ido-use-virtual-buffers t)
-  :diminish nil)
-   
+(auto-complete-mode 1)
+(company-mode 1)
+(add-hook 'after-init-hook 'global-company-mode)
+
+
+(require 'helm)
+(require 'helm-config)
+
+(global-set-key (kbd "C-c h") 'helm-command-prefix)
+(global-unset-key (kbd "C-x c"))
+
+(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
+(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
+(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+
+;(setq spacemacs-start-directory "~/.emacs.d/.spacemacs.d/")
+;(load-file (concat spacemacs-start-directory "init.el"))
