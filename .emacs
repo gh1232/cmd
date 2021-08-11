@@ -19,7 +19,8 @@
  ;; If there is more than one, they won't work right.
  '(menu-bar-mode nil)
  '(package-selected-packages
-   '(mu4e-views phps-mode slime govc go helm company-php imenu-anywhere ecb smex auto-complete company spacemacs-theme evil))
+   (quote
+    (mu4e-views phps-mode slime govc go helm company-php imenu-anywhere ecb smex auto-complete company spacemacs-theme evil)))
  '(tool-bar-mode nil))
 
 ;(custom-set-faces
@@ -76,8 +77,8 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
     (add-hook 'emacs-startup-hook 'toggle-frame-maximized)
 
 
-(load-file "cmd/fkey.el")
-(load-file "cmd/f5key.el")
+(load-file "fkey.el")
+(load-file "f5key.el")
 ;(add-to-list 'load-path "~/.emacs.d/evil/evil-master/")
 ;(require 'evil)
 ;(evil-mode 1)
@@ -103,73 +104,8 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
 ;(auto-complete-mode 1)
 ;(auto-complete-mode 1)
 ;(company-mode 1)
-(add-hook 'after-init-hook 'global-company-mode)
 
-
-(require 'helm)
-(require 'helm-config)
-
-(global-set-key (kbd "C-c h") 'helm-command-prefix)
-(global-unset-key (kbd "C-x c"))
-
-(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
-(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
-
-(company-mode 1)
-(add-hook 'after-init-hook 'global-company-mode)
-
-
-(require 'helm)
-(require 'helm-config)
-
-(global-set-key (kbd "C-c h") 'helm-command-prefix)
-(global-unset-key (kbd "C-x c"))
-
-(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
-(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
-
-;; Comment/uncomment this line to enable MELPA Stable if desired.  See `package-archive-priorities`
-;; and `package-pinned-packages`. Most users will not need or want to do this.
-;;(add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (package-initialize)
-;  (global-set-key (kbd "C-S-p") 'package-refresh-contents) 
- ; (global-set-key (kbd "C-S-i") 'package-install) 
-
-
-(when (executable-find "curl")
-  (setq helm-google-suggest-use-curl-p t))
-
-(setq helm-split-window-in-side-p           t ; open helm buffer inside current window, not occupy whole other window
-      helm-move-to-line-cycle-in-source     t ; move to end or beginning of source when reaching top or bottom of source.
-      helm-ff-search-library-in-sexp        t ; search for library in `require' and `declare-function' sexp.
-      helm-scroll-amount                    8 ; scroll 8 lines other window using M-<next>/M-<prior>
-      helm-ff-file-name-history-use-recentf t
-      helm-echo-input-in-header-line t)
-
-(defun spacemacs//helm-hide-minibuffer-maybe ()
-  "Hide minibuffer in Helm session if we use the header line as input field."
-  (when (with-helm-buffer helm-echo-input-in-header-line)
-    (let ((ov (make-overlay (point-min) (point-max) nil nil t)))
-      (overlay-put ov 'window (selected-window))
-      (overlay-put ov 'face
-                   (let ((bg-color (face-background 'default nil)))
-                     `(:background ,bg-color :foreground ,bg-color)))
-      (setq-local cursor-type nil))))
-
-
-(add-hook 'helm-minibuffer-set-up-hook
-          'spacemacs//helm-hide-minibuffer-maybe)
-
-(setq helm-autoresize-max-height 0)
-(setq helm-autoresize-min-height 20)
-(helm-autoresize-mode 1)
-
-(helm-mode 1)
-  (setq inferior-lisp-program "sbcl")
-  ;(setq slime-lisp-implementations '(("sbcl" ("sbcl" "--dynamic-space-size" "1024")) ("clisp" ("clisp")) ("ecl" ("ecl")) ("cmucl" ("cmucl"))))
-;(setq slime-lisp-implementations '((sbcl ("sbcl" "--dynamic-space-size" "1024"))))
 (when (not (package-installed-p 'use-package))
   (package-refresh-contents)
   (package-install 'use-package))
@@ -221,146 +157,30 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
          ("C-p" . company-select-previous))
   :config
   (setq company-idle-delay 0.3)
-  (global-company-mode t))
+  (global-company-mode t)
+;(company-mode 1)  
+(add-hook 'after-init-hook 'global-company-mode)
+  )
 
    (use-package magit
   :ensure t
   :bind ("C-x g" . magit-status))
 
-(use-package auto-complete)
+;(use-package auto-complete
+;:config 
+; (auto-complete-mode 1))
+
 (use-package flycheck
   :ensure t
   :init
-  (global-flycheck-mode t))
-e have to add the following lines of code:
-(use-package try :ensure t)
+  (global-flycheck-mode t)
+  )
+
+  (use-package try :ensure t)
 (use-package which-key :ensure t :config (which-key-mode))
 
 
 
-(use-package evil
-  :ensure t
-  :defer .1 ;; don't block emacs when starting, load evil immediately after startup
-  :init
-  (setq evil-want-integration nil) ;; required by evil-collection
-  (setq evil-search-module 'evil-search)
-  (setq evil-ex-complete-emacs-commands nil)
-  (setq evil-vsplit-window-right t) ;; like vim's 'splitright'
-  (setq evil-split-window-below t) ;; like vim's 'splitbelow'
-  (setq evil-shift-round nil)
-  (setq evil-want-C-u-scroll t)
-  :config
-  (evil-mode)
-
-  ;; vim-like keybindings everywhere in emacs
-  (use-package evil-collection
-    :after evil
-    :ensure t
-    :config
-    (evil-collection-init))
-
-  ;; gl and gL operators, like vim-lion
-  (use-package evil-lion
-    :ensure t
-    :bind (:map evil-normal-state-map
-                ("g l " . evil-lion-left)
-                ("g L " . evil-lion-right)
-                :map evil-visual-state-map
-                ("g l " . evil-lion-left)
-                ("g L " . evil-lion-right)))
-
-  ;; gc operator, like vim-commentary
-  (use-package evil-commentary
-    :ensure t
-    :bind (:map evil-normal-state-map
-                ("gc" . evil-commentary)))
-
-  ;; gx operator, like vim-exchange
-  ;; NOTE using cx like vim-exchange is possible but not as straightforward
-  (use-package evil-exchange
-    :ensure t
-    :bind (:map evil-normal-state-map
-                ("gx" . evil-exchange)
-                ("gX" . evil-exchange-cancel)))
-
-  ;; gr operator, like vim's ReplaceWithRegister
-  (use-package evil-replace-with-register
-    :ensure t
-    :bind (:map evil-normal-state-map
-                ("gr" . evil-replace-with-register)
-                :map evil-visual-state-map
-                ("gr" . evil-replace-with-register)))
-
-  ;; * operator in vusual mode
-  (use-package evil-visualstar
-    :ensure t
-    :bind (:map evil-visual-state-map
-                ("*" . evil-visualstar/begin-search-forward)
-                ("#" . evil-visualstar/begin-search-backward)))
-
-  ;; ex commands, which a vim user is likely to be familiar with
-  (use-package evil-expat
-    :ensure t
-    :defer t)
-
-  ;; visual hints while editing
-  (use-package evil-goggles
-    :ensure t
-    :config
-    (evil-goggles-use-diff-faces)
-    (evil-goggles-mode))
-
-  ;; like vim-surround
-  (use-package evil-surround
-    :ensure t
-    :commands
-    (evil-surround-edit
-     evil-Surround-edit
-     evil-surround-region
-     evil-Surround-region)
-    :init
-    (evil-define-key 'operator global-map "s" 'evil-surround-edit)
-    (evil-define-key 'operator global-map "S" 'evil-Surround-edit)
-    (evil-define-key 'visual global-map "S" 'evil-surround-region)
-    (evil-define-key 'visual global-map "gS" 'evil-Surround-region))
-
-  (message "Loading evil-mode...done"))
-
-
-(use-package evil
-  :ensure t
-  :defer .1 ;; don't block emacs when starting, load evil immediately after startup
-  :init
-  (setq evil-want-integration nil) ;; required by evil-collection
-  (setq evil-search-module 'evil-search)
-  (setq evil-ex-complete-emacs-commands nil)
-  (setq evil-vsplit-window-right t) ;; like vim's 'splitright'
-  (setq evil-split-window-below t) ;; like vim's 'splitbelow'
-  (setq evil-shift-round nil)
-  (setq evil-want-C-u-scroll t)
-  :config
-  (evil-mode)
-
-  (use-package general :ensure t
-  :config
-  (general-evil-setup t)
-
-  (general-define-key
-   :states '(normal insert emacs)
-   :prefix "C-\\"
-   :non-normal-prefix "C-\\"
-   "l" '(avy-goto-line)
-   "a" 'align-regexp
-   )
-
-  (general-define-key
-   :states '(normal motion insert emacs)
-   :prefix "\\"
-   "ar" '(ranger :which-key "call ranger")
-   "g"  '(:ignore t :which-key "Git")
-   "gs" '(magit-status :which-key "git status")
-   )
-)
 
 (use-package ido-completing-read+
   :ensure t
@@ -374,20 +194,17 @@ e have to add the following lines of code:
   (setq ido-use-filename-at-point nil)
   ;; Includes buffer names of recently opened files, even if they're not open now.
   (setq ido-use-virtual-buffers t)
-(auto-complete-mode 1)
-(company-mode 1)
-(add-hook 'after-init-hook 'global-company-mode)
+  )
 
-
-(require 'helm)
-(require 'helm-config)
-
-(global-set-key (kbd "C-c h") 'helm-command-prefix)
-(global-unset-key (kbd "C-x c"))
-
-(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebind tab to run persistent action
-(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB work in terminal
-(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
-
-;(setq spacemacs-start-directory "~/.emacs.d/.spacemacs.d/")
 ;(load-file (concat spacemacs-start-directory "init.el"))
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+(use-package evil
+
+ :config (evil-mode 1))

@@ -19,8 +19,7 @@
  ;; If there is more than one, they won't work right.
  '(menu-bar-mode nil)
  '(package-selected-packages
-   (quote
-    (mu4e-views phps-mode slime govc go helm company-php imenu-anywhere ecb smex auto-complete company spacemacs-theme evil)))
+   '(mu4e-views phps-mode slime govc go helm company-php imenu-anywhere ecb smex auto-complete company spacemacs-theme evil))
  '(tool-bar-mode nil))
 
 ;(custom-set-faces
@@ -77,8 +76,8 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
     (add-hook 'emacs-startup-hook 'toggle-frame-maximized)
 
 
-(load-file "fkey.el")
-(load-file "f5key.el")
+(load-file "cmd/fkey.el")
+(load-file "cmd/f5key.el")
 ;(add-to-list 'load-path "~/.emacs.d/evil/evil-master/")
 ;(require 'evil)
 ;(evil-mode 1)
@@ -196,15 +195,130 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
   (setq ido-use-virtual-buffers t)
   )
 
-;(load-file (concat spacemacs-start-directory "init.el"))
+(load-file (concat spacemacs-start-directory "init.el"))
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
 
 (use-package evil
+  :ensure t
+  :defer .1 ;; don't block emacs when starting, load evil immediately after startup
+  :init
+  (setq evil-want-integration nil) ;; required by evil-collection
+  (setq evil-search-module 'evil-search)
+  (setq evil-ex-complete-emacs-commands nil)
+  (setq evil-vsplit-window-right t) ;; like vim's 'splitright'
+  (setq evil-split-window-below t) ;; like vim's 'splitbelow'
+  (setq evil-shift-round nil)
+  (setq evil-want-C-u-scroll t)
+  :config
+  (evil-mode)
+  )
+  ;; vim-like keybindings everywhere in emacs
+  ;(use-package evil-collection
+   ; :after evil
+   ; :ensure t
+   ; :config
+   ; (evil-collection-init))
 
- :config (evilm-mode 1))
+  ;; gl and gL operators, like vim-lion
+  (use-package evil-lion
+    :ensure t
+    :bind (:map evil-normal-state-map
+                ("g l " . evil-lion-left)
+                ("g L " . evil-lion-right)
+                :map evil-visual-state-map
+                ("g l " . evil-lion-left)
+                ("g L " . evil-lion-right)))
+
+  ;; gc operator, like vim-commentary
+  (use-package evil-commentary
+    :ensure t
+    :bind (:map evil-normal-state-map
+                ("gc" . evil-commentary)))
+
+  ;; gx operator, like vim-exchange
+  ;; NOTE using cx like vim-exchange is possible but not as straightforward
+  (use-package evil-exchange
+    :ensure t
+    :bind (:map evil-normal-state-map
+                ("gx" . evil-exchange)
+                ("gX" . evil-exchange-cancel)))
+
+  ;; gr operator, like vim's ReplaceWithRegister
+  (use-package evil-replace-with-register
+    :ensure t
+    :bind (:map evil-normal-state-map
+                ("gr" . evil-replace-with-register)
+                :map evil-visual-state-map
+                ("gr" . evil-replace-with-register)))
+
+  ;; * operator in vusual mode
+  (use-package evil-visualstar
+    :ensure t
+    :bind (:map evil-visual-state-map
+                ("*" . evil-visualstar/begin-search-forward)
+                ("#" . evil-visualstar/begin-search-backward)))
+
+  ;; ex commands, which a vim user is likely to be familiar with
+  (use-package evil-expat
+    :ensure t
+    :defer t)  
+  ;; visual hints while editing
+  (use-package evil-goggles
+    :ensure t
+    :config
+    (evil-goggles-use-diff-faces)
+    (evil-goggles-mode))
+
+  ;; like vim-surround
+  (use-package evil-surround
+    :ensure t
+    :commands
+    (evil-surround-edit
+     evil-Surround-edit
+     evil-surround-region
+     evil-Surround-region)
+    :init
+    (evil-define-key 'operator global-map "s" 'evil-surround-edit)
+    (evil-define-key 'operator global-map "S" 'evil-Surround-edit)
+    (evil-define-key 'visual global-map "S" 'evil-surround-region)
+    (evil-define-key 'visual global-map "gS" 'evil-Surround-region))
+
+  (message "Loading evil-mode...done")
+
+
+(use-package evil
+  :ensure t
+  :defer .1 ;; don't block emacs when starting, load evil immediately after startup
+  :init
+  (setq evil-want-integration nil) ;; required by evil-collection
+  (setq evil-search-module 'evil-search)
+  (setq evil-ex-complete-emacs-commands nil)
+  (setq evil-vsplit-window-right t) ;; like vim's 'splitright'
+  (setq evil-split-window-below t) ;; like vim's 'splitbelow'
+  (setq evil-shift-round nil)
+  (setq evil-want-C-u-scroll t)
+  :config
+  (evil-mode)
+  )
+
+
+  (use-package general :ensure t
+  :config
+  (general-evil-setup t))
+
+  (general-define-key
+   :states '(normal insert emacs)
+   :prefix "C-\\"
+   :non-normal-prefix "C-\\"
+   "l" '(avy-goto-line)
+   "a" 'align-regexp
+   )
+
+  (general-define-key
+   :states '(normal motion insert emacs)
+   :prefix "\\"
+   "ar" '(ranger :which-key "call ranger")
+   "g"  '(:ignore t :which-key "Git")
+   "gs" '(magit-status :which-key "git status")
+   )
+
