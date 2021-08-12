@@ -207,4 +207,4 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
 
 (use-package evil
 
- :config (evilm-mode 1))
+ :config (evil-mode 1))
