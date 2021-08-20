@@ -5,10 +5,13 @@
 (add-to-list 'package-archives '("gnu" . "https://elpa.gnu.org/packages/") t)
 (add-to-list 'package-archives '("melpa-stable" . "https://stable.melpa.org/packages/") t)
 (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
-(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
+;(add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
 ;  (package-refresh-contents)
 (package-initialize)
-(package-install 'use-package)
+
+  (unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
 ;(set-default-font "Lucinda 24")
 (set-face-attribute 'default nil :height 300)
 
@@ -21,7 +24,7 @@
  '(menu-bar-mode nil)
  '(package-selected-packages
    (quote
-    (mu4e-views phps-mode slime govc go helm company-php imenu-anywhere ecb smex auto-complete company spacemacs-theme evil)))
+    (cargo racer eglot mu4e-views phps-mode slime govc go helm company-php imenu-anywhere ecb smex auto-complete company spacemacs-theme evil)))
  '(tool-bar-mode nil))
 
 ;(custom-set-faces
@@ -79,6 +82,7 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
 
 
 ;(add-to-list 'load-path "~/.emacs.d/evil/evil-master/")
+(add-to-list 'load-path "~/rust-mode/")
 ;(require 'evil)
 ;(evil-mode 1)
 
@@ -92,7 +96,9 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
    :demand t
    :config 
 (which-key-mode))
-
+(use-package racer 
+:ensure t
+  :demand t)
 ;(custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -157,7 +163,7 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
   :config
   (setq company-idle-delay 0.3)
   (global-company-mode t)
-;(company-mode 1)  
+(company-mode 1)  
 (add-hook 'after-init-hook 'global-company-mode)
   )
 
@@ -181,7 +187,7 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
 
 
 
-(use-package ido-completing-read+
+'(use-package ido-completing-read+
   :ensure t
   :config
   ;; This enables ido in all contexts where it could be useful, not just
@@ -202,7 +208,7 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(hi-blue-b ((t (:foreground "yellow" :weight bold)))))
 
 (use-package evil
 
@@ -214,9 +220,11 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
 (global-set-key (kbd "<f5>") nil)
 (global-set-key (kbd "<f5>1") 'save-buffers-kill-terminal)
 (global-set-key (kbd "<f5>2") 'save-buffer)
+(global-set-key (kbd "<f5><f5>") 'other-window)
 (global-set-key (kbd "<f5>3") '(find-file "c:\\cmd\\.emacs"))
 (global-set-key (kbd "<f5>ip") 'package-install)
 (global-set-key (kbd "<f5>lp") 'list-packages)
+(global-set-key (kbd "<f5>lP") 'packages-list-packages)
 (global-set-key (kbd "<f5>rp") 'package-refresh-contents)
 ;(global-set-key (kbd "<f5>fs") ')
 ;(global-set-key (kbd "<f5>") 'forward-button)
@@ -226,6 +234,9 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
 (global-set-key (kbd "<f5>b.") 'end-of-buffer)
 (global-set-key (kbd "<f5>hm") 'describe-mode)
 (global-set-key (kbd "<f5>rb") 'revert-buffer)
+(global-set-key (kbd "<f5>rf") 'recover-file)
+(global-set-key (kbd "<f5>rs") 'recover-session)
+(global-set-key (kbd "<f5>tl") 'linum-mode)
 (global-set-key (kbd "<f5>h;") 'help-go-back)
 (global-set-key (kbd "<f5>qw") 'quit-window)
 (global-set-key (kbd "<f5>h'") 'help-go-forward)
@@ -415,6 +426,11 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
 ;(global-set-key (kbd "<f5>") 'next-error)
 (global-set-key (kbd "<f5>gb") 'switch-to-buffer)
 (global-set-key (kbd "<f5>xd") 'dired)
+(global-set-key (kbd "<f5>xg") 'gdb)
+(global-set-key (kbd "<f5>xc") 'calendar)
+(global-set-key (kbd "<f5>xc") 'calendar)
+(global-set-key (kbd "<f5>xm") 'calculator)
+(global-set-key (kbd "<f5>xt") 'tetris)
 ;(global-set-key (kbd "<f5>") 'kmacro-end-and-call-macro)
 ;(global-set-key (kbd "<f5>") 'set-fill-column)
 ;(global-set-key (kbd "<f5>") 'magit-status)
@@ -458,7 +474,8 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
 (global-set-key (kbd "<f5>Ka") 'append-next-kill)
 (global-set-key (kbd "<f5>ir") 'indent-region)
 ;(global-set-key (kbd "<f5>") 'just-one-space)
-(global-set-key (kbd "<f5>xs") 'shell-command)
+(global-set-key (kbd "<f5>xs") 'shell)
+(global-set-key (kbd "<f5>xk") 'shell-command)
 ;(global-set-key (kbd "<f5>") 'ispell-word)
 (global-set-key (kbd "<f5>rq") 'query-replace)
 (global-set-key (kbd "<f5>xa") 'async-shell-command)
@@ -742,13 +759,13 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
 ;(global-set-key (kbd "<f5>") 'eww-search-words)
 
 (global-set-key (kbd "<f5>=p") 'center-paragraph)
+(global-set-key (kbd "<f5>xw") 'eww)
 ;(global-set-key (kbd "<f5>") 'font-lock-fontify-block)
 (global-set-key (kbd "<f5>=l") 'center-line)
 
 (global-set-key (kbd "<f5>gl") 'goto-line)
 ;(global-set-key (kbd "<f5>") 'next-error)
 ;(global-set-key (kbd "<f5>") 'previous-error)
-
 ;(global-set-key (kbd "<f5>") 'facemenu-set-bold)
 ;(global-set-key (kbd "<f5>") 'facemenu-set-default)
 ;(global-set-key (kbd "<f5>") 'facemenu-set-italic)
@@ -817,4 +834,77 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
 (global-set-key (kbd "<f6>1") 'delete-other-windows)
 (global-set-key (kbd "<f6>o") 'other-window)
   (global-set-key (kbd "<m-f6>/") 'query-replace-regexp)
+  (global-set-key (kbd "<f5><f7>") 'menu-bar-open)
+  (global-set-key (kbd "<f5><f6>") 'switch-to-buffer)
+
+'(use-package 'ido
+:config (ido-mode t))
+'(use-package 'icomplete
+:config (icomplete-mode t))
+'(use-package 'helm)
+;(use-package helm :config (require 'helm-config))
+'(use-package selectrum
+:config (selectrum-mode +1)
+(setq selectrum-refine-candidates-function #'orderless-filter)
+(setq selectrum-highlight-candidates-function #'orderless-highlight-matches)
+)
+'(use-package icicles 
+ :config
+(icy-mode 1))
+  '(use-package 'smex ; Not needed if you use package.el
+  :config (smex-initialize) ; Can be omitted. This might cause a (minimal) delay
+                    ; when Smex is auto-initialized on its first run.
+  (global-set-key (kbd "M-x") 'smex)
+  (global-set-key (kbd "M-X") 'smex-major-mode-commands)
+  ;; This is your old M-x.
+  (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+  )
+  
+ '(use-package ace-popup-menu)
+; exwm dired+ sunrise cedet 
+  
+'(use-package 'rust
+:config (rust-mode 1))
+(autoload 'rust-mode "rust-mode" nil t)
+;(require 'rust-mode)
+;(rust-mode 1)
+(add-hook 'rust-mode-hook
+          (lambda () (setq indent-tabs-mode nil)))
+(setq rust-format-on-save t)
+(define-key rust-mode-map (kbd "<f7>r") 'rust-run)
+(define-key rust-mode-map (kbd "<f7>t") 'rust-test)
+(define-key rust-mode-map (kbd "<f7>x") 'rust-compile)
+(define-key rust-mode-map (kbd "<f7>c") 'rust-check)
+(define-key rust-mode-map (kbd "<f7>l") 'rust-run-clippy)
+(define-key rust-mode-map (kbd "<f7>d") 'rust-dbg-wrap-or-unwrap)
+;(use-package rustic)
+;(setq rustic-lsp-client 'eglot)
+(setq rustic-analyzer-command '("~/.cargo/bin/rust-analyzer"))
+
+;(setq rustic-lsp-server 'rls)
+
+;(setq cargo-process--command-bench "bench")
+;(setq cargo-process--command-build "build")
+;(setq cargo-process--command-clean "clean")
+;(setq cargo-process--command-doc "doc")
+;(etq cargo-process--command-doc-open "doc --open")
+;(setq cargo-process--command-new "new")
+;(setq cargo-process--command-init "init")
+;(setq cargo-process--command-run "run")
+;(setq cargo-process--command-run-bin "run --bin")
+;(setq cargo-process--command-run-example "run --example")
+;(setq cargo-process--command-search "search")
+;(setq cargo-process--command-test "test")
+;(setq cargo-process--command-current-test "test")
+;(setq cargo-process--command-current-file-tests "test")
+;(setq cargo-process--command-update "update")
+;(setq cargo-process--command-fmt "fmt")
+;(setq cargo-process--command-check "check")
+;(setq cargo-process--command-clippy "clippy")
+;(setq cargo-process--command-add "add")
+;(setq cargo-process--command-rm "rm")
+;(setq cargo-process--command-upgrade "upgrade")
+;(setq cargo-process--command-audit "audit -f")
+ ;(define-key cargo-mode-map (kbd ...) 'cargo-minor-mode-command-map)
+
 
