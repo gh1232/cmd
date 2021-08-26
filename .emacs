@@ -21,10 +21,13 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(custom-safe-themes
+   (quote
+    ("3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" default)))
  '(menu-bar-mode nil)
  '(package-selected-packages
    (quote
-    (cargo racer eglot mu4e-views phps-mode slime govc go helm company-php imenu-anywhere ecb smex auto-complete company spacemacs-theme evil)))
+    (powerline cargo racer eglot mu4e-views phps-mode slime govc go helm company-php imenu-anywhere ecb smex auto-complete company spacemacs-theme evil)))
  '(tool-bar-mode nil))
 
 ;(custom-set-faces
@@ -71,10 +74,86 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
 (setq inhibit-startup-screen t)
 (switch-to-buffer "**")
 ;(menu-bar-mode -1)
+(defun my-kill-emacs ()
+  "save some buffers, then exit unconditionally"
+  (interactive)
+  (save-some-buffers nil t)
+  (kill-emacs))
+(global-set-key (kbd "C-x C-c") 'my-kill-emacs)
+; use noflet if notwork 
+(require 'cl-lib)
+(defadvice save-buffers-kill-emacs (around no-query-kill-emacs activate)
+  "Prevent annoying \"Active processes exist\" query when you quit Emacs."
+  (cl-letf (((symbol-function #'process-list) (lambda ())))
+    ad-do-it))
+
+(fset 'save-buffers-kill-emacs 'my-save-buffers-kill-emacs)
+(defun my-save-buffers-kill-emacs (&optional arg)
+  "Offer to save each buffer(once only), then kill this Emacs process.
+With prefix ARG, silently save all file-visiting buffers, then kill."
+  (interactive "P")
+  (save-some-buffers arg t)
+  (and (or (not (fboundp 'process-list))
+       ;; process-list is not defined on MSDOS.
+       (let ((processes (process-list))
+         active)
+         (while processes
+           (and (memq (process-status (car processes)) '(run stop open listen))
+            (process-query-on-exit-flag (car processes))
+            (setq active t))
+           (setq processes (cdr processes)))
+         (or (not active)
+         (progn (list-processes t)
+            (yes-or-no-p "Active processes exist; kill them and exit anyway? ")))))
+       ;; Query the user for other things, perhaps.
+       (run-hook-with-args-until-failure 'kill-emacs-query-functions)
+       (or (null confirm-kill-emacs)
+       (funcall confirm-kill-emacs "Really exit Emacs? "))
+       (kill-emacs)))
+;(global-set-key (kbd "C-x C-c") 'my-save-buffers-kill-emacs)
+(defadvice save-buffers-kill-emacs (around no-y-or-n activate)
+  (flet ((yes-or-no-p (&rest args) t)
+         (y-or-n-p (&rest args) t))
+    ad-do-it))
+(add-hook 'special-mode-hook
+          (lambda ()
+            (let ((buffer-name-list (mapcar 'buffer-name (buffer-list))))
+              (when (member "*Warnings*" buffer-name-list)
+                (pop-to-buffer "*Warnings*")))))
+(setq initial-scratch-message "")
+
+;; Removes *scratch* from buffer after the mode has been set.
+(defun remove-scratch-buffer ()
+  (if (get-buffer "*scratch*")
+      (kill-buffer "*scratch*")))
+(add-hook 'after-change-major-mode-hook 'remove-scratch-buffer)
+
+;; Removes *messages* from the buffer.
+(setq-default message-log-max nil)
+(kill-buffer "*Messages*")
+
+;; Removes *Completions* from buffer after you've opened a file.
+(add-hook 'minibuffer-exit-hook
+      '(lambda ()
+         (let ((buffer "*Completions*"))
+           (and (get-buffer buffer)
+                (kill-buffer buffer)))))
+
+;; Don't show *Buffer list* when opening multiple files at the same time.
+(setq inhibit-startup-buffer-menu t)
+
+;; Show only one active window when opening multiple files at the same time.
+(add-hook 'window-setup-hook 'delete-other-windows)
+
 
 
 ;;(toggle-full-screen)
 (add-hook 'window-setup-hook 'toggle-frame-fullscreen t)
+
+(fset 'yes-or-no-p 'y-or-n-p)
+(setq warning-minimum-level :emergency)
+
+
 
 (add-to-list 'default-frame-alist '(fullscreen . maximized))
   (scroll-bar-mode -1) ;; no scroll bar
@@ -906,5 +985,83 @@ New buffer will be named “untitled” or “untitled<2>”, “untitled<3>”, etc.
 ;(setq cargo-process--command-upgrade "upgrade")
 ;(setq cargo-process--command-audit "audit -f")
  ;(define-key cargo-mode-map (kbd ...) 'cargo-minor-mode-command-map)
+(use-package powerline
+:init (powerline-mode t))
+  
+(use-package smart-mode-line
+  :ensure nil
+  :init (add-hook 'after-init-hook 'sml/setup)
+  :config
+  ;; Fix a couple of long project names with an icon:
+  (add-to-list 'sml/replacer-regexp-list '("^~/website/" "[¿]"))
+  (add-to-list 'sml/replacer-regexp-list '("^~/Google Drive/technical/" "[¿]"))
+  (add-to-list 'sml/replacer-regexp-list '("^~/Google/technical/" "[¿]"))
+  (add-to-list 'sml/replacer-regexp-list '("^~/technical/" "[¿¿¿]"))
+
+  (add-to-list 'sml/replacer-regexp-list '("^~/Google Drive/Notes/" "[¿]"))
+  (add-to-list 'sml/replacer-regexp-list '("^~/Google/Notes/" "[¿]"))
+  (add-to-list 'sml/replacer-regexp-list '("^~/Notes/" "[¿]"))
+
+  (add-to-list 'sml/replacer-regexp-list '("^~/Other/dot-files/" "[¿]"))
+  (add-to-list 'sml/replacer-regexp-list '("^~/Work/dot-files/" "[¿]"))
+
+  ;; Shorten a couple of well-known directories ... these need to be first:
+  ;; (add-to-list 'sml/replacer-regexp-list '("^~/Google Drive/" "¿:") t)
+  ;; (add-to-list 'sml/replacer-regexp-list '("^~/Google/" "¿:") t)
+  ;; (add-to-list 'sml/replacer-regexp-list '("^~/google/" "¿:") t)
+  ;; (add-to-list 'sml/replacer-regexp-list '("^~/Dropbox/" "¿:") t)
+  ;; (add-to-list 'sml/replacer-regexp-list '("^~/Work/" "¿:") t)
+  ;; (add-to-list 'sml/replacer-regexp-list '("^~/Workspace/" "¿:"))
+
+;  (sml/apply-theme 'dark)
+
+  ;; Since I almost always use Git, let's shorten its display:
+  (setcdr (assq 'vc-mode mode-line-format)
+    '((:eval (replace-regexp-in-string "^ Git" "\xe0a0" vc-mode)))))
+
+
+(use-package smart-mode-line
+  :ensure t
+  :init (add-hook 'after-init-hook 'sml/setup)
+  :config
+  ;; Fix a couple of long project names with an icon:
+  (add-to-list 'sml/replacer-regexp-list '("^~/website/" "[¿]"))
+  (add-to-list 'sml/replacer-regexp-list '("^~/Google Drive/technical/" "[¿]"))
+  (add-to-list 'sml/replacer-regexp-list '("^~/Google/technical/" "[¿]"))
+  (add-to-list 'sml/replacer-regexp-list '("^~/technical/" "[¿¿¿]"))
+
+  (add-to-list 'sml/replacer-regexp-list '("^~/Google Drive/Notes/" "[¿]"))
+  (add-to-list 'sml/replacer-regexp-list '("^~/Google/Notes/" "[¿]"))
+  (add-to-list 'sml/replacer-regexp-list '("^~/Notes/" "[¿]"))
+
+  (add-to-list 'sml/replacer-regexp-list '("^~/Other/dot-files/" "[¿]"))
+  (add-to-list 'sml/replacer-regexp-list '("^~/Work/dot-files/" "[¿]"))
+
+  ;; Shorten a couple of well-known directories ... these need to be first:
+  ;; (add-to-list 'sml/replacer-regexp-list '("^~/Google Drive/" "¿:") t)
+  ;; (add-to-list 'sml/replacer-regexp-list '("^~/Google/" "¿:") t)
+  ;; (add-to-list 'sml/replacer-regexp-list '("^~/google/" "¿:") t)
+  ;; (add-to-list 'sml/replacer-regexp-list '("^~/Dropbox/" "¿:") t)
+  ;; (add-to-list 'sml/replacer-regexp-list '("^~/Work/" "¿:") t)
+  ;; (add-to-list 'sml/replacer-regexp-list '("^~/Workspace/" "¿:"))
+
+  (sml/apply-theme 'dark)
+
+  ;; Since I almost always use Git, let's shorten its display:
+  (setcdr (assq 'vc-mode mode-line-format)
+    '((:eval (replace-regexp-in-string "^ Git" "\xe0a0" vc-mode)))))
+
+  (require 'smex) ; Not needed if you use package.el
+  (smex-initialize) ; Can be omitted. This might cause a (minimal) delay
+                    ; when Smex is auto-initialized on its first run.
+
+                      (global-set-key (kbd "M-x") 'smex)
+  (global-set-key (kbd "M-X") 'smex-major-mode-commands)
+  ;; This is your old M-x.
+  (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
+;smex-show-unbound-commands
+
+;comment-region
+;menu-bar
 
 

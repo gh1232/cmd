@@ -3,6 +3,7 @@ set nocompatible
 syntax on
 let mapleader = "\\"
 "let g:mapleader=\
+set confirm
 set tabstop=1
 set expandtab
 set shiftwidth=2

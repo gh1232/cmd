@@ -1,7 +1,9 @@
+set nocompatible
 :set guioptions=+M
 syntax on
 let mapleader = "\\"
 "let g:mapleader=\
+set confirm
 set tabstop=1
 set expandtab
 set shiftwidth=2
@@ -30,10 +32,10 @@ inoremap <c-t> <esc>gg
 
 nnoremap <c-b> G
 inoremap <c-b> <esc>G
-inoremap <c-q> <esc>:q<cr>
-nnoremap <c-q> <esc>:q<cr>
-nnoremap <c-w> <esc>:wq<cr> 
-inoremap <c-w> <esc>:wq<cr> 
+inoremap <f5>q <esc>:q<cr>
+nnoremap <f5>q <esc>:q<cr>
+nnoremap <f5>w <esc>:wq<cr> 
+inoremap <f5>w <esc>:wq<cr> 
 "inoremap <c-w> <esc>d
 nnoremap <c-l> dd
 inoremap <c-l> <esc>dd
