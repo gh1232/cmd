@@ -1,5 +1,13 @@
 set nocompatible
 :set guioptions=+M
+"enable mouse support
+
+
+" check file change every 4 seconds ('CursorHold') and reload the buffer upon detecting change
+"set autoread
+"au CursorHold * checktime  
+
+set mouse=a
 syntax on
 let mapleader = "\\"
 "let g:mapleader=\
@@ -25,6 +33,10 @@ filetype plugin indent on
 hi Normal guifg=White guibg=Black
 set titlestring=%F_%l/%L
 au GUIEnter * simalt ~x
+
+
+execute pathogen#infect()
+
 nnoremap <space> <c-f> 
 set hlsearch
 nnoremap <c-t> gg
@@ -106,6 +118,7 @@ noremap <leader>ve :edit I:\upl\vimkeys.vim <cr>G
 nnoremap <leader>Cw :hi Normal guifg=White guibg=Black <cr>
 nnoremap <leader>Cb :hi Normal guifg=Black guibg=White <cr>
 
+nnoremap <leader>xn :NERDTree<cr>
 nnoremap <leader>nt :set number!<cr>
 nnoremap <leader>wh :sp<cr>
 nnoremap <leader>wv :vsp<cr>
@@ -113,3 +126,15 @@ nnoremap <silent> <Leader>bc :bclose<CR>
 nnoremap <silent> <Leader>bn :bnext<CR>
 nnoremap <leader>on :NERDTreeToggle<CR>
 nnoremap <silent> <Leader>ot :TagbarToggle<CR>
+
+syntax on
+filetype plugin indent on
+let g:ycm_rust_src_path="/home/user/Developer/rust-master/src/"
+"autocmd VimEnter * NERDTree
+"autocmd BufEnter * NERDTreeMirror
+
+"CTRL-t to toggle tree view with CTRL-t
+nmap <silent> <leader>on :NERDTreeToggle<CR>
+"Set F2 to put the cursor to the nerdtree
+nmap <silent> <leader>xf :NERDTreeFind<CR>
+

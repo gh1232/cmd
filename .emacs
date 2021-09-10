@@ -203,7 +203,7 @@ With prefix ARG, silently save all file-visiting buffers, then kill."
 
 ;; Display possible completions at all places
 ;; Enhance M-x to allow easier execution of commands
-(use-package smex
+'(use-package smex
   :ensure t
   ;; Using counsel-M-x for now. Remove this permanently if counsel-M-x works better.
   :disabled t
@@ -985,8 +985,8 @@ With prefix ARG, silently save all file-visiting buffers, then kill."
 ;(setq cargo-process--command-upgrade "upgrade")
 ;(setq cargo-process--command-audit "audit -f")
  ;(define-key cargo-mode-map (kbd ...) 'cargo-minor-mode-command-map)
-(use-package powerline
-:init (powerline-mode t))
+;(use-package powerline
+;:init (powerline-mode t))
   
 (use-package smart-mode-line
   :ensure nil
@@ -1051,8 +1051,8 @@ With prefix ARG, silently save all file-visiting buffers, then kill."
   (setcdr (assq 'vc-mode mode-line-format)
     '((:eval (replace-regexp-in-string "^ Git" "\xe0a0" vc-mode)))))
 
-  (require 'smex) ; Not needed if you use package.el
-  (smex-initialize) ; Can be omitted. This might cause a (minimal) delay
+ '(require 'smex) ; Not needed if you use package.el
+  '(smex-initialize) ; Can be omitted. This might cause a (minimal) delay
                     ; when Smex is auto-initialized on its first run.
 
                       (global-set-key (kbd "M-x") 'smex)

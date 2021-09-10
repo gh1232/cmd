@@ -1,5 +1,5 @@
 " Vim with all enhancements
-source $VIMRUNTIME/vimrc_example.vim
+"source $VIMRUNTIME/vimrc_example.vim
 
 " Remap a few keys for Windows behavior
 source $VIMRUNTIME/mswin.vim
