@@ -1,6 +1,31 @@
 set nocompatible
 :set guioptions=+M
 "enable mouse support
+nnoremap <silent> <leader> :WhichKey '\'<CR>
+set visualbell
+"  set_color $fish_color_cwd
+"colorscheme desert
+"set t_Co=256
+":highlight Comment ctermfg=green
+":hi Comment guifg=#ABCDEF
+":set background=dark
+"hi Comment ctermbg=gray ctermfg=darkblue
+
+":%!python -c "import json, sys, collections; print json.dumps(json.load(sys.stdin, objectpairshook=collections.OrderedDict), indent=4)"
+
+":%!python -c "import json, sys, collections; print json.dumps(json.load(sys.stdin, object_pairs_hook=collections.OrderedDict), indent=4)"
+
+"gg=G
+
+"cat $FILE | python -c "import json, sys; print json.dumps(json.load(sys.stdin), indent=2)" > $FILE.tmp
+
+"nmap =j :%!python -m json.tool<CR>
+
+"com! FormatJSON %!python -m json.tool
+":%!python -m json.tool
+
+
+
 
 
 " check file change every 4 seconds ('CursorHold') and reload the buffer upon detecting change
@@ -112,7 +137,7 @@ set splitbelow
 set encoding=utf-8
 "set fileencodings=iso-2022-jp,euc-jp,sjis,utf-8
 set fileformats=dos,unix,mac
-set timeoutlen=5000
+set timeoutlen=1100
 noremap <leader>ve :edit I:\upl\vimkeys.vim <cr>G
 
 nnoremap <leader>Cw :hi Normal guifg=White guibg=Black <cr>
