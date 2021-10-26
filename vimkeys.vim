@@ -162,4 +162,5 @@ let g:ycm_rust_src_path="/home/user/Developer/rust-master/src/"
 nmap <silent> <leader>on :NERDTreeToggle<CR>
 "Set F2 to put the cursor to the nerdtree
 nmap <silent> <leader>xf :NERDTreeFind<CR>
+"so ~/cmd/vimplug-plugins.vim
 
