@@ -1,3 +1,7 @@
+;(set-default-font "Lucinda 24")
+(set-face-attribute 'default nil :height 300)
+;(custom-set-faces
+; '(default ((t (:family "Courier New" :foundry "outline" :slant normal :weight normal :height 203 :width normal)))))
 (setq visible-bell t)
 (setq gnutls-algorithm-priority "NORMAL:-VERS-TLS1.3")
 (require 'package)
@@ -12,8 +16,6 @@
   (unless (package-installed-p 'use-package)
   (package-refresh-contents)
   (package-install 'use-package))
-;(set-default-font "Lucinda 24")
-(set-face-attribute 'default nil :height 300)
 
 ;(add-to-list 'load-path "~/.emacs.d/evil")
 (custom-set-variables
@@ -30,13 +32,11 @@
     (powerline cargo racer eglot mu4e-views phps-mode slime govc go helm company-php imenu-anywhere ecb smex auto-complete company spacemacs-theme evil)))
  '(tool-bar-mode nil))
 
-;(custom-set-faces
-; '(default ((t (:family "Courier New" :foundry "outline" :slant normal :weight normal :height 203 :width normal)))))
 
  (defun mynew-scratch ()
     (interactive)
     (switch-to-buffer (get-buffer-create "*scratch6*")))
-(global-set-key (kbd "C-n") 'mynew-scratch)
+;(global-set-key (kbd "C-n") 'mynew-scratch)
 
 (defun lunaryorn-new-buffer-frame ()
   "Create a new frame with a new empty buffer."
@@ -169,8 +169,8 @@ With prefix ARG, silently save all file-visiting buffers, then kill."
 ;(load-file "~/.emacs.d/emacskeys.el")
 
 ;(load-file "~/.emacs.d/elpa/which-key/which-key.el")
-
-  (use-package which-key
+?
+(use-package which-key
    :ensure t
    :demand t
    :config 
@@ -261,7 +261,6 @@ With prefix ARG, silently save all file-visiting buffers, then kill."
   )
 
   (use-package try :ensure t)
-(use-package which-key :ensure t :config (which-key-mode))
 
 
 
@@ -289,15 +288,20 @@ With prefix ARG, silently save all file-visiting buffers, then kill."
  ;; If there is more than one, they won't work right.
  '(hi-blue-b ((t (:foreground "yellow" :weight bold)))))
 
-(use-package evil
+'(use-package evil
 
  :config (evil-mode 1))
 ;(load-file "./cmd/fkey.el")
 ;(load-file "./cmd/f5key.el")
 
+(add-to-list 'load-path "~/.emacs.d/elpa/xah-fly-keys/")
+(require 'xah-fly-keys)
+(xah-fly-keys-set-layout "qwerty") ; required
+;; possible layout values: azerty, azerty-be, colemak, colemak-mod-dh, dvorak, programer-dvorak, qwerty, qwerty-abnt, qwerty-no (qwerty Norwegian), qwertz, workman, norman,
 
 (global-set-key (kbd "<f5>") nil)
 (global-set-key (kbd "<f5>1") 'save-buffers-kill-terminal)
+(global-set-key (kbd "<f5>qq") 'my-kill-emacs)
 (global-set-key (kbd "<f5>2") 'save-buffer)
 (global-set-key (kbd "<f5><f5>") 'other-window)
 (global-set-key (kbd "<f5>3") '(find-file "c:\\cmd\\.emacs"))
@@ -626,6 +630,8 @@ With prefix ARG, silently save all file-visiting buffers, then kill."
 ;(global-set-key (kbd "<f5>") 'facemenu-set-face)
 ;(global-set-key (kbd "<f5>") 'facemenu-set-underline)
 
+(global-set-key (kbd "<f5>xe") '(lambda (x) (evil-mode 1)))
+(global-set-key (kbd "<f5>xx") '(lambda (x) (xah-fly-keys 1)))
 ;(global-set-key (kbd "<f5>") 'move-to-column)
 (global-set-key (kbd "<f5>gc") 'goto-char)
 (global-set-key (kbd "<f5>gl") 'goto-line)

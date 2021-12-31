@@ -1,6 +1,8 @@
 set nocompatible
 :set guioptions=+M
 "enable mouse support
+
+set timeoutlen=400
 nnoremap <silent> <leader> :WhichKey '\'<CR>
 set visualbell
 "  set_color $fish_color_cwd
@@ -67,6 +69,7 @@ set hlsearch
 nnoremap <c-t> gg
 inoremap <c-t> <esc>gg
 
+nnoremap q <esc>:q<cr>
 nnoremap <c-b> G
 inoremap <c-b> <esc>G
 inoremap <f5>q <esc>:q<cr>
@@ -137,7 +140,6 @@ set splitbelow
 set encoding=utf-8
 "set fileencodings=iso-2022-jp,euc-jp,sjis,utf-8
 set fileformats=dos,unix,mac
-set timeoutlen=1100
 noremap <leader>ve :edit I:\upl\vimkeys.vim <cr>G
 
 nnoremap <leader>Cw :hi Normal guifg=White guibg=Black <cr>
