@@ -1,0 +1,33 @@
+saa
+ve-buffers-kill-emacs 
+  save-buffer 
+   delete-char 
+    kill-word 
+     kill-line 
+      undo
+       next-line 
+        previous-line 
+         scroll-up 
+          scroll-down 
+           beginning-of-line 
+            end-of-line 
+             forward-char 
+              backward-char 
+               forward-word 
+                backward-word 
+                 beginning-of-buffer 
+                  end-of-buffer 
+                   goto-line 
+                    isearch-foward 
+                     isearch-backward 
+                      query-replace 
+                       set-mark-command 
+                        command-yank 
+                         kill-region 
+                          find-file 
+                           switch-to-buffer 
+                            split-window-vertically 
+                             delete-other-windows 
+                              other-window 
+query-replace-regexp
+
