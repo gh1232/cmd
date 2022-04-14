@@ -1,0 +1,1744 @@
+
+  UNIX SHELL Quote Tutorial <#toc_UNIX_SHELL_Quote_Tutorial>
+
+Home <https://www.grymoire.com/index.html>
+Unix/Linux ▼ Index <https://www.grymoire.com/Unix/index.html> Quotes
+<https://www.grymoire.com/Unix/Quote.html> Bourne Shell
+<https://www.grymoire.com/Unix/Bourne.html> POSIX Shell
+<https://www.grymoire.com/Unix/Sh.html> C Shell
+<https://www.grymoire.com/Unix/Csh.html> File Permissions
+<https://www.grymoire.com/Unix/Permissions.html> Regular Expressions
+<https://www.grymoire.com/Unix/Regular.html> grep
+<https://www.grymoire.com/Unix/Grep.html> awk
+<https://www.grymoire.com/Unix/Awk.html> sed
+<https://www.grymoire.com/Unix/Sed.html> find
+<https://www.grymoire.com/Unix/Find.html> tar
+<https://www.grymoire.com/Unix/Tar.html> make
+<https://www.grymoire.com/Unix/Make.html> inodes
+<https://www.grymoire.com/Unix/Inodes.html>
+Security ▼ Index <https://www.grymoire.com/Security/index.html> IPv6
+<https://www.grymoire.com/Security/IPv6.html> Wireless
+<https://www.grymoire.com/Security/Wireless.html> Hardware
+<https://www.grymoire.com/Security/Hardware.html>
+Misc ▼ Index <https://www.grymoire.com/index.html> spam
+<https://www.grymoire.com/Spam/index.html> Deception
+<https://www.grymoire.com/Deception/index.html> PostScript Halftones
+<https://www.grymoire.com/Postscript/Halftones.html> Bill of Rights
+<https://www.grymoire.com/Privacy/BillOfRights.html>
+References ▼ Index <https://www.grymoire.com/References.html> Top 10
+reasons to avoid CSH <https://www.grymoire.com/Unix/CshTop10.txt> sed
+Chart <https://www.grymoire.com/Unix/SedChart.pdf> awk Reference
+<https://www.grymoire.com/Unix/AwkRef.html>
+Magic <https://www.grymoire.com/magic.html> Search
+<https://www.grymoire.com/Search.html> About
+<https://www.grymoire.com/About.html> Donate
+<https://www.grymoire.com/Unix/donate.html> ☰ <javascript:void(0);>
+
+Last modified: Fri Nov 27 09:44:59 2020
+
+
+    Written by Bruce Barnett <#toc_Written_by_Bruce_Barnett>
+
+
+      Table of Contents <#toc_Table_of_Contents>
+
+  * Using the echo command <#uh-00>
+  * Quoting a single character with the backslash <#uh-0>
+  * Strong Quoting with the Single Quotes <#uh-1>
+  * Weak Quotes with the Double Quotes <#uh-2>
+  * Using quotes to include spaces and characters in filenames <#uh-3>
+  * Quotes within Quotes <#uh-4>
+  * Finding out if your quotes are wrong <#uh-5>
+  * The verbose and echo variables in the C shell <#uh-6>
+  * The Bourne Shell variables <#uh-7>
+  * Including identical quotes within quotes <#uh-8>
+  * Quoting long lines <#uh-9>
+  * HERE IS documents <#uh-10>
+  * When to quote? <#uh-11> 
+
+This is part of my Unix tutorials <https://www.grymoire.com/Unix> series.
+
+First thing you have to understand is that certain characters, called
+meta-characters, have special meanings. The actual meaning depends on
+the program that sees this meta-character. Some characters are special
+to the Unix shell, and some are special to a utility like /sed/ or /grep/.
+
+Before you study regular expressions, it is *important* that you
+understand how to use the shell to send regular expressions to a
+program. Or to put it another way, you want to say "Hey Shell. Ignore
+these meta-characters. I want the utility to treat them special, not
+you!" The mechanism to do this is called quoting. In other works, you
+put quotes around the meta-characters to inticate to the shell that they
+are not special - as far as the shell is concerned. When you quote a
+character, you ask the shell to leave it alone - and pass it on
+unchanged to the utility.
+
+The "$" character is a good example. It could be the beginning of a
+variable name, or it could be part of a regular expression. If you need
+a regular expression, you must know if any of the characters of the
+expression are meta-characters, and must know the right way to quote
+that character, so that it is passed to the program without being
+modified by the shell.
+
+I wrote this tutorial in a shell-agnostic manner. That is, what I
+describe here holds for all of the major varieties of shells, including
+the dreaded C shell. In other words, it *doesn't matter which shell you
+use - because they all understand the three methods of quoting/escaping
+meta-characters* - more or less. There are some tricky bits, but I will
+mention them later when I cover the different shells.
+
+Here is a chart of the meta-characters the Bourne and C shell know
+about. I have also included several combinations of characters just to
+make this table more complete. There is a lot of detail on this chart,
+and it's far from complete. Frankly, skip over this for now. I just
+wanted you to realize this stuff can be complicated. And if aren't sure
+if something is a special character or not, it's a good idea to use
+quotes just in case.
+
+    List of Special Characters and what they mean
+
+Character 	Where 	Meaning
+<RETURN> 	csh, sh 	Execute command
+# 	csh, sh, ASCII files 	Start a comment
+<SPACE> 	csh, sh 	Argument separator
+` 	csh, sh 	Command substitution
+" 	csh, sh 	Weak Quotes
+' 	csh, sh 	Strong Quotes
+\ 	csh, sh 	Single Character Quote
+/variable/ 	sh, csh 	Variable
+/variable/ 	csh, sh 	Same as /variable/
+| 	csh, sh 	Pipe character
+^ 	sh 	Pipe Character
+& 	csh, sh 	Run program in background
+? 	csh, sh 	Match one character
+* 	csh, sh 	Match any number of characters
+; 	csh, sh 	Command separator
+;; 	sh 	End of Case statement
+~ 	csh 	Home Directory
+~/user/ 	csh 	/User/'s Home Directory
+! 	csh 	History of Commands
+- 	Programs 	Start of optional argument
+$# 	csh, sh 	Number of arguments to script
+$* 	csh, sh 	Arguments to script
+$@ 	sh 	Original arguments to script
+$- 	sh 	Flags passed to shell
+$? 	sh 	Status of previous command
+$$ 	sh 	Process identification number
+$! 	sh 	PID of last background job
+&& 	sh 	Short-circuit AND
+|| 	sh 	Short-circuit OR
+. 	csh, sh 	Typ. filename extension
+. 	sh 	Source a file and execute as command
+: 	sh 	Nothing command
+: 	sh 	Separates Values in environment variables
+: 	csh 	Variable modifier
+Character 	Where 	Meaning
+[ ] 	csh, sh 	Match range of characters
+[ ] 	sh 	Test
+%/job/ 	csh 	Identifies job Number
+(/cmd;cmd/) 	csh. sh 	Runs /cmd;cmd/ as a sub-shell
+{ } 	csh 	In-line expansions
+{/cmd;cmd/ } 	sh 	Like (/cmd;cmd/ ) without a subshell
+>/ofile/ 	csh, sh 	Standard output
+>>/ofile/ 	csh, sh 	Append to standard output
+</ifile/ 	csh, sh 	Standard Input
+<</word/ 	csh, sh 	Read until /word/, substitute variables
+<<\/word/ 	csh, sh 	Read until /word/, no substitution
+<<-/word/ 	sh 	Read until /word/, ignoring TABS
+>>!/file/ 	csh 	Append to file, ignore error if not there
+>!/file/ 	csh 	Output to new file, ignore error if not there
+>&/file/ 	csh 	Send standard & error output to /file/
+<&/digit/ 	sh 	Switch Standard Input to file
+<&- 	sh 	Close Standard Input
+>&/digit/ 	sh 	Switch Standard Output to file
+>&- 	sh 	Close Standard Output
+/digit1/<&digit2 	sh 	Connect /digit2/ to digit1
+/digit/<&- 	sh 	Close file /digit/
+/digit2/>&digit1 	sh 	Connect /digit2/ to digit1
+/digit/>&- 	sh 	Close file /digit/
+
+I am not going to cover each one of these special meta-characters.
+
+What is important is a solid understanding of the characters that have
+these special meanings. I will also discuss how you can verify the shell
+is interpreting the special characters, so you can pinpoint where your
+problem lies.
+
+There are three different "quotation" marks on the keyboard.. Two of
+them use marks used for quotations in English usage, and are sometimes
+called the single quote and double quote.. The third quotation mark is
+the back quote (more properly called backtick or grave) character: "`".
+It looks like the single quote and some times people get them confused
+in shell scripts. The first two are used for quoting phrases in Unix.
+The back quote is *not* used for quoting characters. That character is
+used for command substitution, where the characters between them are
+executed by the shell and the results is inserted on that line. Example:
+
+|% *echo the date is `date`*
+|
+
+While I'm here, I'll breifly mention that newer POSIX shells denegrate
+the backticks cor command substitution, and now use this form:
+
+|% *echo the date is $(date)*
+|
+
+I cover this in this section. <https://www.grymoire.com/Unix/Sh.html#uh-8a>
+
+Let's get back to the Unix quoting mechanisms.
+
+
+    Using the echo command <#toc-uh-00>
+
+The first thing to learn is the "echo" command built into the Unix
+shell. If you want to understand how the shell interprets
+meta-characters, put an "echo" in front of the command. For instance, to
+understand what happens when you type
+
+|% *ls **
+|
+
+I sugguest you first type
+
+|% *echo ls **
+|
+
+The shell sees the "*" character, which it considers to be special, and
+it changes "*" to match the filed in the current directory, and then it
+calls the "ls" comand with those arguments. The "ls" command never sees
+the "*" character. Suppose you had a file in your directory that had a
+"*" in the filename? How could you list, or remove, just that file? You
+have to quote the "*" to get it past the shell.
+
+The three quoting mechanisms you can use are the single quote, and
+double quote, and the backslash.
+
+
+    Quoting a single character with the backslash <#toc-uh-0>
+
+You can prevent the shell from interpreting a character by placing a
+backslash ("\") in front of it. You can list the file using this command:
+
+|ls *\**
+|
+
+And here's a shell script that can delete any files that contain an
+asterisk:
+
+|echo This script removes all files that 
+echo contain an asterisk in the name.
+echo
+echo Are you sure you want to remove these files\?
+rm -i *\**
+
+|
+
+The backslash was also necessary before the question mark, which is also
+a shell meta-character. Without it, the shell would look for all files
+that match the pattern "files?." If you had the files "files1" and
+"files2" the script would print out
+
+|Are you sure you want to remove these files1 files2
+
+
+|
+
+which is not what you want. This is another example where's it's better
+to use quotes when in doubt. I don't always do this in my examples,
+because it's important to understand the the inner workings. And
+sometimes I use bad examples as part of this tutorial to emphasize the
+details.
+
+The backslash is the "strongest" method of quotation. It works when
+every other method fails. If you want to place text on two or more lines
+for readability, but the program expects one line, you need a line
+continuation character. Just use the backslash as the last character on
+the line:
+
+|% *echo This could be \
+a very \
+long line\!*
+This could be a very long line!
+%
+
+|
+
+This /escapes/ or quotes the end of line character, so it no longer has
+a special meaning. In the above example, I also put a backslash before
+the exclamation point. This is necessary if you are using the C shell,
+which treats the "!" as a special character. If you are using some other
+shell, it might not be necessary.
+
+
+    Strong Quoting with the Single Quotes <#toc-uh-1>
+
+When you need to quote several character at once, you *could* use
+several backslashes:
+
+|% *echo a\ \ \ \ \ \ \ b*
+
+|
+
+(There are 7 spaces between 'a' and 'b'.) This is ugly but works. It is
+easier to use pairs of quotation marks to indicate the start and end of
+the characters to be quoted:
+
+|% *echo 'a       b'*
+
+|
+
+Inside the single quotes, you can include almost all meta-characters:
+
+|% *echo 'What the *heck* is a $ doing here???'*
+What the *heck* is a $ doing here???
+
+|
+
+The above example uses asterisks, dollar signs, and question marks
+meta-characters. The single quotes should be used when you want the text
+left alone. /Note - If you are using the C shell, the "!" character may
+need a backslash before it. It depends on the characters next to it. If
+it is surrounded by spaces, you don't need to use a backslash./
+
+
+    Weak Quotes with the Double Quotes <#toc-uh-2>
+
+Sometimes you want a weaker type of quoting: one that doesn't expand
+meta-characters like "*" or "?," but does expand variables and does
+command substitution. This can be done with the double quote characters:
+
+|% *echo "Is your home directory $HOME?"*
+Is your home directory /home/barnett?
+% *echo "Your current directory is `pwd`"*
+Your current directory is /home/barnett
+# This next example won't work in the C shell and Bourne shell
+% *echo "Your current directory is $(pwd)"*
+Your current directory is /home/barnett
+
+|
+
+Once you learn the difference between single quotes and double quotes,
+you will have mastered a very useful skill. It's not hard. The single
+quotes are stronger than the double quotes. Got it? Okay. And the
+backslash is the strongest of all.
+
+
+    Using quotes to include spaces and characters in filenames <#toc-uh-3>
+
+If you want to work with files with spaces or special characters in the
+filename, you may have to use quotes. For instance, if you wanted to
+create a file with a space in the name, you could use the following:
+
+|% *cp /dev/null 'a file with spaces in the name'*
+
+|
+
+Normally, the shell uses spaces to determine the end of each argument.
+Quoting changes that, and the above example only has two arguments. You
+can also use a backslash before the character. The example below will
+rename a file with a space in the name, changing the space to an
+underscore:
+
+|% *mv a\ file a_file*
+
+|
+
+Using the same techniques, you can deal with any character in a filename:
+
+|% *mv a 'a?'*
+
+|
+
+At worst, a space in a file makes it difficult to use as an argument.
+Other characters are very dangerous to use in a filename.
+
+One example is a filename with a hyphen as the first character. If you
+had a file whose name is "-i" and you wanted to remove it, the command
+
+|% *rm "-i"*
+
+|
+
+
+will not work because the "rm" command interprets "-" to be a
+meta-character - and assumes the argument is an option. The work-around
+is to realize a Unix path can be used, and that "." is the path of the
+current directory. Therefore the solution is to type:
+
+|% *rm "./-i"*
+
+|
+
+Other problems occur when "?" and "*" are in a filename. If you want to
+delete the file "a?" you may end up deleting more than the single file.
+I highly recomment you get in the habit of using "echo" as a way to
+check what is going to happen with the meta-characters.
+
+
+    Quotes within Quotes <#toc-uh-4>
+
+While having two types of quotes (three if you count the backslash)
+might seem confusing, in reality it provides you with several ways to
+solve the same problems. You can put either quotes inside the other. If
+you want to quote single quotes, use double quotes around it. To quote
+double quotes, use single quotes. Heck, it's easier to show you:
+
+|% *echo "Don't do that"*
+Don't do that
+% *echo 'The quote of the day is: "TGIF"'*
+The quote of the day is: "TGIF"
+%
+
+|
+
+
+    Finding out if your quotes are wrong <#toc-uh-5>
+
+In some cases, you may need to use the backslash when you are not sure.
+In other cases, a backslash will do the wrong thing. How can you find
+out if you are quoting things correctly? The answer: use the shell.
+
+An easy way to check quotes is to add an "echo" before the command so
+you can see what is happening, or change an "ls" command into an "echo"
+command:
+
+|*echo scp gateway:\*.tar.Z .*
+*ssh user@cruncher echo ls \* *
+*ssh user@cruncher echo 'ls *'*
+
+|
+
+If you want to do file redirection on a remote machine, echo isn't
+sufficient. The command
+
+|*ssh user@cruncher echo 'ls * >/tmp/file'*
+
+|
+
+sends the results of the echo to the file when you wanted the command
+echoed to your terminal. You need to nest the quotes:
+
+|*ssh user@cruncher "echo 'ls * >/tmp/file'"*
+*ssh user@cruncher 'echo "ls * >/tmp/file"'*
+*ssh user@cruncher "echo 'cd newdir;ls * >>/tmp/file'"*
+
+|
+
+If you are debugging a shell script, and you want to see what your
+script is doing, you can duplicate one of the important lines in your
+script and insert an "echo" in front of one of the duplicates. Doing
+this one or two times in a script isn't very difficult, but there are
+times when you want to watch every line of your script. In this case,
+just ask the shell to show you want is going on.
+
+
+    The Posix/Bourne Shell variables <#toc-uh-7>
+
+The POSIX and Bourne shells have two variables that, when set, will help
+you follow the convoluted trail of variable and meta-character
+expansion. You can enable variable expansion to POSIX and Bourne shell
+scripts when you execute the script by typing:
+
+|% *sh -v script*
+% *sh -x script*
+
+|
+
+You can also turn this feature on and off inside the script. To turn on
+the verbose flag, use
+
+|*set -v*
+
+|
+
+to turn on the echo variable, use:
+
+|*set -x*
+
+|
+
+If you want to turn these variables off, use a plus instead of a minus:
+
+|*set +x*
+*set +v*
+
+|
+
+
+    The verbose and echo variables in the C shell <#toc-uh-6>
+
+The C shell also has two variables that, when set, will help you follow
+the convoluted trail of variable and meta-character expansion. The command
+
+|*set verbose*
+
+|
+
+will echo every line of your script before the variables have been
+evaluated. The command
+
+|*set echo*
+
+|
+
+will display each line after the variables and meta-characters have been
+substituted. If you wish to turn the variables off, use *unset* instead
+of *set*
+
+A convenient way to turn these variables on the first line of the script
+using the the "-x" option (echo)
+
+|*#!/bin/csh -x*
+
+|
+
+or the "-v" option (verbose):
+
+|*#!/bin/csh -v*
+
+|
+
+In both examples above, the /.cshrc/ file is read at the beginning of
+the script. The "-f" option can skip this file. You can combine all
+three options if you like:
+
+|*#!/bin/csh -fxv*
+
+|
+
+If you want to read in the /.cshrc/ file, and want to trace the values
+of these variables, capitalize the "X" and "V" variables. This turns on
+tracing before the /.cshrc/ file is read:
+
+|*#!/bin/csh -XV*
+
+|
+
+It is not necessary to modify the program if you want to turn on the
+*verbose* or *echo* variables. If this is a script that you do not have
+the permissions to modify, you can set these variables from the command
+line:
+
+|% *csh -x shell_script*
+
+|
+
+
+    Including identical quotes within quotes <#toc-uh-8>
+
+One problem people have is including the same quotes within quotes. Many
+expect the following to work:
+
+|echo "The word for today is \"TGIF\""
+echo 'Don\'t quote me'
+
+|
+
+The first example works with the Bourne shell, but not the C shell. The
+second example doesn't work for either of them. I bet many of you
+programmers are confused by this. I was. Normally, we describe a string
+with a "start of the string" at the beginning, and an
+"end-of-the-string" at the end. Between these two is the string. Simple.
+And when you are dealing with the shell, this is sort-of correct. Unlike
+most programming languages, quotes turn substitution on and off. They
+are not used to indicate the starting and ending of a string. Consider
+the following set of quotes:
+
+|echo 'a'b'c'
+
+|
+
+This is broken up into three units. The first and last are quoted, and
+the middle is not. After quoting and substitution occurs, the three
+units are combined. The middle part is not quoted (i.e it is allows to
+be treated as meta-characters), and can be a variable, for instance, we
+can change "b" to be "$HOME":
+
+|echo 'a'$HOME'b'
+
+|
+
+This technique is a typical way to get a shell variable into an /awk/
+script. Here is a simple shell script that demonstrates this. Please
+study this, as it is important:
+
+|
+#!/bin/sh
+# this is a shell script that acts like a filter,
+# but in only prints out one column.
+# the value of the column is the argument 
+# to the script
+#
+# uncomment the next line to see how this works
+#set -x
+#
+# example:
+#       printcol 1
+#       printcol 3
+# the value of the argument is $1
+# Here comes the tricky part -
+awk '{print $'$1'}'
+# I told you!
+
+|
+
+In this example, the shell breaks up the argument to awk into three
+pieces: pieces:
+
+{print $ 	Quoted
+$1 	Evaluated
+} 	Quoted
+
+You can uncomment the command "set -x" and try the script with the command
+
+|printcol 2 </etc/hosts
+
+|
+
+The argument to the shell script is 2, so "$1" is evaluated and returns
+the value "2." This makes the argument to awk the string "print {$2}"
+and the second column is printed out.
+
+Note that this technique works for any shell using either one of the
+quotes.
+
+You must understand this when you want to have quotes within quotes. In
+fact, you don't want to put quotes within quotes, you want to combine or
+concatenate several units into one argument.
+
+Let me rephrase that. If you want to include a single quote in an
+argument that starts with a single quote, you must turn off the
+mechanism started by the single quote, and use a different quoting
+method. Remember, the backslash is the strongest of all quoting
+mechanisms. You can quote anything with the backslash. This example
+quotes all three quote characters:
+
+|
+% *echo \'\"\\*
+|
+
+Where the results are
+
+|
+'"\
+|
+
+You can always use the backslash to quote a character. However, within
+the single quote mechanism, "\'" does not "quote the quote." The proper
+way to do this is as follows:
+
+|% *echo 'Don'   \'   't do that'*
+Don ' t do that
+
+|
+
+I put in a few extra spaces, so you could follow what was happening.
+Here it is again without the extra spaces:
+
+|% *echo 'Don'\''t do that'*
+Don't do that
+
+|
+
+Just remember to match the quotes together when you mentally parse a
+shell script. This also works with double quotes:
+
+|% *echo "The quote for today is "\"TGIF\"*
+The quote for today is "TGIF"
+
+|
+
+Or, if you want to put quotes around "TGIF:"
+
+|% *echo "The quote for today is "\""TGIF"\"*
+The quote for today is "TGIF"
+
+|
+
+
+    Quoting long lines <#toc-uh-9>
+
+Most Unix programs also use the backslash to escape a special
+characters. It is common for a Unix utility to interpret a backslash on
+the end of a line as a line continuation character--that is, the end of
+line character is quoted or escaped so the standard meaning is prevented.
+
+The Bourne shell and C shell behave differently when you are quoting
+lines that continue beyond the end of line marker. The C shell will not
+extend a quote beyond the line unless the last character is a backslash:
+
+|
+% *echo "A quote \
+on two lines"*
+A quote 
+on two lines
+|
+
+The Bourne shell does allow quotes to extend beyond lines:
+
+|$ *echo "A quote*
+> *on two lines"*
+A quote
+on two lines
+
+|
+
+Notice how the Bourne shell prompts you with a ">" when the quote is not
+closed. You can argue among yourselves which behavior is correct. I can
+understand the rational behind the C shell's reason for disallowing
+multi-line quoting by default. The earlier example:
+
+|echo 'Don\'t do that'
+
+|
+
+will generate an error if you use the C shell. However, if you use the
+Bourne shell, you will be given a ">" prompt and this will continue
+until you type in a single quote. This can be confusing for new Unix users.
+
+I find the Bourne shell easier to use when I write multi-line quotes
+which are /awk/ scripts:
+
+#!/bin/sh -x
+#This script counts how many people
+# are in the group specified as the first argument
+grp=${1:?"Missing argument"}	# get group ID number
+# If missing, report an error and exit.
+awk -F: '
+# Awk script starts here
+BEGIN {
+	# set total to zero 
+	#   before we start
+	total=0;	
+}
+$3 ~ /^'$grp'$/ {total++;} 
+END {
+	# end of file, print total
+	printf("Total: %d\n", total);
+}' </etc/passwd
+
+This example uses the "$grp" shell variable right in the middle of the
+*awk* script. This is a common method of passing shell variables into
+the middle of an /awk/ script. Some people prefer to use other
+mechanisms to use dynamic variables inside a string. For instance, awk
+provides another mechanism
+<https://www.grymoire.com/Unix/Awk.html#toc-uh-4> but I encourage you to
+understand this technique because it works with other utilities.
+
+
+    HERE IS documents <#toc-uh-10>
+
+There is another type of quote the shells support. There are called
+*Here is* documents. There are used when you need to read something from
+standard input, but you don't want to create a file to provide that
+input. You can use this as another way to have dynamic variables inside
+a shell script. There are also used to create files in a shell script. A
+HERE IS document can be created by the "<<" character, followed by a
+special word:
+
+|% *sort >file <<EndOfSort
+zygote
+abacus
+EndOfSort*
+
+|
+
+This is very useful because variables are evaluated dynamically during
+this operation. Here is a way to transfer a file using *ftp* from a
+shell script:
+
+|#!/bin/sh
+# Usage:
+#	ftpfile machine file
+# set -x
+SOURCE=$1
+FILE=$2
+BFILE=`basename $FILE`
+ftp -n $SOURCE <<EndFTP
+ascii
+user anonymous $USER@`hostname`
+get $FILE /tmp/$BFILE
+EndFTP
+
+|
+
+As you can see, variables and command substitutions are done. If you
+want the quoted text to be left alone, put a slash in front of the name
+of the word:
+
+|cat >file <<\FunkyStriNG
+
+
+|
+
+Notice the funky string. This is done just in case the text contains the
+word that ends the file. It is very unlikely that I will want to put
+that particular combination of characters in any file. You should be
+warned that the C shell expects the word to be escaped. i.e.
+"\FunkyStriNG" while the Bourne shell does not. It expects to see
+"FunkyStriNG."
+
+
+    When to quote? <#toc-uh-11>
+
+As you can see, this quoting business can cause a lot of confusion. At
+this point, you should know how to get the shell to recognize the exact
+string you want. When I cover regular expressions next month, you will
+be able to follow the quotes without losing your mind.
+
+
+      Thanks <#toc_Thanks>
+
+Thanks to the suggestion from Dai Son Nguyen.
+
+Copyright © 1991 Bruce Barnett and General Electric Company
+
+Copyright © 2001, 2011, 2013,2019 Bruce Barnett All Rights reserved
+
+Original version written in 1991 and published in the Sun Observer
+
+Thanks to Jesse Silverman for corrections, and @mathias
+
+Updated Thu Aug 11 21:37:24 EDT 2011
+
+
+        Thanks <#toc_Thanks_1>
+
+Thanks to Rob Weemhoff for the corrections.
+
+------------------------------------------------------------------------
+
+/This document was translated by troff2html v0.21 on June 28, 2001./
+
+Valid HTML 4.01!
+<https://validator.w3.org/check?uri=http%3A%2F%2Fwww.grymoire.com%2FUnix%2Quote.html>
+
+
+Hide Download Bar
+Ctrl + Shift + Z = Show/Hide Download Bar
+Downloads
+Download Manager (S3)
+Clear
+Left Click: Clear All Finished
+Right Click: Undo last clear
+100%
+Download History
+Download list is empty
+hbash.txt
+Unk.
+Unk.
+136 KB
+455 KB/s
+hbash.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbash.txt
+Status:
+	
+136 KB / Unknown ( 455 KB/s )
+File Size:
+	
+505 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:21:49
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+1.62 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashman.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashman.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashman.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+398 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:23:48
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+863 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hfilesys.txt
+Unk.
+Unk.
+-.--
+-.--
+hfilesys.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hfilesys.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+122 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:51:42
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+192 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdeblic.txt
+Unk.
+Unk.
+-.--
+-.--
+hdeblic.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdeblic.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+40 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:52:06
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+91 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebdev
+Unk.
+Unk.
+96 KB
+963 KB/s
+hdebdev
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebdev
+Status:
+	
+96 KB / Unknown ( 963 KB/s )
+File Size:
+	
+291 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:11
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+3.60 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebmaint
+Unk.
+Unk.
+79 KB
+395 KB/s
+hdebmaint
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebmaint
+Status:
+	
+79 KB / Unknown ( 395 KB/s )
+File Size:
+	
+322 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:31
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+2.02 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebmaintnew
+100%
+00:00
+54 KB
+538 KB/s
+hdebmaintnew
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebmaintnew
+Status:
+	
+54 KB / 54 KB ( 538 KB/s )
+File Size:
+	
+175 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:46
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+1.26 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+debpackaging-tutorial.en.pdf
+100%
+00:00
+388 KB
+3.79 MB/s
+debpackaging-tutorial.en.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\debpackaging-tutorial.en.pdf
+Status:
+	
+388 KB / 388 KB ( 3.79 MB/s )
+File Size:
+	
+388 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:54:09
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+3.91 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebconfig
+100%
+00:00
+6 KB
+60 KB/s
+hdebconfig
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebconfig
+Status:
+	
+6 KB / 8 KB ( 60 KB/s )
+File Size:
+	
+27 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:54:23
+Time to Complete:
+	
+00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+32 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+debhamradio-maintguide.en.pdf
+100%
+00:00
+193 KB
+Infinity GB/s
+debhamradio-maintguide.en.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\debhamradio-maintguide.en.pdf
+Status:
+	
+193 KB / 193 KB ( Infinity GB/s )
+File Size:
+	
+193 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:57:27
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+2.58 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hgoogbashstyle.txt
+Unk.
+Unk.
+-.--
+-.--
+hgoogbashstyle.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hgoogbashstyle.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+44 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:02:34
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+46 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hposixsh.txt
+Unk.
+Unk.
+-.--
+-.--
+hposixsh.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hposixsh.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+177 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:09:12
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+183 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+htextsculpt.txt
+Unk.
+Unk.
+-.--
+-.--
+htextsculpt.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\htextsculpt.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+43 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:10:16
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+47 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hrelalgbash.txt
+Unk.
+Unk.
+-.--
+-.--
+hrelalgbash.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hrelalgbash.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+27 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:11:49
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+25 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashex.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashex.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashex.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+39 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:13:13
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+34 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hperlguide.txt
+Unk.
+Unk.
+-.--
+-.--
+hperlguide.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hperlguide.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+95 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:13:32
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+87 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hmakeref.txt
+Unk.
+Unk.
+-.--
+-.--
+hmakeref.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hmakeref.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+21 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:14:04
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+19 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+New York, NY, USA
+There was a problem connecting to the weather service.
+Reload Weather Data
+Click for hourly forecast.
+Click to expand
+Click to collapse
+New York, NY, USA : 65°F
+Today : 	
+New York, NY, USA
+Today	2/23/2022
+Clearing
+The temperature approaching the record of 72 ...
+	68°F
+Feels like 69°F
+Sunrise:	6:39 AM
+UV Index:	Moderate (3)
+Sunburn: 45 minutes
+Winds:	7 mph
+Precipitation:	0.01 in
+
+Tonight	2/23/2022
+Partly cloudy and much colder
+	31°F
+Feels like 55°F
+Sunset:	5:40 PM
+Winds:	8 mph
+Precipitation:	0 in
+Moon:	21
+
+68°F
+	31°F
+Tomorrow : 	
+New York, NY, USA
+Tomorrow	2/24/2022
+Mostly cloudy and much colder
+	37°F
+Feels like 39°F
+Sunrise:	6:38 AM
+UV Index:	Low (1)
+Winds:	4 mph
+Precipitation:	0 in
+
+Tomorrow Night	2/24/2022
+A wintry mix late, up to 1 in
+Snow and sleet late in the evening followed b...
+	32°F
+Feels like 28°F
+Sunset:	5:41 PM
+Winds:	4 mph
+Precipitation:	0.6 in
+Moon:	22
+
+37°F
+	32°F
+Friday : 	
+New York, NY, USA
+Friday	2/25/2022
+Cloudy with rain tapering off
+	38°F
+Feels like 34°F
+Sunrise:	6:36 AM
+UV Index:	Low (1)
+Winds:	7 mph
+Precipitation:	0.67 in
+
+Friday Night	2/25/2022
+Clear to partly cloudy
+	22°F
+Feels like 23°F
+Sunset:	5:42 PM
+Winds:	7 mph
+Precipitation:	0 in
+Moon:	23
+
+38°F
+	22°F
+Saturday : 	
+New York, NY, USA
+Saturday	2/26/2022
+Mostly sunny and cold
+	34°F
+Feels like 37°F
+Sunrise:	6:35 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	5 mph
+Precipitation:	0 in
+
+Saturday Night	2/26/2022
+Clear
+	28°F
+Feels like 22°F
+Sunset:	5:43 PM
+Winds:	5 mph
+Precipitation:	0 in
+Moon:	24
+
+34°F
+	28°F
+Sunday : 	
+New York, NY, USA
+Sunday	2/27/2022
+Partly sunny
+	42°F
+Feels like 38°F
+Sunrise:	6:33 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	9 mph
+Precipitation:	0 in
+
+Sunday Night	2/27/2022
+Mainly clear and colder
+Mainly clear and colder; hypothermia likely w...
+	20°F
+Feels like 25°F
+Sunset:	5:45 PM
+Winds:	9 mph
+Precipitation:	0 in
+Moon:	25
+
+42°F
+	20°F
+Monday : 	
+New York, NY, USA
+Monday	2/28/2022
+Colder with plenty of sun
+	29°F
+Feels like 23°F
+Sunrise:	6:32 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	9 mph
+Precipitation:	0 in
+
+Monday Night	2/28/2022
+Clear and cold
+	22°F
+Feels like 7°F
+Sunset:	5:46 PM
+Winds:	4 mph
+Precipitation:	0 in
+Moon:	26
+
+29°F
+	22°F
+Tuesday : 	
+New York, NY, USA
+Tuesday	3/1/2022
+Partly sunny and not as cold
+	43°F
+Feels like 46°F
+Sunrise:	6:30 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	5 mph
+Precipitation:	0 in
+
+Tuesday Night	3/1/2022
+Partly cloudy
+	37°F
+Feels like 29°F
+Sunset:	5:47 PM
+Winds:	4 mph
+Precipitation:	0 in
+Moon:	27
+
+43°F
+	37°F
+

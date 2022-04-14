@@ -1,0 +1,2476 @@
+*Skip to main text* <#content>
+Free Software Supporter <https://www.fsf.org/fss>:
+
+JOIN THE FSF <https://www.fsf.org/associate/support_freedom?referrer=4052>
+
+ [A GNU head] *GNU* Operating System <https://www.gnu.org/>
+Supported by the Free Software Foundation <#mission-statement>  [Search
+www.gnu.org]  <https://www.gnu.org/cgi-bin/estseek.cgi>
+Site navigation <#navigation> *Skip* <#content>
+
+  * ABOUT GNU <https://www.gnu.org/gnu/gnu.html>
+  * PHILOSOPHY <https://www.gnu.org/philosophy/philosophy.html>
+  * LICENSES <https://www.gnu.org/licenses/licenses.html>
+  * EDUCATION <https://www.gnu.org/education/education.html>
+  * = SOFTWARE <https://www.gnu.org/software/software.html> =
+  * DISTROS <https://www.gnu.org/distros/distros.html>
+  * DOCS <https://www.gnu.org/doc/doc.html>
+  * MALWARE <https://www.gnu.org/proprietary/proprietary.html>
+  * HELP GNU <https://www.gnu.org/help/help.html>
+  * GNU ART <https://www.gnu.org/graphics/graphics.html>
+  * FUN <https://www.gnu.org/fun/humor.html>
+  * GNU'S WHO? <https://www.gnu.org/people/people.html>
+  * SOFTWARE DIRECTORY <https://directory.fsf.org/>
+  * HARDWARE <https://h-node.org/>
+  * SITEMAP <https://www.gnu.org/server/sitemap.html>
+
+
+    History of GNU Parallel
+
+------------------------------------------------------------------------
+
+GNU *parallel* was originally two tools: *xxargs* and *parallel*.
+
+*xxargs* was a tool that had the most basic features of *xargs* namely
+-0, -n, -x, and {}. In addition it also had -1 which is called
+*--halt-on-error 1* in GNU *parallel*. *xxargs* was developed during
+2002-2005 and was based on work by Cameron Simpson. Cameron sums up the
+reason for developing *xxargs* very well in a posting from 2001-12-20:
+
+    Having pretty much had it with xargs, which is a busted piece of
+    crap due to its quoting/whitespace problems, here is a less featured
+    but more robust one. - Cameron Simpson <cs@zip.com.au>
+
+*parallel* dates back to around the same time. It was originally a
+wrapper that generated a makefile and used *make -j* to do the
+parallelization. The only usage was: *cat commandlines | parallel number*.
+
+The full(!) source code of the very first version of Parallel dated
+2002-01-06:
+
+  #!/usr/bin/perl
+
+  $processes=shift;
+
+  chomp(@jobs=<>);
+  for (@jobs) {
+      $jobnr++;
+      push @makefile,
+      (".PHONY : job$jobnr\n",
+       "job$jobnr :\n",
+       "\t$_\n");
+  }
+  unshift @makefile, "all : ",(map { "job$_ " } 1 .. $jobnr),"\n";
+  
+  open (MAKE, "| make -k -f - -j $processes") || die;
+  print MAKE @makefile;
+  close MAKE;
+
+It did not support grouping of output or running jobs on multiple
+computers, and the most common reason for bugs was quoting the string
+incorrectly in the Makefile. It also stressed *make*'s dependency
+calculation: at this time *make*'s initialization would take O(n^2) time
+on n independant targets, which was a real problem if you had 1000000
+commandlines to run. A later version chopped the commandlines up into
+blocks of 5000 lines to minimize the problem.
+
+In 2005 it occurred to me that I often used *xxargs* and *parallel*
+together and I saw no reason why they could not merge into a single
+tool. The single tool was called *parallel* and the development of
+*xxargs* stopped. At this point both *xxargs* and *parallel* were used
+in production.
+
+GNU *parallel* thus did not have one but two main objectives: replace
+*xargs* and run commands in parallel.
+
+In the years after 2005 I noticed that other people still had problems
+with *xargs*' treatment of quotes and whitespace, so I tried getting
+*parallel* accepted into GNU findutils. It was not accepted as it was
+written in Perl and the team did not want GNU findutils to depend on Perl.
+
+In 2007 unittests were added to *parallel* to make sure old problems
+would not creep back in while developing new features. The hosting was
+moved to git hosted on savannah.nongnu.org.
+
+In February 2009 I tried getting *parallel* added to the package
+moreutils. The author never replied to the email or the two reminders,
+but in June 2009 moreutils chose to add another program called parallel.
+This choice leads to some confusion even today.
+
+In 2010 *parallel* was adopted as an official GNU tool and the name was
+changed to GNU *parallel*. As GNU already had a tool for running jobs on
+remote computers (called *pexec*) it was a hard decision to include GNU
+*parallel* as well. I believe the decision was mostly based on GNU
+*parallel* having a more familiar user interface - behaving very much
+like *xargs*. Shortly after the release as GNU tool remote execution was
+added and all missing options from *xargs* were added to make it
+possible to use GNU *parallel* as a drop in replacement for *xargs*.
+
+Copenhagen, 2010-11-20, Ole Tange, Author of GNU Parallel (Source code
+added 2021-03-06).
+
+------------------------------------------------------------------------
+BACK TO TOP ▲ <#header>
+
+     [FSF logo]  <https://www.fsf.org/>*“The Free Software Foundation
+    (FSF) is a nonprofit with a worldwide mission to promote computer
+    user freedom. We defend the rights of all software users.”*
+
+JOIN <https://www.fsf.org/associate/support_freedom?referrer=4052>
+DONATE <https://donate.fsf.org/> SHOP <https://shop.fsf.org/>
+
+Please send general FSF & GNU inquiries to <gnu@gnu.org>
+<mailto:gnu@gnu.org>. There are also other ways to contact
+<https://www.gnu.org/contact/> the FSF. Broken links and other
+corrections or suggestions can be sent to <bug-parallel@gnu.org>
+<mailto:bug-parallel@gnu.org>.
+
+Please see the Translations README
+<https://www.gnu.org/server/standards/README.translations.html> for
+information on coordinating and contributing translations of this article.
+
+Copyright © 2010 Free Software Foundation, Inc.
+
+This page is licensed under a Creative Commons Attribution-NoDerivatives
+4.0 International License <http://creativecommons.org/licenses/by-nd/4.0/>.
+
+Copyright Infringement Notification <https://www.fsf.org/about/dmca-notice>
+
+Updated: $Date: 2021/03/22 20:52:35 $
+
+Hide Download Bar
+Ctrl + Shift + Z = Show/Hide Download Bar
+Downloads
+Download Manager (S3)
+Clear
+Left Click: Clear All Finished
+Right Click: Undo last clear
+100%
+Download History
+Download list is empty
+hbash.txt
+Unk.
+Unk.
+136 KB
+455 KB/s
+hbash.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbash.txt
+Status:
+	
+136 KB / Unknown ( 455 KB/s )
+File Size:
+	
+505 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:21:49
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+1.62 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashman.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashman.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashman.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+398 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:23:48
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+863 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hfilesys.txt
+Unk.
+Unk.
+-.--
+-.--
+hfilesys.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hfilesys.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+122 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:51:42
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+192 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdeblic.txt
+Unk.
+Unk.
+-.--
+-.--
+hdeblic.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdeblic.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+40 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:52:06
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+91 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebdev
+Unk.
+Unk.
+96 KB
+963 KB/s
+hdebdev
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebdev
+Status:
+	
+96 KB / Unknown ( 963 KB/s )
+File Size:
+	
+291 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:11
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+3.60 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebmaint
+Unk.
+Unk.
+79 KB
+395 KB/s
+hdebmaint
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebmaint
+Status:
+	
+79 KB / Unknown ( 395 KB/s )
+File Size:
+	
+322 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:31
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+2.02 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebmaintnew
+100%
+00:00
+54 KB
+538 KB/s
+hdebmaintnew
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebmaintnew
+Status:
+	
+54 KB / 54 KB ( 538 KB/s )
+File Size:
+	
+175 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:46
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+1.26 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+debpackaging-tutorial.en.pdf
+100%
+00:00
+388 KB
+3.79 MB/s
+debpackaging-tutorial.en.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\debpackaging-tutorial.en.pdf
+Status:
+	
+388 KB / 388 KB ( 3.79 MB/s )
+File Size:
+	
+388 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:54:09
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+3.91 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebconfig
+100%
+00:00
+6 KB
+60 KB/s
+hdebconfig
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebconfig
+Status:
+	
+6 KB / 8 KB ( 60 KB/s )
+File Size:
+	
+27 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:54:23
+Time to Complete:
+	
+00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+32 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+debhamradio-maintguide.en.pdf
+100%
+00:00
+193 KB
+Infinity GB/s
+debhamradio-maintguide.en.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\debhamradio-maintguide.en.pdf
+Status:
+	
+193 KB / 193 KB ( Infinity GB/s )
+File Size:
+	
+193 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:57:27
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+2.58 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hgoogbashstyle.txt
+Unk.
+Unk.
+-.--
+-.--
+hgoogbashstyle.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hgoogbashstyle.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+44 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:02:34
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+46 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hposixsh.txt
+Unk.
+Unk.
+-.--
+-.--
+hposixsh.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hposixsh.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+177 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:09:12
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+183 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+htextsculpt.txt
+Unk.
+Unk.
+-.--
+-.--
+htextsculpt.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\htextsculpt.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+43 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:10:16
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+47 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hrelalgbash.txt
+Unk.
+Unk.
+-.--
+-.--
+hrelalgbash.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hrelalgbash.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+27 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:11:49
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+25 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashex.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashex.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashex.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+39 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:13:13
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+34 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hperlguide.txt
+Unk.
+Unk.
+-.--
+-.--
+hperlguide.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hperlguide.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+95 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:13:32
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+87 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hmakeref.txt
+Unk.
+Unk.
+-.--
+-.--
+hmakeref.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hmakeref.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+21 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:14:04
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+19 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hquotes.txt
+Unk.
+Unk.
+-.--
+-.--
+hquotes.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hquotes.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+39 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:34:14
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+33 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hregex.txt
+Unk.
+Unk.
+-.--
+-.--
+hregex.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hregex.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+38 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:34:28
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+32 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hgrep.txt
+Unk.
+Unk.
+-.--
+-.--
+hgrep.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hgrep.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+25 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:34:45
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+21 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hsed.txt
+Unk.
+Unk.
+-.--
+-.--
+hsed.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hsed.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+135 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:35:00
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+105 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hposixshtut.txt
+Unk.
+Unk.
+-.--
+-.--
+hposixshtut.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hposixshtut.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+183 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:35:20
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+126 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hawk.txt
+Unk.
+Unk.
+-.--
+-.--
+hawk.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hawk.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+141 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:35:32
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+100 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hsh.txt
+Unk.
+Unk.
+-.--
+-.--
+hsh.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hsh.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+165 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:35:48
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+116 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hmake.txt
+Unk.
+Unk.
+-.--
+-.--
+hmake.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hmake.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+58 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:36:11
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+40 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hperm.txt
+Unk.
+Unk.
+-.--
+-.--
+hperm.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hperm.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+47 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:36:25
+Time to Complete:
+	
+00:02
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+29 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hcsh10bad
+100%
+00:00
+11 KB
+53 KB/s
+hcsh10bad
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hcsh10bad
+Status:
+	
+11 KB / 11 KB ( 53 KB/s )
+File Size:
+	
+27 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:36:47
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+134 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+htextman.txt
+Unk.
+Unk.
+-.--
+-.--
+htextman.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\htextman.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+85 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:37:46
+Time to Complete:
+	
+00:02
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+40 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hunixtools.txt
+Unk.
+Unk.
+-.--
+-.--
+hunixtools.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hunixtools.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+187 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:43:20
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+232 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashtips.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashtips.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashtips.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+38 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:45:23
+Time to Complete:
+	
+00:02
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+22 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashpitf.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashpitf.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashpitf.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+109 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:45:40
+Time to Complete:
+	
+00:02
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+59 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashcmdpsh.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashcmdpsh.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashcmdpsh.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+66 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:46:32
+Time to Complete:
+	
+00:02
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+34 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hterml.txt
+Unk.
+Unk.
+-.--
+-.--
+hterml.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hterml.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+48 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:46:50
+Time to Complete:
+	
+00:02
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+25 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashfaq.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashfaq.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashfaq.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+99 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:48:53
+Time to Complete:
+	
+00:02
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+51 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+bashabs-guide.pdf
+100%
+00:00
+1.50 MB
+15.00 MB/s
+bashabs-guide.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\bashabs-guide.pdf
+Status:
+	
+1.50 MB / 2.61 MB ( 15.00 MB/s )
+File Size:
+	
+2.61 MB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 04:00:17
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+26.96 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+zsh_a4.pdf
+100%
+00:00
+1.76 MB
+Infinity GB/s
+zsh_a4.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\zsh_a4.pdf
+Status:
+	
+1.76 MB / 1.76 MB ( Infinity GB/s )
+File Size:
+	
+1.76 MB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 04:44:44
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+-.--
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+htexinfo.txt
+Unk.
+Unk.
+239 KB
+2.33 MB/s
+htexinfo.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\htexinfo.txt
+Status:
+	
+239 KB / Unknown ( 2.33 MB/s )
+File Size:
+	
+873 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 04:48:24
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+9.91 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hinfo-stnd.txt
+100%
+00:00
+28 KB
+280 KB/s
+hinfo-stnd.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hinfo-stnd.txt
+Status:
+	
+28 KB / 28 KB ( 280 KB/s )
+File Size:
+	
+108 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 04:48:45
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+1.25 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hllvmref.txt
+Unk.
+Unk.
+-.--
+-.--
+hllvmref.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hllvmref.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+728 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 05:02:19
+Time to Complete:
+	
+00:03
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+215 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+mit-scheme-ref.pdf
+100%
+00:00
+1.52 MB
+7.59 MB/s
+mit-scheme-ref.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\mit-scheme-ref.pdf
+Status:
+	
+1.52 MB / 1.52 MB ( 7.59 MB/s )
+File Size:
+	
+1.52 MB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 05:02:34
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+9.60 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+parallel.pdf
+100%
+00:00
+465 KB
+Infinity GB/s
+parallel.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\parallel.pdf
+Status:
+	
+465 KB / 465 KB ( Infinity GB/s )
+File Size:
+	
+465 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 05:12:20
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+1.50 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+parallel_cheat.pdf
+100%
+00:03
+288 KB
+720 KB/s
+parallel_cheat.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\parallel_cheat.pdf
+Status:
+	
+288 KB / 2.70 MB ( 720 KB/s )
+File Size:
+	
+2.70 MB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 05:13:48
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:03
+Percent Done:
+	
+100%
+Average Speed:
+	
+6.48 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+sem.pdf
+100%
+00:00
+37 KB
+124 KB/s
+sem.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\sem.pdf
+Status:
+	
+37 KB / 37 KB ( 124 KB/s )
+File Size:
+	
+37 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 05:14:27
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+160 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+parcat.pdf
+100%
+00:00
+25 KB
+255 KB/s
+parcat.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\parcat.pdf
+Status:
+	
+25 KB / 25 KB ( 255 KB/s )
+File Size:
+	
+25 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 05:14:41
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+232 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+parset.pdf
+100%
+00:00
+32 KB
+54 KB/s
+parset.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\parset.pdf
+Status:
+	
+32 KB / 32 KB ( 54 KB/s )
+File Size:
+	
+32 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 05:14:50
+Time to Complete:
+	
+00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+54 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+parsort.pdf
+100%
+--:--
+18 KB
+-.--
+parsort.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\parsort.pdf
+Status:
+	
+18 KB / 18 KB ( -.-- )
+File Size:
+	
+18 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 05:14:58
+Time to Complete:
+	
+00:04
+Time Left:
+	
+--:--
+Percent Done:
+	
+100%
+Average Speed:
+	
+4 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+sql.pdf
+100%
+00:00
+40 KB
+403 KB/s
+sql.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\sql.pdf
+Status:
+	
+40 KB / 40 KB ( 403 KB/s )
+File Size:
+	
+40 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 05:15:09
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+480 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+niceload.pdf
+100%
+00:00
+41 KB
+406 KB/s
+niceload.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\niceload.pdf
+Status:
+	
+41 KB / 41 KB ( 406 KB/s )
+File Size:
+	
+41 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 05:15:19
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+616 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+parallel_design.pdf
+100%
+00:00
+151 KB
+1.47 MB/s
+parallel_design.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\parallel_design.pdf
+Status:
+	
+151 KB / 151 KB ( 1.47 MB/s )
+File Size:
+	
+151 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 05:15:37
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+2.11 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+New York, NY, USA
+There was a problem connecting to the weather service.
+Reload Weather Data
+Click for hourly forecast.
+Click to expand
+Click to collapse
+New York, NY, USA : 65°F
+Today : 	
+New York, NY, USA
+Today	2/23/2022
+Clearing
+The temperature approaching the record of 72 ...
+	68°F
+Feels like 69°F
+Sunrise:	6:39 AM
+UV Index:	Moderate (3)
+Sunburn: 45 minutes
+Winds:	7 mph
+Precipitation:	0.01 in
+
+Tonight	2/23/2022
+Partly cloudy and much colder
+	31°F
+Feels like 55°F
+Sunset:	5:40 PM
+Winds:	8 mph
+Precipitation:	0 in
+Moon:	21
+
+68°F
+	31°F
+Tomorrow : 	
+New York, NY, USA
+Tomorrow	2/24/2022
+Mostly cloudy and much colder
+	37°F
+Feels like 39°F
+Sunrise:	6:38 AM
+UV Index:	Low (1)
+Winds:	4 mph
+Precipitation:	0 in
+
+Tomorrow Night	2/24/2022
+A wintry mix late, up to 1 in
+Snow and sleet late in the evening followed b...
+	32°F
+Feels like 28°F
+Sunset:	5:41 PM
+Winds:	4 mph
+Precipitation:	0.6 in
+Moon:	22
+
+37°F
+	32°F
+Friday : 	
+New York, NY, USA
+Friday	2/25/2022
+Cloudy with rain tapering off
+	38°F
+Feels like 34°F
+Sunrise:	6:36 AM
+UV Index:	Low (1)
+Winds:	7 mph
+Precipitation:	0.67 in
+
+Friday Night	2/25/2022
+Clear to partly cloudy
+	22°F
+Feels like 23°F
+Sunset:	5:42 PM
+Winds:	7 mph
+Precipitation:	0 in
+Moon:	23
+
+38°F
+	22°F
+Saturday : 	
+New York, NY, USA
+Saturday	2/26/2022
+Mostly sunny and cold
+	34°F
+Feels like 37°F
+Sunrise:	6:35 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	5 mph
+Precipitation:	0 in
+
+Saturday Night	2/26/2022
+Clear
+	28°F
+Feels like 22°F
+Sunset:	5:43 PM
+Winds:	5 mph
+Precipitation:	0 in
+Moon:	24
+
+34°F
+	28°F
+Sunday : 	
+New York, NY, USA
+Sunday	2/27/2022
+Partly sunny
+	42°F
+Feels like 38°F
+Sunrise:	6:33 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	9 mph
+Precipitation:	0 in
+
+Sunday Night	2/27/2022
+Mainly clear and colder
+Mainly clear and colder; hypothermia likely w...
+	20°F
+Feels like 25°F
+Sunset:	5:45 PM
+Winds:	9 mph
+Precipitation:	0 in
+Moon:	25
+
+42°F
+	20°F
+Monday : 	
+New York, NY, USA
+Monday	2/28/2022
+Colder with plenty of sun
+	29°F
+Feels like 23°F
+Sunrise:	6:32 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	9 mph
+Precipitation:	0 in
+
+Monday Night	2/28/2022
+Clear and cold
+	22°F
+Feels like 7°F
+Sunset:	5:46 PM
+Winds:	4 mph
+Precipitation:	0 in
+Moon:	26
+
+29°F
+	22°F
+Tuesday : 	
+New York, NY, USA
+Tuesday	3/1/2022
+Partly sunny and not as cold
+	43°F
+Feels like 46°F
+Sunrise:	6:30 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	5 mph
+Precipitation:	0 in
+
+Tuesday Night	3/1/2022
+Partly cloudy
+	37°F
+Feels like 29°F
+Sunset:	5:47 PM
+Winds:	4 mph
+Precipitation:	0 in
+Moon:	27
+
+43°F
+	37°F
+

@@ -1,0 +1,3232 @@
+
+  Hyperpolyglot <https://hyperpolyglot.org/>
+
+Command Line Interpreters: POSIX Shell, Cmd.exe, PowerShell
+
+/a side-by-side reference sheet/
+
+grammar and execution <#grammar-execution> | variables and expression
+<#var-expr> | arithmetic and logic <#arithmetic-logic> | strings
+<#strings> | regexes <#regexes> | dates and time <#dates-time> | arrays
+<#arrays> | functions <#functions> | execution control
+<#execution-control> | exceptions <#exceptions> | streams <#streams> |
+files <#files> | directories <#directories> | processes and environment
+<#processes-environment> | libraries and namespaces
+<#libraries-namespaces> | reflection <#reflection> | debugging and
+profiling <#debugging-profiling>
+
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+version used <#version-used-note>
+  	/dash; POSIX 2008/ 	/6.3/ 	/4.0/
+show version <#version-note>
+  		/displayed at startup/ 	$host.version
+grammar and execution <#grammar-execution-note>
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+interpreter <#interpreter-note>
+  	$ dash foo.sh 	/when foo.bat is in the search path:/
+> foo 	PS> .\foo.ps1
+
+DOS> powershell -file foo.ps1
+repl <#repl-note>
+  	$ dash 	> cmd 	> powershell
+execute command and exit <#exec-and-exit-note> 	$ dash -c 'echo hi' 	> cmd /c "echo hi" 	> powershell -command 'write-output "hi"'
+statement separator <#stmt-separator-note> 	/pipelines separated by/
+; & && ||
+
+/lists of pipelines separated by newlines unless newline is preceded by
+a backslash or inside these characters:/
+"" '' `` () 	/pipelines separated by/ & && ||
+
+/lists of pipelines separated by newline unless preceded by caret ^
+which is not inside double quote "/ 	; /or newline; a newline can be
+escaped with a backtick:/ ` /newlines are permitted in double quotes and after a pipe:/ |
+word separators <#word-separator-note> 	| & ; ( ) < > /space tab/ 	| & <
+> /space tab/ 	
+escape special character <#esc-special-char-note> 	# write "foo" to foo.txt:
+echo foo > foo.txt
+
+# write "foo > foo.txt" to stdout:
+echo foo \> foo.txt 	rem write "foo" to foo.txt
+echo foo > foo.txt
+
+rem write "foo > foo.txt" to stdout:
+echo foo ^> foo.txt 	
+block delimiters <#block-delimiters-note> 	{/…/}
+(/…/)
+do /…/ done 	( /…/ ) 	{ /…/ }
+are expressions statements <#expression-statement> 	/no/ 	/no
+
+relational expressions can only be used in the conditional of an/ if
+/statement
+
+arithmetic expressions can only be assigned to a variable using/ set
+/a 	/yes/
+end-of-line comment <#comment-note>
+  	# /comment/ 	rem /comment/
+
+:: /comment/ 	# /comment/
+comment out multiple lines <#multiline-comment-note> 	<<EOF
+/comment/
+/another comment/
+EOF 	goto comment
+/comment/
+/another comment/
+:comment 	<# /comment/
+/another comment/ #>
+variables and expressions <#var-expr-note>
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+assignment <#assignment-note> 	a=1
+/whitespace next to/ = /not permitted/ 	set a=1 	$a = 1
+parallel assignment <#parallel-assignment-note>
+  	/none/ 	/none/ 	$a, $b = 1, 2
+swap <#swap-note> 	tmp=$a
+a=$b
+b=$tmp 	set tmp=%a%
+set a=%b%
+set b=%tmp% 	$a, $b = $b, $a
+compound assignment operators: arithmetic, string, bit
+<#compound-assignment-note> 	/none/ 	+= -= *= /= %=
+/none/
+«= »= &= |= ^= 	+= -= *= /= %=
++= *=
+/none/
+increment and decrement <#incr-decr-note> 	/none/ 	/none/ 	$x = 1
+$x++
+$x--
+variable declaration <#var-decl-note>
+  	/assignment/, export, readonly 	/assignment/ 	/assignment/
+are identifiers case sensitive? <#identifiers-case-sensitive-note>
+/yes/ 	/no/ 	/no/
+null <#null-note>
+  	'' 	/Variables must contain a non-empty string. This deletes the
+variable x:/
+set x= 	$null
+null test <#null-test-note>
+  	if [ -z $v ]
+then
+  echo not defined
+fi 	if not defined v echo not defined 	$v -eq $null
+arithmetic and logic <#arithmetic-logic-note>
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+true and false <#true-false-note>
+  	/status codes:/
+true false
+
+/inside/ [ ]:
+1 '' 	/no booleans; conditional of if statement must contain a
+relational expression/ 	$true $false
+falsehoods <#falsehoods-note> 	/status codes:
+nonzero integers/
+
+/inside/ [ ]:
+'' 	/relational expressions which evaluate to false/ 	0 0.0 "" ''
+logical operators <#logical-ops-note>
+  	/status codes:/
+&& || !
+
+/inside/ [ ]:
+-a -o ! 	/short-circuit operators:/
+&& ||
+
+/inside conditional of if:/
+not 	-and -or -not
+conditional expression <#conditional-expr-note>
+  	$(( x>0 ? x : -x )) 	/none/ 	/none/
+relational expression <#relational-expr>
+  	[ $a -gt 3 ] 	%a% gtr 3 	$a -gt 3
+relational operators <#relational-operators>
+  	/integers:/
+-eq -ne -gt -lt -ge -le
+
+/strings:/
+= != > < /none/ /none/ 	equ neq gtr lss geq leq 	-eq -ne -gt -lt -ge -le
+arithmetic expression <#arithmetic-expr>
+  	$(( 1 + 3 )) 	/arithmetic expression must be stored in a variable:/
+set /a "foo=1+3" 	1 + 3
+arithmetic operators <#arithmetic-operators>
+  	+ - * /none/ / % **
+
+/operators are integer-only in most shells; use/ bc /for float
+arithmetic/ 	+ - * /none/ / % /none/
+
+/operators only work on integers/ 	+ - * / /??/ % /??/
+integer division <#integer-division>
+  	$(( $a / $b )) 	set /a "result=7/3" 	$rem = $null
+$quot = [Math]::DivRem($a, $b, [ref] $rem)
+integer division by zero <#int-div-zero-note> 	/writes "division by 0"
+error message; statement terminates with a 1 status/ 	/Writes "Divide by
+zero error." and sets %errorlevel% to nonzero value./ 	/error: Attempted
+to divide by zero/
+float division <#float-division>
+  	`echo " scale=5; $a / $b " | bc` 	/none/ 	$a / $b
+float division by zero <#float-div-zero-note> 	/writes "division by 0"
+error message; statement terminates with a 1 status/ 	/none/ 	/evaluates
+to/ Infinity /which is not a float literal/
+power <#power-note>
+  		/none/ 	[Math]::pow(2, 32)
+sqrt <#sqrt-note>
+  		/none/ 	[Math]::sqrt(2)
+sqrt -2 <#sqrt-negative-two>
+  	/no sqrt/ 	/none/ 	/evaluates to/ NaN /which is not a float literal/
+transcendental functions <#transcendental-func> 	e l s c /none/ /none/
+/none/ a /none/
+/how to use:/
+`echo 'e(2)' | bc -l` 	/none/ 	[Math]::exp [Math]::log
+[Math]::sin [Math]::cos [Math]::tan
+[Math]::asin [Math]::acos [Math]::atan
+[Math]::atan2
+float truncation <#float-truncation>
+/round towards zero, round to nearest integer, round down, round up/
+/none and no floats/ 	/none/ 	[Math]::truncate(3.14)
+[Math]::round(3.14)
+[Math]::floor(3.14)
+[Math]::ceiling(3.14)
+absolute value <#abs-val-note>
+/and signum/ 		/none/ 	[Math]::abs(-7)
+[Math]::sign(-7)
+integer overflow <#integer-overflow>
+  	/modular arithmetic/ 	/sometimes modular arithmetic; sometimes writes
+error message and sets %errorlevel% to nonzero value./ 	/converts to float/
+float overflow <#float-overflow>
+  	/no floats/ 	/none/ 	/evaluates to/ Infinity /which is not a float
+literal/
+random integer, uniform float <#random> 	echo $RANDOM /15 bit integer/
+rem integer in range 0 to 32767:
+echo %random% 	random 100
+random 1.0
+seed random numbers <#seed-random> 	RANDOM=17
+r=$RANDOM 	/none/ 	$r = random -setseed 17
+bit operators <#bit-operators>
+  	<< >> & | ^ ~ 	/use with/ set /a:
+<< >> & | ^ ~ 	/none/ /none/ -band -bor -bxor -bnot
+
+# powershell 3.0:
+-lsl -lsr
+strings <#strings-note>
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+string literal <#string-literal> 	'don'\''t say "no"'
+"don't say \"no\""
+$'don\'t say "no"' 	/None; barewords are used for strings./
+
+/Double quotes are used for file names which contain spaces and other
+special characters. However, the double quotes are stored in the
+variables and passed to commands./ 	'don''t say "no"'
+"don't say `"no`""
+newline in literal <#string-literal-newline> 	/yes/ 	/No; a bareword
+string can be continued on the following line by ending a line with ^;
+the CRLF is not part of the value of the string; it is not possible to
+store a CRLF in a variable./ 	/yes/
+barewords <#barewords> 	/yes/ 	/yes/ 	/yes/
+bareword escape character <#bareword-esc-char-note> 	/backslash:/ \;
+/caret:/ ^<
+
+/Characters special to the interpreter can be stored in a variable by
+preceding them by a caret: ^; the interpreter will attempt to interpret
+them when the variable is dereferenced, however./ 	/backquote:/: `$
+escapes <#string-escapes> 	gray|/in double quotes/##
+\\ \"
+/in/ $' ' /quotes:/
+\a \b \e \f \n \r \t \v \\ \' \c/c/ \x/hh/ \/ooo/ 		`' `" ``
+`0 `a `b `f `n `r `t `v
+/in other backtick sequences the backtick is ignored/
+variable interpolation <#variable-interpolation> 	count=3
+item=ball
+"$count ${item}s" 		$count = 3
+$item = "ball"
+"$count $($item)s"
+length <#string-length> 	s="hello"
+${#s} 	/see footnote/ 	$s = "hello"
+$s.length
+string comparison <#string-comparison> 	[ $USER = foo ]
+[ $USER != foo ] 		# case insensitive:
+-eq -ne -gt -lt -ge -le
+
+# case sensitive:
+-ceq -cne -cgt -clt -cge -cle
+index of substring <#index-substring> 	/none/ 		/returns -1 if not found:/
+"foo bar".indexof("bar")
+extract substring <#extract-substring> 	s="foo bar"
+${s:4:3} 	set s=foo bar
+echo %s:~4:3% 	"foo bar".substring(4, 3)
+string concatenation <#string-concatenation> 	c="hello, ""world" 	rem
+trailing whitespace is stored:
+set part1=hello, 
+set part2=world
+echo %part1%%part2% 	$c = "hello, " + "world"
+string replication <#string-replication> 			$hbar = "-" * 80
+split <#split> 	/none/ 		"foo,bar,baz" -split ","
+join <#join> 	/none/ 		@("foo","bar","baz") -join ","
+sprintf <#sprintf> 	`printf "tie: %s %d %f" "Spain" 13 3.7` 		$a = "Spain", 13, 3.7
+"tie: {0} {1} {2}" -f $a
+case manipulation <#case> 	echo "hello" | tr [a-z] [A-Z]
+echo "HELLO" | tr [A-Z] [a-z]
+A=hello
+echo -n ${A:0:1} | tr [a-z] [A-Z]; echo -n ${A:1} 		"hello".toupper()
+"HELLO".tolower()
+strip <#strip> 	/none/ 		" hello ".trim()
+pad on right, pad on left <#pad> 	`printf "%-10s" "hello"`
+`printf "%10s" "hello"` 		$s = "hello"
+$s + " " * (10 - $s.length)
+" " * (10 - $s.length) + $s
+string to number <#string-to-number> 	A="12"
+$(( 7 + $A ))
+
+B=".037"
+`echo 73.9 + $B | bc` 	set x="12"
+set /a "result=7+%x%" 	7 + "12"
+
+73.9 + ".037"
+number to string <#number-to-string>
+  	/all values are strings/ 	/all values are strings/
+[convert]::tostring(7) + " items"
+
+# or use variable interpolation
+regular expressions <#regex-note>
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+regex match <#regex-match-note> 	s=hello
+rx='[a-z][a-z]*'
+if expr $s : $rx > /dev/null
+then
+  /…/
+fi 	set s=hello
+echo %s%|findstr /r "[a-z][a-z]*" && (echo match ) ^
+  || (echo does not match) 	if ("hello" -match "^[a-z][a-z]*$") {
+  /…/
+}
+single substitution <#single-subst-note> 	s='do re mi mi mi'
+s=$(echo $s | sed s/mi/ma/) 		
+global substitution <#global-subst-note> 	s='do re mi mi mi'
+s=$(echo $s | sed s/mi/ma/g) 	set "s=do re mi mi mi"
+echo %s:mi=ma% 	$s = "do re mi mi mi"
+$s = $s -replace "mi", "ma"
+dates and time <#dates-time-note>
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+current datetime <#current-datetime-note> 	date +'%Y-%m-%d %H:%M:%S'
+date /t && time /t 	get-date -format 'yyyy-MM-dd HH:mm:ss'
+get-date -uformat '%Y-%m-%d %H:%M:%S'
+current unix epoch <#current-unix-epoch-note> 	date +'%s' 		get-date
+-uformat %s
+format datetime <#fmt-datetime-note> 	date -d '1970-01-01 00:00:00 UTC'
++'%s' 		get-date -date '1970-01-01 00:00:00' -uformat %s
+arrays <#arrays-note>
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+literal <#resizable-array-literal-note> 	nums=(1 2 3 4) 	set
+nums=(1 2 3 4) 	$nums = 1 ,2 ,3, 4
+$nums = @(1 ,2, 3, 4)
+size <#resizable-array-size-note> 	${#nums[@]} 	set numsc=0
+for %i in %nums% do set /a numsc+=1
+echo %numsc% 	$nums.Length
+lookup <#resizable-array-lookup-note>
+  	${nums[0]} 		$nums[0]
+update <#resizable-array-update-note>
+  	nums[1]=5 		$nums[0] = 5
+slice <#array-slice>
+  	${nums[@]:1:2} 		$nums[1..2]
+concatenate <#array-concatenation> 	a=(1 2 3)
+b=(4 5 6)
+c=(${a[@]} ${b[@]}) 		@(1, 2, 3) + @(4, 5, 6)
+iterate over elements <#array-iteration> 	for i in ${nums[@]}
+do echo $i
+done 		foreach ($i in $nums) {
+  write-output $i
+}
+sort <#array-sort> 			$a = 3, 2, 4, 1
+$b = $a | Sort-Object
+reverse <#array-reverse> 			$a = 1, 2, 3
+[array]::reverse($a)
+functions <#functions-note>
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+define <#def-func-note> 	add() { echo $(( $1 + $2 )); }
+/or/
+function add { echo $(( $1 + $2 )); } 	goto:eof
+:add
+  set /a sum=%~1+%~2
+  echo %sum%
+goto:eof 	function add {
+  param ($a, $b)
+  $a + $b
+}
+call <#call-func-note>
+  	add 1 2 	call:add 1 2 	add 1 2
+missing argument behavior <#missing-arg-note> 	'' 	/parameter treated as
+undefined variable or as containing the empty string/ 	$null
+extra argument behavior <#extra-arg-note> 	/ignored/ 	/none/ 	/ignored/
+default argument <#default-arg-note> 	/none/ 	/none/ 	function add {
+  param ($a=0, $b=0)
+  $a + $b
+}
+named parameters <#named-param-note> 	/none/ 	/none/ 	add -a 1 -b 2
+return value <#retval-note> 	return /arg available in/ $? /variable if a
+positive integer smaller than 256/ 		
+anonymous function literal <#anon-func-literal-note> 	/none/ 	/none/ 	$f
+= { write-output "foo" }
+call anonymous function <#call-anon-func-note> 	/none/ 	/none/ 	& $f
+/or/
+$x.invoke()
+default scope <#default-scope>
+  	/global/ 	/global/ 	/local/
+nest <#nest-func-note> 	/Nested function visible outside containing
+function./ 	/none/ 	function add {
+  param ($a, $b)
+  function add2 {
+    param ($a2, $b2)
+    $a2 + $b2
+  }
+  add2 $a $b
+}
+
+# Nested function not visible outside of containing
+# function; nested function can see local variables
+# of containing function.
+execution control <#execution-control-note>
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+if <#if-note> 	if [ $n -eq 0 ]
+then
+  echo "no hits"
+elif [ $n -eq 1 ]
+then
+  echo "1 hit"
+else
+  echo $n " hits"
+fi 	if %n% equ 0 (
+  echo no hits
+) else (
+  if %n% equ 1 (
+    echo one hit
+  ) else (
+    echo %n% hits
+  )
+) 	if ($n -eq 0) {
+  write-output "no hits"
+} elseif ($n -eq 1) {
+  write-output "one hit"
+} else {
+  write-output "$n hits"
+}
+while <#while-note> 	i=0
+while [ $i -lt 10 ]
+do i=$(($i + 1))
+  echo $i
+done 	set i=0
+:loop
+  set /a i+=1
+  echo %i%
+if %i% lss 10 goto :loop 	$i = 0
+while ($i -lt 10) {
+  write-output (++$i)
+}
+for <#for-note> 	for i in 1 2 3
+do
+  echo $i
+done 	set nums=(1 2 3 4)
+for %%n in %nums% do echo %%n 	for ($i=1; $i -le 3; $i++) {
+  write-output $i
+}
+break <#break-note>
+  	break 		break
+continue <#continue-note>
+  	continue 		continue
+exceptions <#exceptions-note>
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+raise <#raise-exc-note> 	/Commands which fail return nonzero exit status.
+
+Exit status of last command stored in $?/ 	/Commands which fail return
+nonzero exit status.
+
+Exit status of last command stored in %errorlevel%/ 	throw "bam!"
+handle <#handle-exc-note> 	trap 'echo "risky failed"' ERR
+risky 	risky
+
+if errorlevel 1 (
+  echo risky failed
+) 	try {
+  throw "bam!"
+}
+catch {
+  write-output "caught!"
+}
+uncaught exception behavior <#uncaught-exc-note> 	/stderr and
+continue/ 	/stderr and continue/ 	/script exits/
+concurrency <#concurrency-note>
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+sleep <#sleep-note> 	sleep 10 	/vista and later:/
+timeout 10 	timeout 10
+streams <#streams-note>
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+read line from stdin <#read-line-stdin-note> 	# stored in $ine:
+read line
+
+# with prompt:
+read -p 'line: ' line 	rem stored in %line%:
+set /p line=
+
+rem with prompt:
+set /p line="line: " 	$line = read-host
+
+# with prompt:
+$line = read-host 'line'
+write line to stdout <#write-line-stdout-note> 	echo "hi world" 	echo hi
+world 	write-output "hi world"
+write formatted string to stdout <#printf-note> 	printf '%.2f\n' 3.1415 		
+write file to stdout <#write-file-stdout-note> 	cat foo.txt 		
+write to standard error <#write-stderr-note> 	echo "hi world" >&2 	echo
+hi world >&2 	
+iterate over file by line <#file-iterate-note> 	awk 'length($0) > 70
+{print $0}' /etc/passwd 		
+write to process <#write-proc-note> 	echo "hi world" | wc 	echo hi world
+| find /c hi 	
+write to file <#write-file> 	echo "hello" > /tmp/a 	echo hello > \tmp\a 	
+append to file <#append-file> 	echo "hello" >> /tmp/a 	echo hello >> \tmp\a 	
+files <#files-note>
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+create empty file <#create-empty-file-note> 	# does not overwrite
+existing file, but updates
+# last mod. time:
+touch foo.txt 	rem overwrites existing file:
+type nul > foo.txt 	# error if file exists:
+new-item -type file foo.txt
+file exists test, file regular test <#file-test-note> 	if [ -e foo.txt
+]; then echo "exists"; fi
+if [ -f foo.txt ]; then echo "regular"; fi 	if exist foo.txt ( echo exists )
+
+/??/ 	if (test-path foo.txt) { write-output "exists" }
+
+if (test-path -pathtype leaf) {
+  write-output "regular"
+}
+file size <#file-size-note> 	ls -l foo.txt 	dir foo.txt 	get-childitem
+foo.txt
+is readable, is writeable, is executable
+<#readable-writeable-executable-note> 	if [ -r /etc/passwd ]; then echo
+readable; fi
+if [ -w /tmp ]; then echo writeable; fi
+if [ -x /bin/ls ]; then echo executable; fi 		
+set file permisions <#chmod-note> 	chmod 0600 foo.txt 		
+last modification time <#last-modification-time-note> 	ls -l foo.txt
+dir foo.txt 	get-childitem foo.txt
+copy file, remove file, rename file <#file-cp-rm-mv-note> 	cp
+/tmp/foo.txt /tmp/bar.txt
+rm /tmp/foo.txt
+mv /tmp/bar.txt /tmp/foo.txt 	copy foo.txt bar.txt
+del foo.txt
+move bar.txt foo.txt 	copy-item foo.txt bar.txt
+remove-item foo.txt
+move-item bar.txt foo.txt
+create symlink, symlink test, readlink <#symlink-note> 	ln -s
+/etc/passwd /tmp/passwd
+if [ -h /tmp/passwd ]; then echo "symlink"; fi
+readlink /tmp/passwd 		
+generate unused file name <#unused-file-name-note> 	mktemp
+/tmp/fooXXXXX 		[System.IO.Path]::GetTempFileName()
+directories <#directories-note>
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+working directory <#working-dir-note>
+/get and set/ 	echo $(pwd)
+echo $PWD
+
+cd /tmp 	echo %cd%
+
+chdir \windows 	$loc = get-location
+echo $loc
+
+set-location \windows
+program directory <#program-dir-note> 	/bash only:/
+"$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )" 	echo %~dp0 	
+dirname and basename <#dirname-basename-note> 	dirname /etc/hosts
+basename /etc/hosts 		
+iterate over directory by file <#iterate-dir-note> 	for f in /etc/*
+do
+  echo $f
+done 		
+make directory <#mkdir-note> 	mkdir /tmp/foo.d 	mkdir foo 	new-item
+-type directory foo
+recursive copy <#recursive-cp-note> 	cp -R /tmp/foo.d /tmp/bar.d 		
+remove empty directory <#rmdir-note> 	rmdir /tmp/foo.d 	rmdir foo 	
+remove directory and contents <#rm-rf-note> 	rm -rf /tmp/foo.d 	rmdir /s
+/q foo 	
+directory test <#dir-test-note> 	if [ -d /tmp ]; then echo directory; fi 		
+processes and environment <#processes-environment-note>
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+command line args <#cmd-line-arg-note> 	$1
+$2
+/…/
+
+# number of args:
+$#
+
+# pass args as $# words to twiddle
+twiddle "$@"
+
+# pass args as one word to twiddle
+twiddle "$*" 	%1
+%2
+/…/
+
+rem number of args:
+set #=0
+for %%i in %* do set /a #+=1
+echo %#%
+
+rem no way to pass argument with space
+twiddle %* 	
+program name <#program-name-note> 	$0 	%0 	
+environment variable <#env-var-note>
+/get, set, clear/ 	/shell variables are environment variables/
+$HOME 		$env:home
+user id and name <#user-id-name-note> 	id
+
+# user name only; most systems:
+whoami 		
+exit <#exit-note> 	exit 0 	rem batch script exits:
+exit /b 0
+
+rem also closes cmd.exe window:
+exit 0 	exit
+external command <#external-cmd-note> 	ls 	dir 	dir
+command substitution <#cmd-subst-note> 	s=$(ls) 	/none/ 	$s=dir
+speech <#speech> 	/mac only:/
+say "I'm a Mac" 		$sp = new-object -comobject "SAPI.SpVoice"
+$sp.speak("I'm a PC")
+command path <#command-path> 	which ping 		get-command ping
+set signal handler <#set-signal-handler> 	function int_handler {
+  echo "exiting…";
+  exit
+}
+
+trap int_handler INT 		
+send signal <#send-signal-note> 	kill -INT 1234
+kill -KILL 1234 		
+start job in background <#start-background-job> 	sleep 1000 & 		
+suspend current job <#suspend-job> 	/^Z/ 		
+terminate job <#terminate-job-note> 	kill %1 		
+list jobs <#list-jobs> 	jobs 		
+background suspended job <#background-suspended-job> 	bg %1 		
+bring background job into foreground <#foreground-background-job> 	fg %1 		
+disown job <#disown-job> 	disown %1 		
+libraries and namespaces <#libraries-namespaces-note>
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+library <#library> 	$ cat foo.sh
+function add() {
+  echo $(($1 + $2));
+} 		/from directory in search path:/
+
+> type Modules\Foo\Foo.psm1
+function add {
+  param ($a, $b)
+  $a + $b
+}
+import library <#import-library> 	source foo.sh
+add 3 7 		import-module foo
+
+add 1 2
+library path environment variable <#library-path-env> 	/none/ 	
+$env:psmodulepath
+reflection <#reflection-note>
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+command line documentation <#cmd-line-doc-note> 	man ls 	help dir
+get-help get-childitem
+list defined variables <#list-variables> 	printenv 	set 	get-variable
+list available libraries <#list-available-lib-note> 			get-module
+-listavailable
+debugging and profiling <#debugging-profiling-note>
+check syntax <#check-syntax-note> 	$ apt-get install shellcheck
+$ shellcheck foo.sh 		
+flags for stronger errors <#strong-err-note> 	/bash only:/
+bash -eu -o pipefail
+
+-e: /exit with nonzero status if command fails/
+-u: /exit with nonzero status if undefined variable accessed/
+-o pipefail: /exit with nonzero status if command in pipeline fails/ 		
+cpu usage <#cpu-usage-note> 	time ls 		
+	posix shell <#posix> 	cmd.exe <#cmd-prompt> 	powershell <#powershell>
+	__________________________________________________________ 	__________________________________________________________ 	__________________________________________________________
+
+
+  General <#general>
+
+
+    version used <#version-used>
+
+The version of the language used for verifying the examples in the
+reference sheet.
+
+
+    show version <#version>
+
+How to get the version.
+
+*cmd.exe*
+
+The version number displayed at start up is the Windows kernel version.
+6.3 is the Windows 8.1 kernel version number.
+
+
+  Grammar and Execution <#grammar-execution>
+
+
+    interpreter <#interpreter>
+
+The customary name of the interpreter and how to invoke it.
+
+*posix shell:*
+
+On Unix, scripts are executing by passing the file containing the script
+to the interpreter as an argument:
+
+|$ dash ~/configure.sh|
+
+If the executable bit is set, the file can be run directly:
+
+|$ ~/configure.sh|
+
+To determine the name of the interpreter that will process the script,
+Unix will look for the presence of a shebang (#!) at the start of the
+file. If the pathname to a command follows the shebang, it will be used
+to interpret the script. If no shebang is present, the script will be
+interpreted with /bin/sh which is bash on Mac OS X and Cygwin and dash
+on Ubuntu.
+
+Command line arguments which set the positional parameters $1, $2, and
+so on can be set upon invocation as follows:
+
+|$ dash ~/configure.sh arg1 arg2
+$ ~/configure.sh arg1 arg2|
+
+Arguments can also be put on the shebang line, but this is only useful
+for passing options to the shell. If the file foo.sh contains
+
+|#!/bin/sh -x|
+
+then invoking it as
+
+|./foo.sh|
+
+is equivalent to
+
+|/bin/sh -x foo.sh|
+
+Hardcoding a full path in a shebang is a common cause of portability
+problems because different systems may install the interpreter in
+different locations. The env command avoids the problem by searching the
+PATH directories for the command:
+
+|#!/usr/bin/env lua|
+
+*powershell:*
+
+On Windows, a file is a PowerShell script if it has a .ps1 suffix. There
+is no need to mark the script as executable. However, PowerShell is not
+configured to run scripts by default. To change the configuration, start
+a PowerShell as an Administrator and run the following command:
+
+|set-executionpolicy remotesigned|
+
+It is possible to invoke a PowerShell script by specifying the
+PowerShell interpreter as the command and the script as an argument, but
+the suffix of the file must still be ps1:
+
+|powershell -file .\test.ps1|
+
+
+    repl <#repl>
+
+How to invoke the REPL.
+
+
+    execute command and exit <#exec-and-exit>
+
+How to pass a single command to be executed as a command line argument.
+
+
+    statement separator <#stmt-separator>
+
+How the parser determines the end of a statement.
+
+*posix shell:*
+
+A posix shell /simple command/ consists of optional variable
+assignments, followed by a command and zero or more arguments and
+redirections. The command can be an external command, user defined
+function, or built-in.
+
+A posix shell /pipeline/ is a sequence of one or more /simple commands/
+joined by pipes |. The shell executes the commands in parallel and
+redirects the stdout of each command to the stdin of the following
+command. The exit status is the status of the last command.
+
+The /control operators/ ; & && || are /pipeline/ separators. The
+semicolon ; enforces sequential execution. The ampersand & executes in
+parallel. The && executes to the first /pipeline/ that returns a nonzero
+status. The || executes to the first /pipeline/ that returns a zero status.
+
+A /list/ is one or more /pipelines/ joined by /control operators/. A
+/list/ can have a semicolon ; or ampersand & at the end. A /list/ is
+terminated by a newline.
+
+A newline does not terminate a /list/ when:
+
+  * inside single quotes '', double quotes "", backticks ``, or parens ()
+  * inside a block started by the keywords: for, select, case, if,
+    while, until
+
+A newline that would normally terminate a statement can be escaped with
+a backslash.
+
+Multiple lists can be grouped inside parens ( ) or curly brackets { }.
+When grouped inside parens, the lists are executed inside a subshell.
+The curly brackets, but not the parens, must be separated from their
+contents by white space. Also, within curly brackets, but not within
+parens, the last list must be terminated by a semicolon or newline.
+
+
+    word separators <#word-separator>
+
+
+    escape special character <#esc-special-char>
+
+How to escape a special character.
+
+
+    block delimiters <#block-delimiters>
+
+How blocks are delimited.
+
+*posix shell:*
+
+Blocks can be delimited with {}, (), or the /do/,/done/ keywords.
+
+If a block is started with an open curly bracket {, then the block must
+be terminated with a line containing a close curly bracket by itself }.
+
+If a block is delimited by (), then the commands in the block are
+executed in a subshell.
+
+A block is delimited by /do/ and /done/ when using the execution control
+keywords /for/, /select/, /while/, and /until/.
+
+The /then/ and /else/ keywords of an /if/ statement start blocks which
+are terminated by a following /elif/, /else/, or /fi/.
+
+The /function/ and /if/ keywords open blocks which are terminated by
+/end/ keywords. The /repeat/ keyword opens a block which is terminated
+by /until/.
+
+
+    to end-of-line comment <#comment>
+
+How to make the remainder of the line a comment.
+
+
+    multiline comment <#multiline-comment>
+
+How to comment out multiple lines.
+
+*posix shell:*
+
+The method described is the syntax for a here document, which is a
+multiline string literal.
+
+
+  Variables and Expressions <#var-expr>
+
+
+    assignment <#assignment>
+
+How to assign a value to a variable.
+
+
+    parallel assignment <#parallel-assignment>
+
+How to assign values to variables in parallel.
+
+
+    swap <#swap>
+
+How to exchange the values held by two variables.
+
+
+    compound assignment operators: arithmetic, string, bit
+    <#compound-assignment>
+
+The compound assignment operators for arithmetic, string, and bit operations
+
+*powershell:*
+
+Note that /= performs float division, even when both operands are integers.
+
+When the left operand is a string, += concatenates the right operand to
+the left operand.
+
+When the left operand is a string and the right operand an integer, *=
+concatenates the left operand with itself /right operand/ times.
+
+
+    increment and decrement <#incr-decr>
+
+The C-style increment and decrement operators which can be used in
+expressions.
+
+
+    variable declaration <#var-decl>
+
+How to declare a variable.
+
+*posix shell:*
+
+The following three lines have identical behavior:
+
+|A="hello, world"
+declare A="hello, world"
+typeset A="hello, world"|
+
+It is possible to make a read only variable. Again there are three ways:
+
+|readonly A="can't change"
+declare -r A="can't change"
+typeset -r A="can't change"|
+
+Variables are not exported to subprocesses unless declared to be exported:
+
+|export A="exported to subprocess"
+declare -x A="exported to subprocess"
+typeset -x A="exported to subprocess"|
+
+Variables assigned on the same line as a command are not created, only
+exported to the subprocess that instantiates the command:
+
+|EDITOR=emacs svn commit|
+
+By default variables defined inside functions are global. They can be
+declared to be local:
+
+|function foo () {
+  local b=17
+  # echoes 17:
+  echo $b
+}
+# echoes nothing:
+echo $b|
+
+
+    are identifiers case sensitive? <#identifiers-case-sensitive>
+
+*powershell:*
+
+PowerShell identifiers are case insensitive.
+
+
+    null <#null>
+
+The null literal.
+
+
+    null test <#null-test>
+
+How to test if a value is null.
+
+
+  Arithmetic and Logic <#arithmetic-logic>
+
+*posix shell:*
+
+The POSIX shell provides at least three different environments for
+logical expressions, each with their own operators and values for true
+and false.
+
+Logical expressions are usually encountered in the conditionals of if,
+elif, while, and until. A command is expected as the conditional
+expression. The command is executed, and a return value of zero is
+treated as true and nonzero as false.
+
+	status codes 	[ ] 	$(( ))
+where used 	command 	command 	argument
+true 	true 	/no canonical true value/ 	1
+false 	false 	'' 	0
+falsehoods 	/nonzero exit status/ 	'' 	0
+logical operators 	&& || ! 	-a -o ! 	&& || !
+grouping 	{ } 	\( \) 	( )
+string relational operators 	/none/ 	= != \< \> 	/none/
+arithmetic relational operators 	/none/ 	-eq -ne -lt -gt -le -ge 	== !=
+< > <= >=
+arithmetic operators 	/none/ 	/none/ 	+ - * / % **
+bit operators 	/none/ 	/none/ 	 <<  >> & | ^ ~
+
+*posix shell: status codes:*
+
+Logical expressions can be formed using status codes returned by
+commands. The commands can be external, built-in, or user defined
+functions. A status code of zero is used to indicate success, and for
+the purpose of logic zero is treated as true and all other status codes
+as false.
+
+The && and || operators are short circuit operators. An exclamation point ! can be
+used to negate the status code of a command. It is not necessary to
+separate && and || from their operands with whitespace, but it is necessary to mark off a
+! used as negation with whitespace.
+
+*posix shell: test command:*
+
+*posix shell: arithmetic expansion:*
+
+
+    true and false <#true-false>
+
+The literals for true and false.
+
+
+    falsehoods <#falsehoods>
+
+Values which are false in conditional expressions.
+
+
+    logical operators <#logical-ops>
+
+Logical and, or, and not.
+
+*posix shell:*
+
+&& || and ! are available inside [[ ]], (( )), and $(( )) expressions.
+Inside [ ] expressions use -a, -o, and !.
+
+
+    conditional expression <#conditional-expr>
+
+The syntax for a conditional expression.
+
+
+    are expressions statements
+
+Whether an expression can be used where a statement is expected.
+
+
+    relational expressions
+
+*posix shell:*
+
+Bash has three types of relational expressions: [[ ]], [ ], and (( )).
+For a description of [ ], read the man page for test
+<http://www.google.com/search?q=man+test>.
+
+(( )) evaluates its contents in the same manner as the arithmetic
+expansion $(( )). If the result is zero, it returns 1 (false). Otherwise
+it returns 0 (true).
+
+[[ $a == /pattern/ ]] and [[ $a != /pattern/ ]] interpret * and ? on the
+right side as patterns. Thus "hello" == "hell*" is true. For numeric
+comparison, use [ $a -eq /num/ ] or [ $a -ne /num/ ].
+
+Bash expressions <#bash-expressions> discusses the different types of
+bash expressions in more detail.
+
+
+    relational operators
+
+*posix shell:*
+
+If == and =! have an unquoted string on the right, then * and ? within
+the string will be treated as wild cards for matching.
+
+
+    convert from string
+
+*posix shell:*
+
+All values are strings. The $(( )) operator will interpolate any
+variables and then evaluate the resulting string as an arithmetic
+expression composed of integers. The variables are not limited to
+containing integers. The following script outputs 10:
+
+|A=7+3
+echo $(($A))|
+
+To perform floating point arithmetic, bash must shell out to a floating
+point utility such as /bc/.
+
+
+    convert to string
+
+
+    arithmetic expressions
+
+How to evaluate an arithmetic expression.
+
+*posix shell:*
+
+Bash arithmetic is available within $(( )) and (( )). The latter form
+evaluates the arithmetic expression and returns status 1 if the result
+zero, and 0 otherwise.
+
+Bash only has integer arithmetic. For floating point arithmetic, use the
+external commands /bc/ or /dc/.
+
+
+    arithmetic operators
+
+The operators for addition, subtraction, multiplication, float division,
+integer division, modulus, and exponentiation. Some languages provide a
+function /pow/ instead of an operator for exponentiation.
+
+*posix shell:*
+
+arithmetic operators are available in $(( )) and (( )).
+
+
+    integer division
+
+How to perform integer division.
+
+
+    float division
+
+How to perform floating point division, even if the operands might be
+integers.
+
+*posix shell:*
+
+The bash shell lacks built-in floating point arithmetic. /bc/ is an
+arbitrary precision calculator, and /scale/ is the number of digits to
+the right of the decimal point. If scale is not specified, it defaults
+to zero, which results in integer division.
+
+It is also possible to use /dc/, which is a reverse polish notation
+arbitrary precision calculator:
+
+|`echo " 5 k $a $b / p " | dc`|
+
+
+    arithmetic functions
+
+Functions for computing square root, natural exponent, natural
+logarithm, sine, cosine, tangent, arcsine, arccosine, arctangent, and
+/atan2/.
+
+The trigonometric functions are all in radians. /atan2/ takes two
+arguments which are the x and y co-ordinates of a vector in the
+Cartesian plane. It returns
+the angle to the positive x-axis made by the vector.
+
+
+    arithmetic truncation
+
+
+    division by zero
+
+
+    integer overflow
+
+
+    float overflow
+
+
+    sqrt -2
+
+The result of taking the square root of -2.
+
+
+    random integer, uniform float
+
+The examples show how to generate a uniform random integer in the range
+from 0 to 99, inclusive; how to generate a uniform float in the range
+0.0 to 1.0; how to generate a float from a standard normal distribution
+
+*posix shell:*
+
+$RANDOM evaluates to a random integer between 0 and 32767 inclusive.
+
+
+    seed random numbers
+
+*posix shell:*
+
+Bash 3.2.48 seeds the random number at start up using the current time
+and the PID:
+
+|  /* Seed the random number generator. */
+  sbrand (dollar_dollar_pid + shell_start_time);|
+
+Here is the random number generation code:
+
+|/* A linear congruential random number generator based on the example
+   one in the ANSI C standard.  This one isn't very good, but a more
+   complicated one is overkill. */
+
+/* Returns a pseudo-random number between 0 and 32767. */
+static int
+brand ()
+{
+  rseed = rseed * 1103515245 + 12345;
+  return ((unsigned int)((rseed >> 16) & 32767));    /* was % 32768 */
+}|
+
+*powershell:*
+
+The initial seed is set to a value that varies each time PowerShell is
+started up.
+
+If a repeatable sequence of random numbers is desired, the seed can be
+set to a specific value using the -setseed option on the first call to
+random.
+
+
+    bit operators
+
+*posix shell:*
+
+The bit operators are available in $(( )) and (( )).
+
+
+  Strings <#strings>
+
+
+    string literal
+
+The syntax for a string literal and how to escape the delimiter.
+
+
+    newline in literal
+
+Whether a newline character sequence can be included in a string.
+
+For all the languages described in this reference sheet a string literal
+is permitted to encompass multiple lines in the source code and the
+resulting string will contain the same number of lines.
+
+
+    escapes
+
+Character escape sequences which can be used in string literals.
+
+
+    variable interpolation
+
+How to interpolate variables in a string.
+
+*posix shell:*
+
+A dollar sign $ can be backslash escaped to prevent variable interpolation:
+
+|echo "the value of \$a is $a"|
+
+*powershell:*
+
+A dollar sign $ can be backtick escaped to prevent variable interpolation:
+
+|write-output "the value of @@`@@$a is $a"|
+
+
+    length
+
+How to get the length of a string.
+
+*cmd.exe:*
+
+|:strLen string len -- returns the length of a string
+::                 -- string [in]  - variable name containing the string being measured for length
+::                 -- len    [out] - variable to be used to return the string length
+(   SETLOCAL ENABLEDELAYEDEXPANSION
+    set "str=A!%~1!"&
+    set "len=0"
+    for /L %%A in (12,-1,0) do (
+        set /a "len|=1<<%%A"
+        for %%B in (!len!) do if "!str:~%%B,1!"=="" set /a "len&=~1<<%%A"
+    )
+)
+( ENDLOCAL
+    IF "%~2" NEQ "" SET /a %~2=%len%
+)
+EXIT /b|
+
+
+    string comparison
+
+How to determine if two strings are equal or unequal.
+
+
+    index substring
+
+How to find the index of the start of a substring in a string.
+
+
+    extract substring
+
+
+    string concatenation
+
+The string concatenation operator.
+
+
+    split
+
+How to split a string into an array of strings.
+
+*powershell:*
+
+When splitting a string into words, no delimiter need be specified and
+the string to be split can follow the -split operator:
+
+|-split "foo bar baz"|
+
+
+    join
+
+How to concatenate the elements of an array into a string with a separator.
+
+
+    scan
+
+
+    sprintf
+
+How to create a string using a printf style format.
+
+
+    case manipulation
+
+
+    strip
+
+
+    pad on right, pad on left
+
+
+  Regular Expressions <#regexes>
+
+
+    regex match <#regex-match>
+
+How to test whether a regular expression matches a string.
+
+*posix shell:*
+
+The double square bracket operator [[ ]] is not part of the POSIX
+standard but it is a feature of bash, ksh, and zsh. It supports a match
+test operator:
+
+|if [[ "hello" =~ ^[a-z][a-z]*$ ]]; then|
+
+
+    single substitution <#single-subst>
+
+How to replace the first occurrence of a pattern in a string.
+
+*posix shell:*
+
+The following parameter expansion is not part of the POSIX standard but
+provided by bash, ksh, and zsh:
+
+|str='do re mi mi mi'
+echo ${str/mi/ma}|
+
+
+    global substitution <#global-subst>
+
+How to replace all occurrences of a pattern in a string.
+
+*posix shell:*
+
+The following parameter expansion is not part of the POSIX standard but
+provided by bash, ksh, and zsh:
+
+|str='do re mi mi mi'
+echo ${str//mi/ma}|
+
+
+  Dates and Time <#dates-time>
+
+
+  Arrays <#arrays>
+
+
+    array literal
+
+Array literal syntax.
+
+
+    array size
+
+How to get the number of elements in an array.
+
+
+    array lookup
+
+How to access a value in an array by index.
+
+
+    array slice
+
+How to slice a subarray from an array.
+
+
+    array iteration
+
+
+    membership
+
+How to test for membership in an array.
+
+
+    intersection
+
+How to compute an intersection.
+
+
+    union
+
+
+    map
+
+
+    filter
+
+
+    reduce
+
+
+    universal predicate
+
+How to test whether a condition holds for all members of an array.
+Always true for an empty array.
+
+
+    existential predicate
+
+How to test whether an item in an array exists for which a condition
+holds. Always false for an empty array.
+
+
+    dictionary literal
+
+
+    dictionary size
+
+
+    dictionary lookup
+
+
+    dictionary iteration
+
+
+    out of bounds behavior
+
+
+  Functions <#functions>
+
+Python has both functions and methods. Ruby only has methods: functions
+defined at the top level are in fact methods on a special main object.
+Perl subroutines can be invoked with a function syntax or a method syntax.
+
+
+    function definition
+
+*posix shell:*
+
+A bash function definition can alternately be preceded by the keyword
+/function/, and when used, the parens following the function name are
+prohibited.
+
+
+    function invocation
+
+*posix shell:*
+
+The syntax for invoking a function is the same as the syntax for
+invoking a command. If a function is defined with the same name as a
+command in the search path, the function will be executed.
+
+
+    missing argument value
+
+Value of an argument variable if a function is invoked with fewer
+arguments than are declared.
+
+
+    extra arguments
+
+If a function is invoked with more arguments than are declared, how the
+function can access them.
+
+
+    default argument value
+
+How to declare a default value for an argument.
+
+
+    variable number of arguments
+
+How to write a function which accepts a variable number of argument.
+
+
+    named parameters
+
+How to write a function which uses named parameters.
+
+
+    return value
+
+*posix shell:*
+
+Bash functions can only return small integers via return. However, a
+function can echo to stdout and the caller can invoke it with backticks
+to get a string value.
+
+
+    lambda declaration
+
+How to define a lambda function.
+
+
+    lambda invocation
+
+
+    default scope
+
+*posix shell:*
+
+By default, bash and variables inside functions have global scope.
+
+
+  Execution Control <#execution-control>
+
+
+    if
+
+Some optional branching constructs:
+
+*posix shell:*
+
+|case $a in (0) echo "no";; (1) echo "yes";; (2) echo "maybe";; (*) echo "error";; esac|
+
+
+    while
+
+*posix shell:*
+
+Also has an /until/ loop.
+
+
+    break/continue/redo
+
+/break/ exits a /for/ or /while/ loop immediately. /continue/ goes to
+the next iteration of the loop. /redo/ goes back to the beginning of the
+current iteration.
+
+
+    for
+
+*posix shell:*
+
+A C-style for loop:
+
+|for ((i=0; i<10; i++ )); do echo $i; done|
+
+
+  Exceptions <#exceptions>
+
+
+    raise exception
+
+How to raise an exception.
+
+
+    catch exception
+
+How to handle an exception.
+
+
+    uncaught exception behavior
+
+System behavior if an exception goes uncaught. Most interpreters print
+the exception message to stderr and exit with a nonzero status.
+
+*posix shell:*
+
+The bash interpreter writes a message to stderr whenever a command
+returns a nonzero status. By default, the interpreter does not exit, but
+if this behavior is desired, then the following should be put at the top
+of the script:
+
+|trap exit ERR|
+
+
+    wait on thread
+
+
+  Streams <#streams>
+
+
+    write to standard out
+
+*posix shell:*
+
+To prevent /echo/ from appending a newline to the output, use
+
+|echo -n "hello"|
+
+
+    standard filehandles
+
+
+    read line
+
+
+    read file
+
+
+    write to file
+
+
+    append to file
+
+
+  Files <#files>
+
+
+  Directories <#directories>
+
+
+  Processes and Environment <#processes-environment>
+
+
+    external command
+
+*posix shell:*
+
+The syntax for calling an external command is the same as the syntax for
+invoking a function. If a function is defined with the same name as an
+external command in the search path, the function is invoked.
+
+
+    backticks
+
+
+    command line args
+
+
+    speech
+
+How to make the computer talk.
+
+*posix shell:*
+
+On Mac OSX the command say can also be executed from the bash or zsh prompt:
+
+|say "I'm a Mac"|
+
+On Ubuntu Linux this command can be used:
+
+|espeak "I'm Unix"|
+
+
+    environment variable
+
+
+    command path
+
+The directory containing a command. Also indicates if the command is a
+built-in, alias, or function. Shows the definition of aliases and functions.
+
+
+    exit
+
+*posix shell:*
+
+The exit status of a bash script is the return status of the last
+command executed, or the argument of /exit/.
+
+
+    set signal handler
+
+
+  Libraries and Namespaces <#libraries-namespaces>
+
+
+    library
+
+What a library looks like.
+
+
+    import library
+
+
+    library path
+
+
+    namespace declaration
+
+
+    namespace separator
+
+
+  Reflection <#reflection>
+
+
+    class
+
+
+  Debugging and Profiling <#debugging-profiling>
+
+
+  POSIX Shell <#top>
+
+POSIX 2008: Shell & Utilities
+<http://pubs.opengroup.org/onlinepubs/9699919799/idx/xcu.html>
+
+
+  Command Prompt <#top>
+
+Command-line reference A-Z
+<http://technet.microsoft.com/en-us/library/bb490890.aspx>
+
+
+  PowerShell <#top>
+
+Windows PowerShell User's Guide
+<http://technet.microsoft.com/en-us/library/cc196356.aspx>
+
+issue tracker <https://github.com/clarkgrubb/hyperpolyglot/issues> |
+content of this page licensed under creative commons
+attribution-sharealike 3.0 <http://creativecommons.org/licenses/by-sa/3.0/>
+Hide Download Bar
+Ctrl + Shift + Z = Show/Hide Download Bar
+Downloads
+Download Manager (S3)
+Clear
+Left Click: Clear All Finished
+Right Click: Undo last clear
+100%
+Download History
+Download list is empty
+hbash.txt
+Unk.
+Unk.
+136 KB
+455 KB/s
+hbash.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbash.txt
+Status:
+	
+136 KB / Unknown ( 455 KB/s )
+File Size:
+	
+505 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:21:49
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+1.62 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashman.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashman.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashman.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+398 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:23:48
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+863 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hfilesys.txt
+Unk.
+Unk.
+-.--
+-.--
+hfilesys.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hfilesys.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+122 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:51:42
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+192 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdeblic.txt
+Unk.
+Unk.
+-.--
+-.--
+hdeblic.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdeblic.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+40 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:52:06
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+91 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebdev
+Unk.
+Unk.
+96 KB
+963 KB/s
+hdebdev
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebdev
+Status:
+	
+96 KB / Unknown ( 963 KB/s )
+File Size:
+	
+291 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:11
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+3.60 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebmaint
+Unk.
+Unk.
+79 KB
+395 KB/s
+hdebmaint
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebmaint
+Status:
+	
+79 KB / Unknown ( 395 KB/s )
+File Size:
+	
+322 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:31
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+2.02 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebmaintnew
+100%
+00:00
+54 KB
+538 KB/s
+hdebmaintnew
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebmaintnew
+Status:
+	
+54 KB / 54 KB ( 538 KB/s )
+File Size:
+	
+175 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:46
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+1.26 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+debpackaging-tutorial.en.pdf
+100%
+00:00
+388 KB
+3.79 MB/s
+debpackaging-tutorial.en.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\debpackaging-tutorial.en.pdf
+Status:
+	
+388 KB / 388 KB ( 3.79 MB/s )
+File Size:
+	
+388 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:54:09
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+3.91 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebconfig
+100%
+00:00
+6 KB
+60 KB/s
+hdebconfig
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebconfig
+Status:
+	
+6 KB / 8 KB ( 60 KB/s )
+File Size:
+	
+27 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:54:23
+Time to Complete:
+	
+00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+32 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+debhamradio-maintguide.en.pdf
+100%
+00:00
+193 KB
+Infinity GB/s
+debhamradio-maintguide.en.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\debhamradio-maintguide.en.pdf
+Status:
+	
+193 KB / 193 KB ( Infinity GB/s )
+File Size:
+	
+193 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:57:27
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+2.58 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hgoogbashstyle.txt
+Unk.
+Unk.
+-.--
+-.--
+hgoogbashstyle.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hgoogbashstyle.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+44 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:02:34
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+46 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hposixsh.txt
+Unk.
+Unk.
+-.--
+-.--
+hposixsh.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hposixsh.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+177 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:09:12
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+183 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+htextsculpt.txt
+Unk.
+Unk.
+-.--
+-.--
+htextsculpt.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\htextsculpt.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+43 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:10:16
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+47 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hrelalgbash.txt
+Unk.
+Unk.
+-.--
+-.--
+hrelalgbash.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hrelalgbash.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+27 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:11:49
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+25 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashex.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashex.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashex.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+39 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:13:13
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+34 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hperlguide.txt
+Unk.
+Unk.
+-.--
+-.--
+hperlguide.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hperlguide.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+95 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:13:32
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+87 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hmakeref.txt
+Unk.
+Unk.
+-.--
+-.--
+hmakeref.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hmakeref.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+21 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:14:04
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+19 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hquotes.txt
+Unk.
+Unk.
+-.--
+-.--
+hquotes.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hquotes.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+39 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:34:14
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+33 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hregex.txt
+Unk.
+Unk.
+-.--
+-.--
+hregex.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hregex.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+38 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:34:28
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+32 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hgrep.txt
+Unk.
+Unk.
+-.--
+-.--
+hgrep.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hgrep.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+25 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:34:45
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+21 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hsed.txt
+Unk.
+Unk.
+-.--
+-.--
+hsed.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hsed.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+135 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:35:00
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+105 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hposixshtut.txt
+Unk.
+Unk.
+-.--
+-.--
+hposixshtut.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hposixshtut.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+183 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:35:20
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+126 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hawk.txt
+Unk.
+Unk.
+-.--
+-.--
+hawk.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hawk.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+141 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:35:32
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+100 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hsh.txt
+Unk.
+Unk.
+-.--
+-.--
+hsh.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hsh.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+165 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:35:48
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+116 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hmake.txt
+Unk.
+Unk.
+-.--
+-.--
+hmake.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hmake.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+58 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:36:11
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+40 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hperm.txt
+Unk.
+Unk.
+-.--
+-.--
+hperm.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hperm.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+47 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:36:25
+Time to Complete:
+	
+00:02
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+29 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hcsh10bad
+100%
+00:00
+11 KB
+53 KB/s
+hcsh10bad
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hcsh10bad
+Status:
+	
+11 KB / 11 KB ( 53 KB/s )
+File Size:
+	
+27 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:36:47
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+134 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+htextman.txt
+Unk.
+Unk.
+-.--
+-.--
+htextman.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\htextman.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+85 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:37:46
+Time to Complete:
+	
+00:02
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+40 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hunixtools.txt
+Unk.
+Unk.
+-.--
+-.--
+hunixtools.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hunixtools.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+187 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:43:20
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+232 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashtips.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashtips.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashtips.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+38 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:45:23
+Time to Complete:
+	
+00:02
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+22 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashpitf.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashpitf.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashpitf.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+109 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:45:40
+Time to Complete:
+	
+00:02
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+59 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+New York, NY, USA
+There was a problem connecting to the weather service.
+Reload Weather Data
+Click for hourly forecast.
+Click to expand
+Click to collapse
+New York, NY, USA : 65°F
+Today : 	
+New York, NY, USA
+Today	2/23/2022
+Clearing
+The temperature approaching the record of 72 ...
+	68°F
+Feels like 69°F
+Sunrise:	6:39 AM
+UV Index:	Moderate (3)
+Sunburn: 45 minutes
+Winds:	7 mph
+Precipitation:	0.01 in
+
+Tonight	2/23/2022
+Partly cloudy and much colder
+	31°F
+Feels like 55°F
+Sunset:	5:40 PM
+Winds:	8 mph
+Precipitation:	0 in
+Moon:	21
+
+68°F
+	31°F
+Tomorrow : 	
+New York, NY, USA
+Tomorrow	2/24/2022
+Mostly cloudy and much colder
+	37°F
+Feels like 39°F
+Sunrise:	6:38 AM
+UV Index:	Low (1)
+Winds:	4 mph
+Precipitation:	0 in
+
+Tomorrow Night	2/24/2022
+A wintry mix late, up to 1 in
+Snow and sleet late in the evening followed b...
+	32°F
+Feels like 28°F
+Sunset:	5:41 PM
+Winds:	4 mph
+Precipitation:	0.6 in
+Moon:	22
+
+37°F
+	32°F
+Friday : 	
+New York, NY, USA
+Friday	2/25/2022
+Cloudy with rain tapering off
+	38°F
+Feels like 34°F
+Sunrise:	6:36 AM
+UV Index:	Low (1)
+Winds:	7 mph
+Precipitation:	0.67 in
+
+Friday Night	2/25/2022
+Clear to partly cloudy
+	22°F
+Feels like 23°F
+Sunset:	5:42 PM
+Winds:	7 mph
+Precipitation:	0 in
+Moon:	23
+
+38°F
+	22°F
+Saturday : 	
+New York, NY, USA
+Saturday	2/26/2022
+Mostly sunny and cold
+	34°F
+Feels like 37°F
+Sunrise:	6:35 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	5 mph
+Precipitation:	0 in
+
+Saturday Night	2/26/2022
+Clear
+	28°F
+Feels like 22°F
+Sunset:	5:43 PM
+Winds:	5 mph
+Precipitation:	0 in
+Moon:	24
+
+34°F
+	28°F
+Sunday : 	
+New York, NY, USA
+Sunday	2/27/2022
+Partly sunny
+	42°F
+Feels like 38°F
+Sunrise:	6:33 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	9 mph
+Precipitation:	0 in
+
+Sunday Night	2/27/2022
+Mainly clear and colder
+Mainly clear and colder; hypothermia likely w...
+	20°F
+Feels like 25°F
+Sunset:	5:45 PM
+Winds:	9 mph
+Precipitation:	0 in
+Moon:	25
+
+42°F
+	20°F
+Monday : 	
+New York, NY, USA
+Monday	2/28/2022
+Colder with plenty of sun
+	29°F
+Feels like 23°F
+Sunrise:	6:32 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	9 mph
+Precipitation:	0 in
+
+Monday Night	2/28/2022
+Clear and cold
+	22°F
+Feels like 7°F
+Sunset:	5:46 PM
+Winds:	4 mph
+Precipitation:	0 in
+Moon:	26
+
+29°F
+	22°F
+Tuesday : 	
+New York, NY, USA
+Tuesday	3/1/2022
+Partly sunny and not as cold
+	43°F
+Feels like 46°F
+Sunrise:	6:30 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	5 mph
+Precipitation:	0 in
+
+Tuesday Night	3/1/2022
+Partly cloudy
+	37°F
+Feels like 29°F
+Sunset:	5:47 PM
+Winds:	4 mph
+Precipitation:	0 in
+Moon:	27
+
+43°F
+	37°F
+

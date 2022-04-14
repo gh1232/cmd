@@ -1,0 +1,2094 @@
+GBdirect <http://www.gbdirect.co.uk/>
+http://www.gbdirect.co.uk/ <http://www.gbdirect.co.uk/>
+
+
+  Power Shell Usage
+
+
+      Bash Tips & Tricks
+
+Simon Myers
+simon.myers@gbdirect.co.uk <mailto:simon.myers@gbdirect.co.uk>
+
+
+        UKUUG Linux 2003 Conference • August 2003
+
+http://www.ukuug.org/events/linux2003/
+<http://www.ukuug.org/events/linux2003/>
+
+This view lists all the slides from the talk in a continuous format.
+There is a PDF version
+<https://www.ukuug.org/events/linux2003/papers/bash_tips/Bash_tips.pdf>
+available, suitable for printing on A4 paper.
+
+The slides are also designed to be viewed as a slideshow from this file
+with Mozilla or a compatible browser. JavaScript is used to make
+pressing |N| progress to the next slide. The slides fit on a
+1024 × 768 pixel display. To toggle full-screen mode in Mozilla press |F11|.
+
+Switch to the slideshow view <javascript:SwitchToSlideshow()>.
+
+
+    1 Intro
+
+  * Tips for driving Bash better in everyday Linux use
+  * Target audience: people who type things in Linux
+
+Happy crowd scene
+<https://www.ukuug.org/events/linux2003/papers/bash_tips/1d_happy_crowd.jpg>
+
+  * Assumptions:
+      o You suspect Bash has features useful to you
+      o You know that bash(1) is /looong/
+      o You’re too lazy to read it
+
+
+    2 Not a List of Keystrokes
+
+  * More interesting tips than just listing keystrokes
+  * This talk not about:
+      o |Ctrl+W|, |Meta+BkSpc|, |Meta+D|, |Ctrl+K|, |Ctrl+U|, |Meta+F|,
+        |Meta+B|, |Shift+Ins|, |Ctrl+T|, |Ctrl+]|, |Ctrl+Meta+]|
+
+Rat in academic dress, typing
+<https://www.ukuug.org/events/linux2003/papers/bash_tips/2d_typing.png>
+
+  * If you want to learn keystrokes, look them up
+
+
+    3 History
+
+  * Command history means never having to retype previous commands
+  * In theory
+  * Default configuration makes this not always the practice
+  * Problems:
+      o Sometimes commands don’t seem to get saved
+      o It can be awkward to find those that have been
+
+
+    4 The ‘New Window’ Problem
+
+  * Opening a terminal might read 400 history lines off disk
+
+A terminal with 400 lines of history read from disk, and 100 lines typed
+
+  * Type 100 new command lines into it
+  * One command is taking a while to finish…
+
+For example a long compilation, or an FTP or SSH session, and you need
+to do something else local too.
+
+
+    5 The ‘New Window’ Problem
+
+  * So open a second window
+
+A second terminal, with 400 lines of history read from disk
+
+  * The new window doesn’t have the 100 most recent lines!
+  * History is saved on exit — and the first shell hasn’t exited yet
+
+The history on disk still has just the original 400 lines, so that’s
+what gets loaded into the 2nd window.
+
+
+    6 ‘Loser Takes All’
+
+  * Now closing the first window will write the history to disk
+
+Closing the first terminal writes its 500 lines to disk
+
+  * All 500 lines saved for future reference
+  * But that second window, with only 5 lines typed in it, is still open…
+
+
+    7 ‘Loser Takes All’
+
+  * Closing the second window saves /its/ history to disk
+
+Closing the second terminal writes its 405 lines to disk, over the
+previous file
+
+  * The 100 lines from the first window are overwritten!
+  * History is only remembered from the shell that finishes last
+
+
+    8 Rewriting History
+
+  * Both of these problems stem from only writing history lines to disk
+    when a shell exits
+  * The solution is to append each line to the history individually
+  * Specify this in |.bashrc|
+      o Make Bash append rather than overwrite the history on disk:
+
+        shopt -s histappend
+
+      o Whenever displaying the prompt, write the previous line to disk:
+
+        PROMPT_COMMAND='history -a'
+
+  * A new shell gets the history lines from all previous shells
+
+If you’ve configured your terminal windows to run log-in shells then you
+might need to use |.bash_profile| instead of |.bashrc|. But on many
+systems |.bash_profile| sources |.bashrc| anyway. This also applies to
+other mentions of |.bashrc| in this presentation.
+
+
+    9 Searching the Past
+
+  * There are several ways of finding previous lines from history
+
+
+    10 Searching the Past
+
+  * There are several bad ways of finding previous lines from history
+  * Many people go for pressing |Up| lots (and lots)
+      o A tad inefficient, perhaps
+  * Cannier folk know that |Ctrl+R| searches previous lines
+      o But |Ctrl+R zip Esc| doesn’t find the last |zip| command — it
+        also matches any line that copied, deleted, unzipped, or did
+        anything else with a zip file
+  * Those of a gambling bent can chance |!| and a command name
+      o Irritating when |!gv| opens |gvim| instead of |gv|
+
+
+    11 Sane Incremental Searching
+
+  * Bash can cycle through lines starting in a particular way
+  * Just type in a few characters then press |Up|
+      o Don’t need to press |Up| so many times
+      o Don’t see lines that merely contain those letters
+      o Don’t have to chance executing the wrong line
+
+|zip Up| goes to the most recent |zip| command. Further presses of |Up|
+cycle through previous |zip| commands.
+
+|gv Up| goes to the most recent command starting with those letters.
+Suppose that found a |gvim| command and you were looking for a |gv|
+command: pressing |Space Up| would then go to the most recent line
+starting |gv?|.
+
+
+    12 Configuring |Up| and |Down|
+
+  * Incremental searching with |Up| and |Down| is configured in |.inputrc|
+
+    "\e[A": history-search-backward
+    "\e[B": history-search-forward
+
+  * Old behaviour still available with |Ctrl+P| and |Ctrl+N|
+  * If that prevents |Left| and |Right| from working, fix them like this:
+
+    "\e[C": forward-char
+    "\e[D": backward-char
+
+
+    13 Repeating Command Bits
+
+  * Commonly want to repeat just bits of commands
+  * Very often the previous command’s last argument
+  * |Meta+.| types this
+      o Press repeatedly to cycle through the final argument from
+        earlier commands
+
+Suppose these commands have been executed:
+
+$ /mount /mnt/cdrom/
+$ /ls /var/tmp/
+
+It is then possible to type the start of the next command line (such as
+|ls -l|) and simply press |Meta+.| to have |/var/tmp| be ‘typed’ for
+you. Pressing |Meta+.| again (without an intervening keystroke) will
+‘untype’ |/var/tmp| and replace it with |/mnt/cdrom|.
+
+Note that on PCs |Alt| typically functions as |Meta|, so |Alt+.| is what
+would be pressed. This applies to all mentions of |Meta| in this talk.
+
+
+    14 Grabbing Other Bits
+
+  * Other bits of previous commands can be grabbed with |!|
+  * |!:0| is the previous command name
+  * |!^|, |!:2|, |!:3|, …, |!$| are the arguments
+  * |!*| is all the arguments
+  * |!-2|, |!-3|, … are earlier commands
+      o |!-2^|, |!-2:2|, |!-2$|, |!-2*|
+  * So can have things like
+
+    $ /!-2:0 -R !^ !-3:2/
+
+      o But looks like nonsense
+      o A brave person who presses |Enter|
+
+
+    15 Magic Space
+
+  * A magic space inserts a space character as normal
+  * And also performs history expansion in the line
+  * See what you type before you commit to it
+      o Press |Space| before |Enter| if necessary
+
+Suppose you squeeze a png image to use maximum compression:
+
+$ /pngcrush pineapple.png crushed_pineapple.png/
+
+You can then list the files’ sizes without having to type their names again:
+
+$ /ls -lh !*/
+
+Then you can rename the new file to the original name (deleting the
+uncrushed file in the process). The new name can be ‘typed’ with
+|Meta+.|, and the original name picked out of a previous command:
+
+$ /mv Meta+. !-2^/
+
+Before committing a file to CVS you check over which changes you’ve
+made. Vim conveniently uses colour to highlight the changes, and using a
+separate window means that they can be kept on-screen while typing the
+commit message:
+
+$ /cvs diff GBdirect/DocTools/Util.pm | gview -/
+
+Then the file can be committed, picking its name out of the previous
+command line:
+
+$ /cvs com !:2/
+
+
+    16 Magic Space Set-Up
+
+  * Magic space is configured in |.inputrc|
+  * Redefine what |Space| does
+  * There are other readline-based programs without this feature, so
+    make it only apply in Bash:
+
+    $if Bash
+      Space: magic-space
+    $endif
+
+For example the MySQL client and the Perl debugger can also use the
+readline library.
+
+
+    17 Forgetting Options
+
+  * Common to forget an option from a command
+  * Want to rerun the command with the option
+  * Go to the previous history line, then move just after the command
+    name to type the option
+  * Can set up a keyboard macro to do this
+
+If you (attempt to) view a directory’s contents:
+
+$ /ls -l /var/spool/exim//
+ls: /var/spool/exim: Permission denied
+
+then to see the permissions of the directory itself, add the |-d| flag:
+
+$ ls /-d/ -l /var/spool/exim/
+
+|grep| can search through all files in a directory:
+
+$ /grep RewriteCond /usr/share/doc/apache/manual//
+grep: /usr/share/doc/apache/manual: Is a directory
+
+But only if you remember the |-r| flag:
+
+$ grep /-r/ RewriteCond /usr/share/doc/apache/manual/
+
+Sometimes processes refuse to die:
+
+$ /killall xmms/
+
+The |-9| flag leaves them with little choice:
+
+$ killall /-9/ xmms
+
+Other places where flags can be added include |ls -tr|, |rm -r|, and
+|chmod -R|.
+
+
+    18 Insert-Option Macro
+
+  * |Meta+O| can be made to load the previous command and position the
+    cursor for typing an option
+  * Defined in |.inputrc|:
+
+    "\M-o": "\C-p\C-a\M-f "
+
+      o |Ctrl+P|: previous line
+      o |Ctrl+A|: start of line
+      o |Meta+F|: forward a word, past the command
+      o |?|: insert a space
+  * 17 unused keystrokes with just |Ctrl| or |Meta| modifiers
+
+The 2 unused keystrokes with |Ctrl| are the rather awkward |Ctrl+\| and
+|Ctrl+^|.
+
+But there are 15 letters available for use with |Meta|, namely:
+|Meta+A|, |Meta+E|, |Meta+G|, |Meta+H|, |Meta+I|, |Meta+J|, |Meta+K|,
+|Meta+M|, |Meta+O|, |Meta+Q|, |Meta+S|, |Meta+V|, |Meta+W|, |Meta+X|,
+and |Meta+Z|.
+
+
+    19 Default Command Options
+
+  * One way to avoid forgetting common options is to have Bash remember them
+  * Define functions to execute commands with desired options
+  * Name the functions to replace commands
+
+|ls| can be made always to include the |-F| flag, to add symbols marking
+directory and command names among the list of filenames.
+
+|mkdir| can have the |-p| flag so that it is is possible to create
+nested subdirectories in one go.
+
+|grep| can have the |-r| flag so that it will work on directories. This
+won’t cause any harm when |grep|ing ordinary files.
+
+Other default flags to consider include |scp -pr|, |dirs -v| and |jobs -l|.
+
+
+    20 Defining Functions
+
+  * Define functions providing default options in |.bashrc|
+
+    function ls
+    {
+      command ls -F "$@"
+    }
+
+      o |command| runs the real command
+      o |"$@"| inserts the user arguments
+  * Do not define |rm| to include |-i| by default
+      o Won’t be there on other people’s systems
+
+
+    21 New Command Names
+
+  * Commands with arguments can have different names:
+
+    function duff
+    {
+      diff -ur "$@"
+    }
+
+  * Safe to export, for use in shells embedded in editors:
+
+    export -f duff
+
+    Can't get enough of that wonderful Duff!
+    <https://www.ukuug.org/events/linux2003/papers/bash_tips/7d_Duff.png>
+
+  * Leaves the original name alone for programs relying on it
+
+This |ll| function produces a long-format directory listing:
+
+function ll
+{
+  command ls -Flh "$@"
+}
+export -f ll
+
+|doc| can be made to change to the specified package’s documentation
+directory and display the files therein:
+
+function doc
+{
+  pushd "/usr/share/doc/$1" && ls
+}
+export -f doc
+
+Functions can be created for performing file conversions. For example
+this function takes a single XFig file, such as |network.fig|, and
+produces a PostScript file with the same basename, such as |network.ps|:
+
+function fig2ps
+{
+  fig2dev -L ps "$1" "${1%.fig}.ps"
+}
+export -f fig2ps
+
+
+    22 Graphical Commands
+
+  * Functions can also be used to ensure that graphical commands always
+    open in the background:
+
+    function gimp
+    {
+      command gimp "$@" &
+    }
+
+Mrs Gimp
+<https://www.ukuug.org/events/linux2003/papers/bash_tips/8d_gimp.png>
+
+  * Saves having to type the |&| every time
+
+This is useful for pretty much any command which opens a window,
+including |gv|, |mozilla|, |acroread|, |xfig|, and |ooffice|.
+
+
+    23 Specifying Directories
+
+  * Bash can help with specifying directory names
+  * |cd -| changes back to the previous directory
+      o Handy if you forgot to |pushd|
+  * In general |~-| is the previous directory
+      o Useful for working with files in 2 different directories
+
+If you have a tarball in the current directory but you wish to extract
+it in a different directory, you can change directory then use |~-| to
+refer to the directory containing the tarball:
+
+~/downloads/Mozilla/ $ /cd /var/tmp/
+/var/tmp $ /tar xzf ~-/moz Tab Meta+S Meta+S/
+
+Afterwards you can change back to where you were:
+
+/var/tmp $ /cd -/
+~/downloads/Mozilla/ $
+
+
+    24 Directory Name Typos
+
+  * When changing directory small typos can be ignored by Bash
+  * Enable this in |.bashrc|:
+
+    shopt -s cdspell
+
+Bash will cope with each component of the typed path having one missing
+character, one extra character, or a pair of characters transposed:
+
+$ /cd /vr/lgo/apaache/
+/var/log/apache
+
+
+    25 Directory Bookmarks
+
+  * Some directories are changed to more frequently than others
+  * Can avoid typing their full paths if their /parents/ are in |$CDPATH|
+
+Suppose |$CDPATH| contains |~/pending| and |/home/www-data|; you would
+then be able to change to their subdirectories from anywhere on the
+system without typing a full path:
+
+$ /cd conference/
+/home/simon/pending/conference
+$ /cd intranet/logs/
+/home/www-data/intranet/logs
+
+If |..| is also in |$CDPATH| then you can easily change to sibling
+directories. For example, following on from above you could do:
+
+$ /cd docs/
+/home/www-data/intranet/docs
+
+
+    26 Setting |$CDPATH|
+
+  * Set |$CDPATH| in |.bashrc|:
+
+    CDPATH='.:..:../..:~/links:~:~/projects:/var/www/virtual_hosts'
+
+      o Colon-separated
+  * Put |.| first so can still change directory normally
+  * Also could include:
+      o |..| for sibling directories
+      o |../..| for aunties and uncles
+      o Home directory
+      o A directory just containing links to often-used directories
+
+
+    27 Completion
+
+  * The way Bash completes filenames and other things with |Tab| can be
+    customized in |.inputrc|
+  * Keep hidden files hidden when doing, for example, |cp ~/ Tab|:
+
+    set match-hidden-files off
+
+      o |cp ~/. Tab| will match hidden files
+  * Complete things that have been typed in the wrong case:
+
+    set completion-ignore-case on
+
+  * When listing possible file completions, put |/| after directory
+    names and |*| after programs:
+
+    set visible-stats on
+
+
+    28 Completion Cycling
+
+  * Instead of beeping on an ambiguous completion request, Bash can be
+    made to list the possibilities
+  * Then a keystroke can be used to cycle through them
+      o Often faster than working out which characters to type to be
+        unambiguous
+
+For example, suppose you want to edit your |.bashrc|. You could start by
+typing:
+
+$ /xemacs ~/.b/
+
+Then pressing |Tab| yields a list of matching files, and completes the
+name as far as possible:
+
+.bash_history  .bash_profile  .bashrc
+$ xemacs ~/.bash
+
+|Meta+S| will cycle through the completions, so pressing it once gives:
+
+$ xemacs ~/.bash_history
+
+Tapping it another couple of times completes to the required filename.
+
+
+    29 Cycling Set-Up
+
+  * Cycling through potential completions is configured in |.inputrc|
+  * List the possible completions when |Tab| is pressed:
+
+    set show-all-if-ambiguous on
+
+  * Make |Meta+S| cycle through the list:
+
+    "\M-s": menu-complete
+
+
+    30 Programmable Completion
+
+  * Bash’s programmable completion enables commands’ arguments to be
+    completed intelligently for different commands
+  * Enable it from |.bashrc|:
+
+    source /etc/bash_completion
+
+When writing a document you often end up with several files with similar
+names but different extensions:
+
+$ /ls/
+Bash_tips.aux  Bash_tips.log  Bash_tips.pdf  Bash_tips.tex
+
+But with programmable completion, Bash will pick the filetype that
+matches the command and ignore all the others:
+
+$ /acroread ba/
+
+Pressing |Tab| converts the above to:
+
+$ acroread Bash_tips.pdf
+
+If that was the only PDF file in the directory you don’t need to type
+/any/ of the filename: just type the command name then press |Tab| and
+the filename will be inserted. And even if there are a few PDF files, it
+still may be quicker not to type any of their names and just use
+|Meta+S| to cycle through them.
+
+This is useful for any application which only works with a limited group
+of filetypes. It can also be used to exclude filetypes from commands.
+For example image and sound files can be excluded from filename
+completions for text editors.
+
+
+    31 Completion Caveats
+
+  * Programmable completion doesn’t always do what you want
+  * Sometimes worse than the default
+      o Can be disabled for a particular command
+
+        complete -r cd
+
+  * Developed independently of Bash
+  * Download the latest version from
+    http://www.caliban.org/bash/#completion
+    <http://www.caliban.org/bash/#completion>
+
+
+    32 Accidental Exiting
+
+  * |Ctrl+D| conveniently exits Bash
+  * Sometimes /too/ conveniently
+  * Specify that it must be pressed twice to exit:
+
+    export IGNOREEOF=1
+
+$ /Ctrl+D/
+$ Use "exit" to leave the shell.
+$ /Ctrl+D/
+$ exit
+
+
+    33 Summary
+
+  * Many things can be done to make using the command line more comfortable
+  * Main ones for me are keeping all history, searching backwards with
+    |Up|, and cycling completions with |Meta+S|
+  * Downside of such luxuries is that that sometimes you have to use
+    systems where they aren’t configured
+  * Would fix the problem if everybody standardized on the settings
+    presented here…
+
+Dancing penguins
+<https://www.ukuug.org/events/linux2003/papers/bash_tips/9d_penguins.png>
+
+© Copyright GBdirect Ltd 2003
+This material may not be distributed without explicit permission.
+Hide Download Bar
+Ctrl + Shift + Z = Show/Hide Download Bar
+Downloads
+Download Manager (S3)
+Clear
+Left Click: Clear All Finished
+Right Click: Undo last clear
+100%
+Download History
+Download list is empty
+hbash.txt
+Unk.
+Unk.
+136 KB
+455 KB/s
+hbash.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbash.txt
+Status:
+	
+136 KB / Unknown ( 455 KB/s )
+File Size:
+	
+505 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:21:49
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+1.62 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashman.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashman.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashman.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+398 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:23:48
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+863 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hfilesys.txt
+Unk.
+Unk.
+-.--
+-.--
+hfilesys.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hfilesys.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+122 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:51:42
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+192 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdeblic.txt
+Unk.
+Unk.
+-.--
+-.--
+hdeblic.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdeblic.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+40 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:52:06
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+91 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebdev
+Unk.
+Unk.
+96 KB
+963 KB/s
+hdebdev
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebdev
+Status:
+	
+96 KB / Unknown ( 963 KB/s )
+File Size:
+	
+291 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:11
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+3.60 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebmaint
+Unk.
+Unk.
+79 KB
+395 KB/s
+hdebmaint
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebmaint
+Status:
+	
+79 KB / Unknown ( 395 KB/s )
+File Size:
+	
+322 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:31
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+2.02 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebmaintnew
+100%
+00:00
+54 KB
+538 KB/s
+hdebmaintnew
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebmaintnew
+Status:
+	
+54 KB / 54 KB ( 538 KB/s )
+File Size:
+	
+175 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:46
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+1.26 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+debpackaging-tutorial.en.pdf
+100%
+00:00
+388 KB
+3.79 MB/s
+debpackaging-tutorial.en.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\debpackaging-tutorial.en.pdf
+Status:
+	
+388 KB / 388 KB ( 3.79 MB/s )
+File Size:
+	
+388 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:54:09
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+3.91 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebconfig
+100%
+00:00
+6 KB
+60 KB/s
+hdebconfig
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebconfig
+Status:
+	
+6 KB / 8 KB ( 60 KB/s )
+File Size:
+	
+27 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:54:23
+Time to Complete:
+	
+00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+32 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+debhamradio-maintguide.en.pdf
+100%
+00:00
+193 KB
+Infinity GB/s
+debhamradio-maintguide.en.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\debhamradio-maintguide.en.pdf
+Status:
+	
+193 KB / 193 KB ( Infinity GB/s )
+File Size:
+	
+193 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:57:27
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+2.58 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hgoogbashstyle.txt
+Unk.
+Unk.
+-.--
+-.--
+hgoogbashstyle.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hgoogbashstyle.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+44 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:02:34
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+46 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hposixsh.txt
+Unk.
+Unk.
+-.--
+-.--
+hposixsh.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hposixsh.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+177 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:09:12
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+183 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+htextsculpt.txt
+Unk.
+Unk.
+-.--
+-.--
+htextsculpt.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\htextsculpt.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+43 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:10:16
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+47 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hrelalgbash.txt
+Unk.
+Unk.
+-.--
+-.--
+hrelalgbash.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hrelalgbash.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+27 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:11:49
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+25 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashex.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashex.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashex.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+39 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:13:13
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+34 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hperlguide.txt
+Unk.
+Unk.
+-.--
+-.--
+hperlguide.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hperlguide.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+95 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:13:32
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+87 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hmakeref.txt
+Unk.
+Unk.
+-.--
+-.--
+hmakeref.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hmakeref.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+21 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:14:04
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+19 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hquotes.txt
+Unk.
+Unk.
+-.--
+-.--
+hquotes.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hquotes.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+39 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:34:14
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+33 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hregex.txt
+Unk.
+Unk.
+-.--
+-.--
+hregex.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hregex.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+38 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:34:28
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+32 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hgrep.txt
+Unk.
+Unk.
+-.--
+-.--
+hgrep.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hgrep.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+25 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:34:45
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+21 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hsed.txt
+Unk.
+Unk.
+-.--
+-.--
+hsed.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hsed.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+135 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:35:00
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+105 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hposixshtut.txt
+Unk.
+Unk.
+-.--
+-.--
+hposixshtut.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hposixshtut.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+183 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:35:20
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+126 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hawk.txt
+Unk.
+Unk.
+-.--
+-.--
+hawk.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hawk.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+141 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:35:32
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+100 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hsh.txt
+Unk.
+Unk.
+-.--
+-.--
+hsh.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hsh.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+165 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:35:48
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+116 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hmake.txt
+Unk.
+Unk.
+-.--
+-.--
+hmake.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hmake.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+58 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:36:11
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+40 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hperm.txt
+Unk.
+Unk.
+-.--
+-.--
+hperm.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hperm.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+47 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:36:25
+Time to Complete:
+	
+00:02
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+29 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hcsh10bad
+100%
+00:00
+11 KB
+53 KB/s
+hcsh10bad
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hcsh10bad
+Status:
+	
+11 KB / 11 KB ( 53 KB/s )
+File Size:
+	
+27 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:36:47
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+134 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+htextman.txt
+Unk.
+Unk.
+-.--
+-.--
+htextman.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\htextman.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+85 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:37:46
+Time to Complete:
+	
+00:02
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+40 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hunixtools.txt
+Unk.
+Unk.
+-.--
+-.--
+hunixtools.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hunixtools.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+187 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:43:20
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+232 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+New York, NY, USA
+There was a problem connecting to the weather service.
+Reload Weather Data
+Click for hourly forecast.
+Click to expand
+Click to collapse
+New York, NY, USA : 65°F
+Today : 	
+New York, NY, USA
+Today	2/23/2022
+Clearing
+The temperature approaching the record of 72 ...
+	68°F
+Feels like 69°F
+Sunrise:	6:39 AM
+UV Index:	Moderate (3)
+Sunburn: 45 minutes
+Winds:	7 mph
+Precipitation:	0.01 in
+
+Tonight	2/23/2022
+Partly cloudy and much colder
+	31°F
+Feels like 55°F
+Sunset:	5:40 PM
+Winds:	8 mph
+Precipitation:	0 in
+Moon:	21
+
+68°F
+	31°F
+Tomorrow : 	
+New York, NY, USA
+Tomorrow	2/24/2022
+Mostly cloudy and much colder
+	37°F
+Feels like 39°F
+Sunrise:	6:38 AM
+UV Index:	Low (1)
+Winds:	4 mph
+Precipitation:	0 in
+
+Tomorrow Night	2/24/2022
+A wintry mix late, up to 1 in
+Snow and sleet late in the evening followed b...
+	32°F
+Feels like 28°F
+Sunset:	5:41 PM
+Winds:	4 mph
+Precipitation:	0.6 in
+Moon:	22
+
+37°F
+	32°F
+Friday : 	
+New York, NY, USA
+Friday	2/25/2022
+Cloudy with rain tapering off
+	38°F
+Feels like 34°F
+Sunrise:	6:36 AM
+UV Index:	Low (1)
+Winds:	7 mph
+Precipitation:	0.67 in
+
+Friday Night	2/25/2022
+Clear to partly cloudy
+	22°F
+Feels like 23°F
+Sunset:	5:42 PM
+Winds:	7 mph
+Precipitation:	0 in
+Moon:	23
+
+38°F
+	22°F
+Saturday : 	
+New York, NY, USA
+Saturday	2/26/2022
+Mostly sunny and cold
+	34°F
+Feels like 37°F
+Sunrise:	6:35 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	5 mph
+Precipitation:	0 in
+
+Saturday Night	2/26/2022
+Clear
+	28°F
+Feels like 22°F
+Sunset:	5:43 PM
+Winds:	5 mph
+Precipitation:	0 in
+Moon:	24
+
+34°F
+	28°F
+Sunday : 	
+New York, NY, USA
+Sunday	2/27/2022
+Partly sunny
+	42°F
+Feels like 38°F
+Sunrise:	6:33 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	9 mph
+Precipitation:	0 in
+
+Sunday Night	2/27/2022
+Mainly clear and colder
+Mainly clear and colder; hypothermia likely w...
+	20°F
+Feels like 25°F
+Sunset:	5:45 PM
+Winds:	9 mph
+Precipitation:	0 in
+Moon:	25
+
+42°F
+	20°F
+Monday : 	
+New York, NY, USA
+Monday	2/28/2022
+Colder with plenty of sun
+	29°F
+Feels like 23°F
+Sunrise:	6:32 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	9 mph
+Precipitation:	0 in
+
+Monday Night	2/28/2022
+Clear and cold
+	22°F
+Feels like 7°F
+Sunset:	5:46 PM
+Winds:	4 mph
+Precipitation:	0 in
+Moon:	26
+
+29°F
+	22°F
+Tuesday : 	
+New York, NY, USA
+Tuesday	3/1/2022
+Partly sunny and not as cold
+	43°F
+Feels like 46°F
+Sunrise:	6:30 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	5 mph
+Precipitation:	0 in
+
+Tuesday Night	3/1/2022
+Partly cloudy
+	37°F
+Feels like 29°F
+Sunset:	5:47 PM
+Winds:	4 mph
+Precipitation:	0 in
+Moon:	27
+
+43°F
+	37°F
+

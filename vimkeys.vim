@@ -86,7 +86,7 @@ inoremap <c-o> <esc>:browse :open<enter>
 nnoremap <c-d> :browse :sav<enter> 
  
 inoremap <c-d> <esc>:browse :sav<enter>
-nmap <c-2> :set guifont=Font\ Awesome\ 14<enter>
+nmap <c-2> :set guifont=Font\ Awesome\ 24<enter>
 nmap <m-f> :set guifont=* <enter>
 nnoremap <leader>F2 :set gfn=Lucida_Console:h32:cANSI <enter>
 nnoremap <leader>F1 :set gfn=Lucida_Console:h30:cANSI <enter>
@@ -97,7 +97,7 @@ nnoremap <leader>F0 :set gfn=Lucida_Console:h20:cANSI <enter>
 nnoremap <leader>F4 :set gfn=Lucida_Console:h14:cANSI <enter>
 nnoremap <leader>F9 :set gfn=Lucida_Console:h9:cANSI <enter>
 set hi=20
-set gfn=Lucida_Console:h20:cANSI
+set gfn=Lucida_Console:h30:cANSI
 nmap <c--> :hi Normal guifg=White guibg=Black
 
 nmap <c-=> :hi Normal guifg=Black guibg=White

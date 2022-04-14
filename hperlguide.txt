@@ -1,0 +1,4123 @@
+*Latest:* HOWTO: Get tenure <https://matt.might.net/articles/tenure/>
+*Next:* A short guide to Salt Lake City
+<https://matt.might.net/articles/when-in-salt-lake/>
+*Prev:* A quick overview of programming with bash
+<https://matt.might.net/articles/bash-by-example/>
+*Rand:* Writing an interpreter, CESK-style
+<https://matt.might.net/articles/cesk-machines/>
+
+
+  A guide to Perl: By experiment
+
+[article index <https://matt.might.net/articles/>] [email me
+<mailto:matt-blog@might.net>] [@mattmight
+<http://twitter.com/mattmight>] [rss
+<https://matt.might.net/articles/feed.rss>]
+
+Let there be no mistake: Perl is extremely useful.
+
+Every programmer needs Perl in their arsenal.
+
+Thanks to many implicit behaviors, some complex programs can be
+specified with alarming brevity.
+
+Perl excels at extracting and transforming data.
+
+<http://digitaljournalist.org/issue0807/x-moore-pakistan06.html>
+[Source: John Moore/Getty Images
+<http://digitaljournalist.org/issue0807/x-moore-pakistan06.html>]
+
+But, Perl is as dangerous as it is ugly.
+
+The syntax and semantics of Perl are complex; for example:
+
+  *
+
+    Perl’s syntax is inherently ambiguous and cannot be resolved without
+    information available at run-time: there are at least 6 different
+    /valid/ ways to parse the expression |foo bar 1, 2, 3|.
+
+  *
+
+    Perl relies on implicitly assigned variables. To program without
+    surprise in Perl, one must know all the cases in which their values
+    change.
+
+  *
+
+    The parameter-passing mechanism is Byzantine, and in some cases,
+    dangerously counter-intuitive.
+
+  *
+
+    “Context” determines how expressions evaluate, yet expressions also
+    determine context.
+
+  *
+
+    There are four distinct scoping mechanisms for variables: lexical,
+    dynamic, global and package.
+
+This guide surveys the syntax and semantics of Perl by launching almost
+200 probes (in the form of tiny scripts) at the interpreter.
+
+These probes forensically recover the meaning of and find dark corners in:
+
+  * variables;
+  * procedures, procedure calls and context;
+  * references;
+  * input and output;
+  * statements;
+  * expressions and operators;
+  * scope;
+  * quote operators (like strings and regex);
+  * |eval| and “exceptions”;
+  * packages;
+  * objects; and
+  * special variables.
+
+*Disclaimer*: This article is not a guide on how to write good,
+idiomatic Perl. Just because you /can/ do what I’ve done below does not
+mean you /should/.
+
+This article is a linguistic and semantic excavation.
+
+Practicing Perl programmers would frown on many of the techniques I
+(ab)used here to shed light on the inner workings of the Perl interpreter.
+
+Several Perl programmers have pointed to Modern Perl
+<http://onyxneon.com/books/modern_perl/> as a good introduction to
+writing modern, idiomatic Perl. (I haven’t read it.)
+
+
+    What is a Perl program?
+
+At a high level, a Perl program is a sequence of statements and
+declarations.
+
+Statements are commands that conduct computation, side effects and I/O:
+
+For example, the following statement prints to the console:
+
+|print 'Hello, world!' ;    # prints Hello, world!|
+
+Declarations may import packages and define procedures.
+
+For instance, we can import the |Math::Trig| package with |use| to gain
+access to the |sin| function and the constant |pi|:
+
+|use Math::Trig ;
+
+$x = sin(pi/2) ;|
+
+And, we can declare a procedure that adds two numbers:
+
+|sub add {
+  return $_[0] + $_[1] ;
+}|
+
+
+    Writing a Perl script
+
+The |perl| command accepts small scripts directly from the command line.
+For example:
+
+|$ perl -e 'print "Hello, World!\n"'|
+
+Of course, scripts may go in their own file as well:
+
+|#!/usr/bin/perl
+print "Hello, world!\n"|
+
+The location of |perl| varies from system to system, so it is good
+practice to invoke the |perl| interpreter with |env|:
+
+|#!/usr/bin/env perl
+print "Hello, world!\n"|
+
+Given the power of expressions in Perl, it is common to write Perl
+programs of the form |print| /expression/ |;|, which prints the value of
+/expression/ to standard out.
+
+
+    The scope of this article
+
+From here on, this article excavates language constructs in Perl, one by
+one.
+
+You should emerge from this article with a strong understanding of the
+syntax and the semantics of Perl.
+
+What you will *not* get from this article is mastery of Perl’s idioms
+and libraries.
+
+If you want to learn idioms and libraries, I strongly recommend the
+three-book series Learning Perl
+<http://www.amazon.com/gp/product/1449303587/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1449303587&linkCode=as2&tag=mmamzn06-20>,
+Intermediate Perl
+<http://www.amazon.com/gp/product/1449393098/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1449393098&linkCode=as2&tag=mmamzn06-20>
+and Mastering Perl
+<http://www.amazon.com/gp/product/0596527241/ref=as_li_ss_il?ie=UTF8&camp=1789&creative=390957&creativeASIN=0596527241&linkCode=as2&tag=mmamzn06-20>.
+
+<http://www.amazon.com/gp/product/1449303587/ref=as_li_ss_il?ie=UTF8&camp=1789&creative=390957&creativeASIN=1449303587&linkCode=as2&tag=mmamzn06-20>
+     
+<http://www.amazon.com/gp/product/1449393098/ref=as_li_ss_il?ie=UTF8&camp=1789&creative=390957&creativeASIN=1449393098&linkCode=as2&tag=mmamzn06-20>
+     
+<http://www.amazon.com/gp/product/0596527241/ref=as_li_ss_il?ie=UTF8&camp=1789&creative=390957&creativeASIN=0596527241&linkCode=as2&tag=mmamzn06-20>
+
+
+If you want to understand a blob of Perl code, this article can help you
+unravel its meaning.
+
+If you want to write clean, maintainable Perl code, you must master its
+idioms and its libraries as well.
+
+[At the very least, you should add:
+
+|use strict;
+use warnings;|
+
+to any code that might go into production.]
+
+
+    Comments
+
+A code comment in Perl begins with a hash |#| and extends to the end of
+the line.
+
+|# This is a comment.
+print "This is not a comment." ; # But this is.|
+
+To get a multi-line comment, you can abuse the POD documentation format:
+
+|=begin comment
+
+print "This does not print" ;
+
+It is a comment.
+
+=end comment
+
+=cut
+
+print "This is not a comment" ; # This prints.|
+
+
+    Variables
+
+It is a close enough approximation of the truth to say that Perl has
+several types of variables.
+
+At first glance, Perl seems to have five common variable “types”:
+“constants,” scalars, arrays, hashes and procedures. (A sixth type, the
+typeglob, is not common in modern Perl.)
+
+Scalar variables hold basic values like numbers and strings (and
+references to other, possibly complex, values).
+
+Constants are barewords that should evaluate to a single value.
+
+Array variables hold multiple scalar values in order.
+
+Hashes map keys (strings) to scalar values.
+
+Procedures (called subroutines) accept arguments, perform computation
+and return results.
+
+Each variable type in Perl is associated with a prefix called a /sigil/.
+
+
+      Scalar variables
+
+The |$| prefix accesses a variable as a scalar:
+
+|$foo = 3 ;
+$string = "hello" :
+print $foo ;        # prints 3
+print $string ;     # prints hello|
+
+
+      Constants
+
+Constants aren’t true variables, but they’re common enough to mention.
+
+Constants have no prefix, and they should only be defined once, with the
+form |use| /constant-name/ |=>| /value/ |;|
+
+|use constant PI => 3.14 ;
+print PI ;|
+
+As it turns out, constants are not actually constant:
+
+|use constant PI => 3.14 ;
+print PI ;                   # prints 3.14
+
+use constant PI => 3.14159 ; # causes warning about redefinition
+print PI ;                   # prints 3.14159|
+
+Even so, it is bad practice to redefine constants.
+
+In fact, because constants are resolved at compile-time, they take
+effect /even if the block in which they are defined fails to execute/:
+
+|if (0) {
+  use constant E => 2.17 ;
+}
+print E ;                    # prints 2.17|
+
+(If we look under the hood, constants aren’t even really constants:
+they’re functions that take no arguments. |PI()| and |&PI| both work.)
+
+
+      Array variables
+
+Arrays use the prefix |@|, and arrays contain sequences of scalar values:
+
+|@bar = (1,2,3) ;
+print @bar ;      # prints 123
+print "@bar" ;    # prints 1 2 3
+print $bar ;      # prints nothing, since $bar is undefined|
+
+The familiar |[]| subscript notation accesses and modifies array
+elements, but with the prefix |$|:
+
+|@arr = ("foo","bar","baz");
+print $arr[1] ;              # prints bar
+print $arr[2] ;              # prints baz
+
+$arr[1] = "bit" ; 
+print @arr ;                 # prints foobitbaz|
+
+Contrary to what one might expect, array variables “contain” the entire
+array, not a pointer or reference to the array. As a result, copying one
+array variable into another copies the /entire/ array:
+
+|@a = (1, 2, 3);
+@b = @a ;
+
+$b[1] = -2 ;
+
+print @a ;  # prints 123
+print @b ;  # prints 1-23|
+
+
+      Hash variables
+
+The prefix |%| denotes a hash variable:
+
+|%hash = ("foo", 1, "bar", 2) ;|
+
+but hashes must be indexed with braces |{}| instead of brackets |[]|:
+
+|%hash = ("foo", 1, "bar", 2) ;
+
+print $hash["foo"] ;             # prints nothing
+print $hash["bar"] ;             # prints nothing
+
+print $hash{"foo"} ;             # prints 1
+print $hash{"bar"} ;             # prints 2
+
+$hash{"bar"} = 20 ;
+print $hash{"bar"} ;             # prints 20 ;|
+
+Hash variables expect a list for initialization. To make it cleaner to
+write these initializers, the |=>| operator acts kind of like the comma
+operator:
+
+|%days = ("mon" => 0, 
+         "tue" => 1, 
+         "wed" => 2,
+         "thu" => 3,
+         "fri" => 4,
+         "sat" => 5,
+         "sun" => 6);
+print $days{"fri"} ;     # prints 4|
+
+With the |=>| operator, if the left-hand operand is a bare identifier,
+it gets treated as a string:
+
+|%days = (mon => 0, 
+         tue => 1, 
+         wed => 2,
+         thu => 3,
+         fri => 4,
+         sat => 5,
+         sun => 6);
+print $days{"fri"} ;     # prints 4|
+
+Hashes are copied on assignment as well:
+
+|%a = (foo => 10);
+%b = %a ;
+
+$b{"foo"} = 20 ;
+
+print %a ;  # prints foo10
+print %b ;  # prints foo20  |
+
+Since keys to hashes must be strings, barewords supplied as hash keys
+will be turned into strings even in the index position:
+
+|%a = (foo => 10) ;
+
+print $a{foo} ;     # prints 10|
+
+
+      Slices
+
+Arrays can be sliced by giving them a list of indices:
+
+|@foo = (0,10,20,30,40,50) ;
+@bar = @foo[2,3] ;
+print @bar ;               # prints 20, 30
+
+@foo[2,5] = (-20,-50) ;
+print @foo ;               # prints 0, 10, -20, 30, 40, -50|
+
+Hashes can also be sliced:
+
+|%foo = (alpha => 10, 
+        beta  => 20,
+        gamma => 30) ;
+
+@alphabet = @foo{alpha,beta} ;
+print @alphabet;
+
+@foo{alpha,gamma} = (-10, -30) ;
+print $foo{alpha} ;                 # prints -10
+print $foo{beta} ;                  # prints 20
+print $foo{gamma} ;                 # prints -30|
+
+
+      Procedure variables
+
+Technically, procedure variables have the prefix |&|, although the
+prefix is not always necessary in modern Perl:
+
+|sub foo {
+ print "hello" ;
+} ;
+
+&foo() ;  # prints hello
+foo() ;   # also prints hello|
+
+
+      Sigils as operators
+
+[*Warning:* This section is going to going to poke into the guts of
+Perl. You can write modern Perl quite well without understanding this
+section. You should probably skip it for now.]
+
+Scalars, arrays, hashes and procedures with the same identifier act like
+distinct variables:
+
+|$same = 42 ;
+@same = (1, 2, 3) ;
+%same = (foo => 1, bar => 2) ;
+sub same { print "foo" } ;
+
+print $same ;  # prints 42 
+print @same ;  # prints 123
+print %same ;  # prints bar2foo1
+same() ;       # prints foo|
+
+However, under the hood, they all share a common symbol table entry.
+
+The bareword represents a symbol table entry, and the sigil specifies
+how to access that entry.
+
+In fact, the sigil is not even lexically part of the variable name; it
+may be separated by whitespace:
+
+|$                    # even toss in a comment
+     x = 10 ;
+
+print $
+
+x ;                  # prints 10
+
+
+@  foo = (10,20) ;
+print @
+foo ;                # prints 10, then 20|
+
+One could argue that there is only one variable type in Perl – the
+bareword – and the sigil is an operator that acts on the location
+represented by a bare word.
+
+If one were programming in C, one might specify a symbol table entry as:
+
+|struct entry {
+  scalar_t scalar ;
+  array_t  array ;
+  hash_t   hash ;
+  proc_t   proc ;
+} ;|
+
+At this point, a bareword variable could be interpreted representing a
+pointer of type |struct entry|: |struct entry*|.
+
+Under this interpretation, the sigils dereference individual fields;
+that is, |$ word| is kind of like |word->scalar| and |@ word| is kind of
+like |word->array|.
+
+But, in fact, it’s more complicated than that.
+
+When Perl looks up a variable like |$foo|, it must first look up the
+string |foo| in the current environment (something like a hash table) to
+get the address of the symbol table entry for |foo|.
+
+Then, it can dereference the scalar field for that address.
+
+If |env| is the hash table that maps bare words to their addresses, then
+looking up |$foo| is really a hash table look-up followed by a field
+dereference:
+
+| hash_get(env,"foo")->scalar |
+
+Under the interpretation that a bareword is (ultimately) a string that
+will get looked up in a hash table to get an address, one wonders if a
+sigil applied to a Perl string will look up the address for that string
+and access as appropriate.
+
+At first glance, it seems like this does not work:
+
+|$'foo' = 10 ;    # syntax error!
+$ 'foo' = 10 ;   # syntax error! |
+
+But, in fact, it is possible:
+
+|$x = 10 ;
+print $x ;   # prints 10
+
+$i = "x" ;
+$$i = 20 ;
+
+print $x ;   # prints 20|
+
+And, sigils can be used with a circumfix syntax to avoid the extra
+indirection:
+
+|${"x"} = 10 ;
+print $x ;     # prints 10|
+
+At this point, it should be clear the Perl variable names may contain
+spaces:
+
+|${"foo bar"} = 10 ;
+print ${"foo bar"} ;   # prints 10|
+
+
+      Typeglobs
+
+The rarely used sixth variable “type,” the typeglob (sigil |*|),
+represents the entire symbol table entry for a variable.
+
+Typeglobs can create aliases in the symbol table and expose this
+implementation detail:
+
+|$same = 42 ;
+@same = (1, 2, 3) ;
+%same = (foo => 1, bar => 2) ;
+sub same { print "foo" } ;
+
+print $same ;  # prints 42 
+print @same ;  # prints 123
+print %same ;  # prints bar2foo1
+same() ;      # prints foo
+
+*different = *same ;
+
+print $different ;  # prints 42 
+print @different ;  # prints 123
+print %different ;  # prints bar2foo1
+different() ;       # prints foo
+
+$different[1] = -2 ;
+
+print @same ;       # prints 1-23|
+
+The assignment |*different = same| has the same effect as |*different =
+*same|.
+
+Modern Perl has proper references <#references>, so these sorts of
+tricks are mostly unnecessary.
+
+
+    Contexts
+
+Perl is relatively unique in its use of “context” to determine how to
+evaluate an expression.
+
+In Perl, there are three contexts in which an expression may be evaluated:
+
+ 1. scalar
+ 2. list
+ 3. void
+
+When an expression is evaluated in a scalar context, it will become a
+scalar (and there are implicit coercions for each value type).
+
+When an expression is evaluated in a list context, it will become a list
+(with another set of implicit coercions).
+
+In a void context, the value of the expression is ignored.
+
+(It’s tempting to call the “list context” the “array context,” and Perl
+even promotes this confusion by calling the context discriminator
+|wantarray| instead of |wantlist|. However, there are important
+distinctions between arrays and lists.)
+
+Lists are transient data structures – ordered collections of values –
+that show up in places like procedure call/return and in assignment.
+
+Using an array in a context that expects a scalar will yield the size of
+the array:
+
+|@bar = ("foo","bar","baz") ;
+$barsize = @bar ;             # @bar turns into list before assignment
+print $barsize ;              # prints 3
+print scalar @bar ;           # prints 3
+print $bar ;                  # prints nothing|
+
+Using a scalar in a context that expects a list will create a
+single-element list with just that value:
+
+|@bar = 42 ;          # acts like @bar = (42) ;
+print $bar[0] ;      # prints 42
+print scalar @bar ;  # prints 1|
+
+When an array is assigned a list, it constructs an array with the same
+elements as the list.
+
+To get this straight, in the following:
+
+|@bar = (10,20,30) ;|
+
+the expression |(10,20,30)| gets evaluated in list context, which
+produces a list with three elements: 10, 20 and 30.
+
+That list is then immediately assigned to the array |@bar|, which
+converts it to an array with three elements: 10, 20 and 30.
+
+In Perl, the comma operator |,| has very different interpretations under
+scalar and list contexts.
+
+In a list context, the comma operator appends its two arguments together
+(each being evaluated in the list context):
+
+|@bar = ("foo", "baz") ;
+print @bar ;             # prints foo, then baz|
+
+Technically, in the above, |"foo"| is evaluated as a list, which creates
+a singleton list containing just |"foo"|, then the same happens to
+|"bar"|, and then these singleton lists are appended.
+
+This leads to counterintuitive behavior, as inner lists are flattened
+into the outer list:
+
+|@bar = (10,20) ;
+print scalar @bar ;    # prints 2 -- the length of @bar
+
+@bar = (10,(20,30)) ;  # (10,(20,30)) became (10,20,30)
+print scalar @bar ;    # prints 3 -- the length of @bar|
+
+In a scalar context, the comma operator |,| evaluates the left operand,
+discards the result and then returns the right operand:
+
+|$bar = ("foo","baz") ;
+print $bar ;             # prints baz (not 2)|
+
+The left-hand side of an assignment determines the context of the
+right-hand side.
+
+When multiple values are assigned, the right-hand side is in list context:
+
+|@coords = (10,20,30) ;
+($x,$y,$z) = @coords ;
+print $x, $y, $z ;      # prints 10, then 20, then 30|
+
+The first non-scalar destination in an assignment captures the remainder
+of the incoming list:
+
+|@long = (1,2,3,4,5,6) ;
+($x,@rest) = @long ;
+print $x ;              # prints 1
+print @rest ;           # prints 23456
+
+($x,@rest,@oops) = @long ;
+print $x ;              # prints 1
+print @rest ;           # prints 23456
+print @oops ;           # prints nothing|
+
+List context appears in more places than one might expect, which means
+that many commas are not part of the syntax of the construct, but are
+really just operators.
+
+For instance, the index in a slice is actually a list context:
+
+|@indices = (2,4) ;
+@values = (0,10,20,30,40,50,60) ;
+@slice = @values[1,@indices] ;     # grabs indices 1,2,4
+
+print @slice ;                     # prints 10, then 20, then 40|
+
+
+    References
+
+A reference is a scalar value that contains the memory address of an object.
+
+References are analogous to pointers in languages like C.
+
+In Perl, it is possible to create references to scalars, arrays and
+hashes (and even to procedures and typeglobs).
+
+To take a reference to a named value, use the reference operator |\|:
+
+|$s = "I'm a scalar." ;
+@a = ("A", "Hash") ;
+%h = (foo => 42, bar => 1702) ;
+
+$sref = \$s ;
+$aref = \@a ;
+$href = \%h ;
+
+print $sref ; # prints SCALAR(0xAddr)
+print $aref ; # prints ARRAY(0xAddr)
+print $href ; # prints HASH(0xAddr)|
+
+The hexadecimal value that prints next to the type of the reference is
+the memory address of the referenced value.
+
+To dereference a reference, prefix it with |$|, |@| or |%| (or wrap it
+with |${}|, |@{}| or |%{}|) depending on the type of the reference:
+
+|print $$sref ; # prints I'm a scalar.
+print @$aref ; # prints AHash
+print %$href ; # prints bar1702foo42
+
+print ${$sref} ; # prints I'm a scalar.
+print @{$aref} ; # prints AHash
+print %{$href} ; # prints bar1702foo42
+
+print ${$aref}[1] ;     # prints Hash
+print ${$href}{"foo"} ; # prints 42|
+
+Perl can also create anonymous references, references for which the
+referenced value does not correspond to a named variable.
+
+The bracket notation |[]| creates an anonymous array:
+
+|$b = [1,2,3] ;
+print $b ;         # prints ARRAY(0xAddr)
+print $$b[1] ;     # prints 2
+print ${$b}[1] ;   # prints 2|
+
+The braces notation |{}| creates an anonymous hash:
+
+|$h = { foo => 1, bar => 2 } ;
+print $h ;            # print HASH(0xAddr)
+print $$h{"bar"} ;    # print 2
+print ${$h}{"bar"} ;  # print 2|
+
+Since references are scalars, it is possible to have arrays that contain
+arrays:
+
+|$matrix = [ [ 1, 0, 0 ],
+            [ 0, 1, 0 ],
+            [ 0, 0, 1 ] ] ;
+
+print ${${$matrix}[1]}[1] ; # prints 1|
+
+The dereference operator |->| works on arrays, hashes and references:
+
+|@array = (10,20,30) ;
+$aref = \@array ;
+
+print @array->[1] ; # prints 20
+print $aref->[1] ;  # prints 20 
+
+@array->[2] = 40 ;  # prints 40
+print $aref->[2] ;  # prints 40 
+
+%hash = (foo => 100, bar => 200) ;
+$href = \%hash ;
+
+print %hash->{"foo"} ;  # prints 100
+print $href->{"foo"} ;  # prints 100
+
+%hash->{"bar"} = 300 ;  # prints 300
+print $href->{"bar"} ;  # prints 300|
+
+The argument supplied to both |[]| and |{}| are actually in list
+context, which means that the usual rules for expansion into a list apply:
+
+|@foo = ("a" => 10, "b" => 20) ;
+
+$href = {@foo} ;       # @foo expands to "a",10,"b",20
+
+print $href->{"a"} ;   # prints 10|
+
+
+      Typeglob references
+
+A reference to a typeglob essentially creates a first-class symbol table
+entry:
+
+|$tgref = \*foo ;
+
+print $tgref ;       # prints GLOB(0xAddr)
+
+*baz = *$tgref ;
+
+$baz = 100 ;
+@baz = (2,3) ;
+
+print $foo ;         # prints 100
+print @foo ;         # prints 2, then 3|
+
+
+    Procedures
+
+Defining procedures in Perl is terse. (Perl calls procedures
+/subroutines/.) In the simplest case, a procedure definition is the
+|sub| keyword, an identifier and a block of code – |sub|
+/procedure-name/ |{| /code/ |}|:
+
+|sub my_procedure {
+  print "I'm a procedure!" ;
+}|
+
+There are many ways to call a procedure:
+
+|my_procedure;             # prints I'm a procedure!
+&my_procedure;            # prints I'm a procedure! 
+my_procedure();           # prints I'm a procedure!
+&my_procedure();          # prints I'm a procedure! 
+my_procedure 1, 2, 3;     # prints I'm a procedure!
+my_procedure (1, 2, 3);   # prints I'm a procedure!
+&my_procedure (1, 2, 3);  # prints I'm a procedure!
+&my_procedure 1, 2, 3;    # error, parens required with &|
+
+Arguments to procedures arrive implicitly via the |@_| array:
+
+|sub foo {
+  print "foo: @_" ;
+}
+
+foo 1, 2, 3 ; # prints foo: 1 2 3
+foo (1,2,3) ; # prints foo: 1 2 3
+foo ;         # prints foo: |
+
+Keep in mind that individual arguments are accessed as |$_[|/n/|]|:
+
+|sub bar {
+  print $_[1] ;
+}
+
+bar 1, 2, 3 ; # prints 2
+bar (1,2,3) ; # prints 2
+bar ;         # prints nothing|
+
+By default, the arguments to a procedure are in the /list/ context,
+which means that arrays passed as arguments will be flattened (by the
+comma operator, actually):
+
+|@a = ((1,2),3) ;   # Internally, @a becomes (1,2,3)
+@c = (6,7) ;       
+@b = (5,@c) ;      # Internally, @b becomes (5,6,7)
+
+sub print9 {
+  print $_[0] ;
+  print $_[1] ;
+  print $_[2] ;
+  print $_[3] ;
+  print $_[4] ;
+  print $_[5] ;
+  print $_[6] ;
+  print $_[7] ;
+  print $_[8] ;
+}
+
+print9 0,@a,4,@b,8 ; # prints 0 through 8, one on each line.
+print $b[1];         # prints 6
+print $b[2];         # prints 7|
+
+Understanding this automatic appending and flattening behavior is
+critical to understanding procedures calls.
+
+The comma operator (|,|) /can/ mean |cons|, |append|, |flatten| all at once.
+
+To reiterate and to be clear, given this procedure definition:
+
+|sub print3 {
+  print $_[0], $_[1], $_[2] ;
+}|
+
+all of the following are equivalent procedure calls:
+
+|# Each of the following prints 123:
+print3 1, 2, 3 ;
+print3 (1,2,3) ;
+&print3 (1,2,3) ; 
+
+@args = (1,2,3) ;
+print3 @args ;
+print3 (@args) ;
+
+@arglets = (1,2) ;
+print3 @args,3 ;
+print3 (@args,3) ;|
+
+(Actually, |print3()| and |&print3()| could differ; |&print3()| would
+ignore the prototype, if there is one, as discussed below.)
+
+The |return| keyword exits the current procedure and returns the value
+it received:
+
+|sub one {
+  return 1 ;
+}
+
+print one ;  # prints 1 |
+
+Otherwise, the value of the last expression gets returned:
+
+|sub two {
+  2
+}
+
+print two ;  # prints 2|
+
+
+      Arguments to procedures
+
+Once again, arguments to procedures are passed implicitly via the |@_|
+array.
+
+If a procedure is called by |&| with no arguments, then it implicitly
+receives the current |@_| as its own arguments:
+
+|sub print_args {
+  print @_ ;
+}
+
+sub call_print_args {
+  &print_args ;
+}
+
+call_print_args "hello, world!" ; # prints hello, world!|
+
+(Procedures called with |&| also ignore the prototype, as explained below.)
+
+The convention for naming arguments is to assign the immediately:
+
+|sub sum {
+  my ($a, $b) = @_ ;
+  return $a + $b ;
+}|
+
+Perl novices often don’t realize that arguments in Perl are implicitly
+passed by alias: modifications to the inputs to a procedure will be seen
+by the caller of that procedure.
+
+That is, the arguments array |@_| contains aliases to the input values:
+
+|$x = 3 ;
+@a = (4,5,6) ;
+
+sub mod_args {
+  $_[0] = 42 ;
+  $_[2] = 17 ;
+}
+
+mod_args $x, @a ;
+
+print "$x : @a" ;  # prints 42 : 4 17 6|
+
+Remarkably, it’s possible to modify arrays and hashes this way:
+
+|sub mod_args {
+  $_[0] = 42 ;
+  $_[2] = 17 ;
+}
+
+@a = (7,8,9) ;
+%h = ( "foo" => 42 ) ;
+
+mod_args $a[1], 0, $h{"bar"} ;
+
+print "@a" ;       # prints 7 42 9
+print $h{"bar"} ;  # prints 17 |
+
+
+      References to procedures and anonymous procedures
+
+Perl allows references to procedures:
+
+|sub sum {
+  return $_[0] + $_[1] ;
+} 
+
+$mysum = \&sum ;         # the & is necessary
+
+print $mysum ;           # prints CODE(0xAddr) 
+
+print &{$mysum}(10,20) ; # prints 30 
+
+print &$mysum(10,20) ;   # prints 30 |
+
+Perl also permits the creation of anonymous procedures (more precisely,
+closures):
+
+|$myprod = sub {
+  return $_[0] * $_[1] ;
+} ;
+
+print $myprod ;            # prints CODE(0xAddr)
+
+print &{$myprod}(10,20) ;  # prints 200 |
+
+The |->| operator provides a more convenient syntax for invoking
+anonymous procedures:
+
+|$anon = sub {
+  print $_[0] ;
+} ;
+
+$anon->(1701) ;  # prints 1701|
+
+
+      Procedures and context
+
+Surprisingly, context can even change how a procedure call is /parsed/.
+
+For instance, the following:
+
+|foo (bar 1, 2 , 3)|
+
+could parse to:
+
+|foo((bar(1, 2, 3)))|
+
+or to:
+
+|foo((bar(1)), 2, 3)|
+
+depending on the context for the arguments of |bar|.
+
+Before Perl can evaluate (or sometimes even parse) an expression, it
+must know the contexts of that expression.
+
+This leads to two questions for procedure calls:
+
+ 1.
+
+    What are the contexts of the arguments to a procedure?
+
+    For instance, given a call:
+
+    |foo(bar())|
+
+    What is the context of |bar()|?
+
+ 2.
+
+    How does the procedure know the context of its return value?
+
+    For instance, given a call:
+
+    |localtime()|
+
+    Is |localtime()| returning a scalar, or a list?
+
+
+      Argument context and prototypes
+
+When declaring a procedure, each procedure may specify a prototype,
+which specifies contexts for arguments.
+
+The prototype precedes the body block; the declaration form for a
+procedure with a prototype is |sub| /procedure-name/ |(| /prototype/ |)|
+|{| /body/ |}|
+
+If a procedure is used (syntactically) before its definition, it is
+possible to predeclare it with |sub| /procedure-name/ |(| /prototype/
+|)| |;|
+
+It is necessary to predeclare so that the Perl parser can correctly
+parse calls to this procedure.
+
+The prototype is a sequence of specifiers, where the basic specifiers are:
+
+  * |$| for scalar context;
+  * |@| for list context;
+  * |&| for a code reference;
+  * |+| for scalar context, unless named hash or array; and
+  * |*| for typeglob (mostly for passing archaic bareword filehandles).
+
+To make some arguments optional, place a semicolon |;| between the
+mandatory and optional arguments specifiers.
+
+Any basic specifier may be preceded by |\| to forcibly capture a
+reference <#references> to the incoming argument.
+
+Finally, it is possible to specify more than one mode for an argument by
+wrapping them in brackets: |\[|/abc/…|]| which will accept |\|/a/ or
+|\|/b/ or |\|/c/ or …
+
+Unfortunately, these specifiers don’t behave according to what one’s
+intuition might expect.
+
+We’ll try out each one to see what it does.
+
+Let’s try creating a procedure that accepts one scalar:
+
+|sub scalarg ($) {
+  print $_[0] ;
+}
+
+@a = ("foo", "bar", "baz") ;
+%h = ("foo" => 42 ) ;
+$x = 1701 ;
+
+scalarg $x ;  # prints 1701
+scalarg @a ;  # prints 3 (length of @a)
+scalarg %h ;  # prints 1/8   # WTF?
+
+scalarg (1,2) ; # error: too many arguments|
+
+So, it seems |$| forces scalarity for its argument.
+
+Let’s try creating a procedure that accepts an array:
+
+|@a = ("foo", "bar", "baz") ;
+%h = ("foo" => 42 ) ;
+$x = 1701 ;
+
+sub arrarg (@) {
+  print $_[0], ",", $_[1], ":", "@_" ;
+}
+
+arrarg $x ;     # prints 1701,:1701 
+arrarg @a ;     # prints foo,bar:foo bar baz
+arrarg %h ;     # prints foo,42:foo 42
+
+arrarg $x,@a ;  # prints 1701,foo:1701 foo bar baz|
+
+It seems that the procedure call still flattened out the arrays (and
+hashes) when making the call.
+
+The prototype specifier |@| doesn’t seem to do what one might expect.
+
+The real purpose of |@| is to allow a variable number of arguments: if
+it appears as the last parameter in a prototype, then the procedure
+accepts any number of arguments.
+
+In fact, last is the only sensible position for this specifier.
+
+Let’s try creating a procedure with the hash specifier:
+
+|@a = ("foo", "bar", "baz") ;
+%h = ("foo" => 42 ) ;
+$x = 1701 ;
+
+sub hasharg (%) {
+  print "$_[0]", "::", "@_"; 
+}
+
+hasharg $x ;      # prints 1701::1701
+hasharg @a ;      # prints foo::foo bar baz
+hasharg %h ;      # prints foo::foo 42|
+
+So, |%| doesn’t mean that argument is going to be a hash. It seems to
+behave identically to |@|. (And, in the absence of a reference modifier,
+that’s exactly what it does.)
+
+Trying to use that argument as a hash, or even the whole input as a
+hash, will not work:
+
+|sub use_hash (%) {
+  print $_[0]{"foo"} ;  # nope
+  print $_{"foo"} ;     # nope
+}
+
+use_hash ("foo" => 1701) ;  # prints nothing|
+
+To use the provided list as a hash, one must re-interpret the arguments
+in |@_| as a hash:
+
+|sub use_hash (%) {
+  %hash = @_ ;
+  print $hash{"foo"} ;
+}
+
+use_hash ("foo" => 42) ;    # prints 42|
+
+Of course, it is also possible to drop |@_| into an anonymous hash and
+then dereference it directly:
+
+|sub use_hash (%) {
+  print ${{@_}}{"foo"} ;
+}
+
+use_hash ("foo" => 1701) ;  # prints foo twice|
+
+The specifier |&| expects to receive a reference to code, but if the
+first argument is a literal block of code, it creates an anonymous
+procedure for it on the fly:
+
+|sub take_block (&) {
+  &{$_[0]}() ; # run it once
+  &{$_[0]}() ; # run it twice
+}
+
+take_block { print "hello" } ; # prints hello twice
+
+sub print_me { 
+  print "me" ;
+}
+
+take_block sub { print_me } ;  # prints me twice
+
+take_block \&print_me ;        # prints me twice
+
+take_block print_me ;          # error: must be block or code ref |
+
+Unfortunately, code blocks (withouth |sub|) are only accepted as the
+very first parameter:
+
+|sub take_block_second ($&) {
+  if ($_[0]) {
+    &{$_[0]} ;
+  }
+}
+
+take_block_second 10, { print "second" } ;  # error: { } treated as hash|
+
+The |+| specifier has an interesting effect:
+
+|@a = ("foo", "bar", "baz") ;
+%h = ("foo" => 42 ) ;
+$x = 1701 ;
+
+sub what_is (+) {
+  print $_[0] ;
+}
+
+what_is $x ;  # prints 1701 
+what_is @a ;  # prints ARRAY(0xAddr)  
+what_is %h ;  # prints HASH(0xAddr)|
+
+Suddenly, instead of allowing the argumens to flatten, the |+| specifier
+captured a reference to the array or hash that was passed in.
+
+Now, it’s possible to take two separate arrays as arguments:
+
+|sub what_are (++) {
+  print $_[0], " ", $_[1] ;
+}
+
+@a1 = (1,2,3) ;
+@b1 = (4,5,6) ;
+
+what_are ((1,2),(3,4)) # scalar context! prints 2, then 4
+what_are @a1,@b1 ;     # prints ARRAY(0xAddr) ARRAY(0xAddr)|
+
+Except that it prefers to interpret items a scalars when possible.
+
+To be clear, the |\@| specifier /can/ force an argument to be a
+referenceable array:
+
+|sub take_array (\@) {
+  print $_[0] ;
+}
+
+take_array @a1 ;                 # prints ARRAY(0xAddr)
+
+sub take_two_arrs (\@\@) {
+  print $_[0], $_[1] ;
+}
+
+take_two_arrs @a1, @b1 ;         # prints ARRAY(0xAddr) ARRAY(0xAddr)
+take_two_arrs ((1,2),(3,4)) ;    # error: arrays must be named|
+
+This is a little strange. The specifier |\@| seems to accept both
+(addressable) arrays and pointers to arrays.
+
+To accept a reference to one of several specifiers, Perl accepts a
+grouped |\[| /specifiers/ |]| form:
+
+|sub array_or_hash (\[@%]) {
+  print $_[0] ;
+}
+
+$scalar = 3 ;
+@array = (10,20,30) ;
+%hash = ("foo" => 42, "bar" => 13) ;
+
+array_or_hash @array ;    # prints ARRAY(0xAddr)
+array_or_hash %hash ;     # prints HASH(0xAddr)
+array_or_hash $scalar ;   # compilation error|
+
+
+      Return context
+
+When inside a procedure, the oddly-titled primitive |wantarray|
+determines if the context to which the procedure is returning expects a
+scalar, a /list/ or nothing at all:
+
+|sub print_context () {
+  if (wantarray()) {    
+    print "list context"; 
+  }
+
+  elsif (defined wantarray()) {
+    print "scalar context";
+  }
+
+  else {
+    print "void context";
+  }
+}
+
+$x = print_context ;  # prints scalar context
+@x = print_context ;  # prints list context
+print_context ;       # prints void context|
+
+This is how procedures like |localtime| can decide whether to return an
+array or a scalar:
+
+|@a = localtime ;
+
+$x = localtime ;
+
+print "@a" ; # prints a 9-element array, e.g.:
+             # 29 49 15 28 0 114 2 27 0
+print "$x" ; # prints the time as string, e.g.:
+             # Tue Jan 28 15:49:29 2014|
+
+In fact, procedures /must/ be aware of their invocation context. If they
+could not determine this, then it would be impossible to correctly
+evaluate |return| statements.
+
+The context of the expressions in |return statements| is the context in
+which the procedure was invoked:
+
+|sub foo {
+  return (4,5,6) ;
+}
+
+$x = foo() ;
+@a = foo() ;
+
+print $x ;     # evaluates (4,5,6) in scalar context 
+               # prints 6
+print @a ;     # evaluates (4,5,6) in list context 
+               # prints 4, 5, then 6|
+
+
+      Ignoring prototypes
+
+If procedure gets invoked with |&|, then its prototype is ignored:
+
+|sub f ($$) {
+  print @_ ;
+}
+
+f ((1,2),(3,4)) ;    # prints 2, then 4
+
+&f ((1,2),(3,4)) ;   # prints 1, 2, 3 ,4|
+
+While it is possible to provide prototypes to anonymous procedures,
+these are also ignored:
+
+|$f = sub ($$) {
+  print @_ ;
+}; 
+
+$f->((1,2),(3,4)) ;   # prints 1, 2, 3, 4|
+
+From this test, it seems that prototype information is not stored with
+the procedure itself, but rather, it is information associated with a
+specific procedure name, and available only during parsing.
+
+
+    Input and output
+
+In Perl, input and output operations are associated with filehandles.
+
+|STDIN| is an input filehandle available by default, and it refers to
+user input coming from the console.
+
+|STDOUT| is an output filehandle available by default, and writing to it
+will send output ot the console.
+
+To read from a filehandle, wrap it with |<>|:
+
+|print <STDIN> ;  # prints the first line of user input|
+
+Every read from a filehandle implicitly assigns the input to the default
+variable, |$_|.
+
+Consequently, the following statement:
+
+|<STDIN> ;|
+
+has the same effect as the statement:
+
+|$_ = <STDIN> ;|
+
+So, the following program also works:
+
+|<STDIN> ;
+print $_ ;  # prints the first line of user input|
+
+In fact, |print| uses the default |$_| if no arguments are given, so the
+following program works as well:
+
+|<STDIN> ; # puts the first line in $_
+print ;   # prints the value in $_|
+
+The |open| operator can establish new filehandles; |close| closes them.
+
+Oddly, filehandles /can/ be barewords:
+
+|open F, "<io.pl";  # opens io.pl for reading as F
+
+while (<F>) {
+  print ;
+}                  # prints contents of io.pl
+
+close F ;          # closes filehandle F|
+
+Filehandles can also be stored in scalar variables:
+
+|open $fh, "<tmp.txt" ;
+
+while (<$fh>) {
+  print ;
+} # prints contents of tmp.txt
+
+close $fh ;|
+
+This certainly makes it more convenient to pass a filehandle to a
+procedure. Bareword filehandles must be treated as typeglobs:
+
+|sub pass_handle {
+  print "file handle: " . $_[0] . "\n" ;
+}
+
+open F, "<tmp.txt" ;
+pass_handle *F ;         # prints file handle: *main::F 
+pass_handle F ;          # error
+close F ;|
+
+But, scalar filehandles need no special treatment, as expected:
+
+|open $fh, "<tmp.txt" ;
+pass_handle $fh;         # prints file handle: GLOB(0xAddr)
+close $fh ;
+|
+
+To accept a truly bareword filehandle as an argument, it becomes
+necessary to use the rarely used |*| prototype specifier, which creates
+an alias to the bareword filehandle in the symbol table:
+
+|sub pass_handle2 (*) {
+  print "file handle: " . $_[0] . "\n" ;
+
+  *FH = $_[0] ;
+  while (<FH>) {
+    print ;
+  } 
+}
+
+open F, "<tmp.txt" ;
+pass_handle2 F;      # prints file handle: F, contents of tmp.txt
+close F ;|
+
+The |print| command is special, in that it can take a filehandle before
+it takes any parameters:
+
+|open $tmp, ">tmp.txt" ; # opens tmp.txt for writing
+print $tmp "Testing" ;  # writes Testing to tmp.txt
+close $tmp ;            # closes the filehandle
+
+
+open $tmp, "<tmp.txt" ; # opens tmp.txt for reading
+
+while (<$tmp>) {
+  print STDOUT $_ ;             
+}                      # prints Testing to STDOUT
+
+close $tmp ;            # closes the filehandle|
+
+By default, |print| and |write| send to |STDOUT|, but you can change the
+default with |select|:
+
+|open $tmp, ">>tmp.txt" ;
+select $tmp ;
+print " and such.\n" ; # appends and such to tmp.txt
+close $tmp ;|
+
+When opening a file, the second argument to |open| determines the mode
+in which it is opened:
+
+  * |open FH, "<file"| opens a file for reading.
+  * |open FH, ">file"| opens a file for writing, and will replace contents.
+  * |open FH, ">>file"| opens a file for appending.
+
+This is not meant as a tutorial on the library, but |open| also has a
+three-argument form:
+
+  * |open FH, "<", "file"| opens a file for reading.
+  * |open FH, ">", "file"| opens a file for writing, and will replace
+    contents.
+  * |open FH, ">>", "file"| opens a file for appending.
+
+Seasoned Perl programmers tell me that three-argument |open| is
+preferred, and that bareword filehandles are strongly discouraged in
+favor of scalars.
+
+Nevertheless, all forms are possible.
+
+
+    Statements
+
+So far, we have used statements and appealed to intuition as to their
+meaning and structure.
+
+The simplest statements in Perl are expressions statements, which
+consist of an expression followed by a semicolon:
+
+|# print "foo" is actually an expression:
+print "foo" ; # prints foo|
+
+
+      |if| statements
+
+In Perl, |if| statements must use parentheses around the conditional,
+and they must use braces around the body:
+
+|if foo { print "foo"; }  # error: should be (foo)
+if (bar) print "bar" ;   # error: should be { print "bar" ; }|
+
+In Perl, |elsif| should be used instead of |else if|:
+
+|$count = 19 ;
+
+if ($count < 10) {
+  print "count < 10" ;
+} elsif ($count < 20) {
+  print "10 < count < 20" ;  # this prints
+} else {
+  print "count >= 20" ;
+} |
+
+For stylistic reasons, conditionals may be placed after statements:
+
+|$foo = 20 ;
+print "big" if $foo > 10 ;     # prints big
+print "small" if $foo <= 10 ;  # prints nothing|
+
+Perl also supports an |unless| variant of |if| which negates the condition:
+
+|$age = 22 ;
+
+unless ($age >= 25) { print "You cannot rent a car." ; }
+ # prints You cannot rent a car.
+
+die() unless $age >= 21 ;  # does nothing|
+
+
+      |while| statements
+
+For iteration, |while| statements in Perl are similar to C and Java.
+
+The condition is checked and the body is evaluated repeatedly until the
+condition is false:
+
+|$count = 10 ;
+while ($count > 0) {
+  print $count ;
+  $count = $count - 1 ;
+} # prints 10 through 1|
+
+The expression |next| will advance to the next iteration of the
+innermost loop:
+
+|$count = 10 ;
+while (--$count > 0) {
+  next if $count % 2 == 0 ;
+  print $count ;
+} # prints 9 7 5 3 1 ;|
+
+The expression |last| will exit the innermost loop:
+
+|$count = 0 ; 
+while (1) {
+  print $count ;
+  $count++ ;
+  last if $count == 10 ;
+} # prints 0 1 2 3 4 5 6 7 8 9 |
+
+In this sense, |last| is like |break| in Java or C.
+
+The expression |redo| will restart the current innermost loop but
+without re-evaluating the condition:
+
+|$count = 1 ;
+while ($count > 0) {
+  if ($count <= 0) {
+    print "impossible?" ;
+    last ;
+  }
+  $count-- ;
+  print $count ;
+  redo ;
+} # prints 0, then impossible?|
+
+In Perl, |while| blocks can have a |continue| block attached. A
+|continue| block always executes after the main body of the loop, but
+before the conditional:
+
+|$count = 10 ;
+while ($count > 0) {
+  next if $count % 2 == 0 ;
+  print $count ;
+} continue {
+  $count-- ;
+} # prints 9 7 5 3 1|
+
+A |next| expression /will/ jump into the |continue| block; a |redo| will
+not.
+
+It is possible to label a loop in Perl, so that |next|, |last| and
+|redo| can choose to which loop they refer:
+
+|$i = 0;
+OUTER: while ($i < 6) {                   
+  $j = 0 ;
+  INNER: while ($j < 6) {
+    next OUTER if $i % 2 == 0 ;
+    next INNER if $j % 3 == 0 ;
+    print "$i:$j" ;
+  } continue {
+    $j++ ;
+  }
+} continue {
+  $i++ ;
+} ;  |
+
+prints:
+
+|1:1
+1:2
+1:4
+1:5
+3:1
+3:2
+3:4
+3:5
+5:1
+5:2
+5:4
+5:5
+|
+
+Naturally, Perl allows |while| to follow a statement:
+
+|$i = 0;
+print $i while ($i++ < 4) ; # prints 1 through 4|
+
+If the intent is to run the block once before testing the condition,
+then the |do|-|while| form applies:
+
+|$i = 0 ;
+do { print $i } while ($i++ < 4) ; # prints 0 through 4|
+
+
+      Blocks
+
+Perl also has compound statements (also known as block statements),
+formed with braces, |{}|:
+
+|{ print "hello" ; print "goodbye" ; } # prints hello; then goodbye|
+
+Finally, |next| and |last| will actually work in /any/ block, not just a
+|while| body:
+
+|{
+  print "This prints." ;
+  next ;
+  print "But this doesn't." ;
+} # prints This prints.
+
+{
+  print "This prints." ;
+  last ;
+  print "But this doesn't." ;
+} # prints This prints.|
+
+They seem to have identical behavior, except that regular blocks can
+have |continue| blocks as well:
+
+|{
+  next ;
+  print "I won't print." ;
+} continue {
+  print "But, I will." ;
+} # prints But, I will.
+
+{
+  last ;
+  print "I won't print." ;
+} continue {
+  print "Neither will this." ;
+} # prints nothing|
+
+Of course, blocks can labelled:
+
+|OUTER: {
+  INNER: {
+    next OUTER ;
+  } continue {
+    print "This won't print." ;
+  }
+} # prints nothing|
+
+
+      |for| statements
+
+Perl has traditional C-style |for| statements of the form |for| |(|
+/initializer/ ; /test/ ; /increment/ |)| |{| /body/ |}|:
+
+|for ($i = 0; $i < 4; $i++) {
+  print $i ;
+} # prints 0 through 3 |
+
+
+      |foreach| statements
+
+The |foreach| form in Perl allows iteration over individual elements in
+arrays:
+
+|@array = ("foo","bar","baz") ;
+
+foreach $element (@array) {
+  print $element ;
+} # prints foo, bar and then baz|
+
+In Perl, the keywords |for| and |foreach| may be used interchangeably.
+
+As it turns out, the iteration variable is an alias to the elements:
+
+|@array = ("foo","bar","baz") ;
+
+foreach $element (@array) {
+  $element = "$element:x" ;
+}
+
+print "@array" ; # prints foo:x bar:x baz:x|
+
+Leaving off the variable for iteration will bind each element to the
+default variable, |$_|:
+
+|@array = (4,5,6) ;
+
+foreach (@array) {
+  print $_ ;
+} # prints 4 through 6 |
+
+The default binding version may follow a statement:
+
+|print $_ for (1..3) ;         # prints 1; then 2; then 3
+print $a for my $a (1..3) ;   # error|
+
+
+      Labelled statements and |goto|
+
+Any statement in Perl can be labelled, and |goto| can branch to any label:
+
+|$n = 4 ;
+$a = 1 ; 
+TOP: 
+$a = $a * $n ;
+$n = $n - 1 ;
+goto TOP if $n >= 1 ;
+print $a ; # prints 24 |
+
+Labels are resolved at run-time in Perl, which means that computed
+strings can be used to jump off to a label:
+
+|$fi = "FI" ;
+$rst = "RST" ;
+$first = "$fi$rst";
+goto $first ;
+FIRST: print "foo" ; goto DONE ;
+SECOND: print "bar" ;
+DONE: {} ;
+# Program prints foo|
+
+The |goto| form in Perl is also used to perform tail call jumps.
+
+The expression |goto &proc| will (effectively) return from the current
+procedure and immediately invoke |proc| in its place:
+
+|sub proc1 {
+  goto &proc2 ; # tail call to proc2
+}
+
+sub proc2 {
+  return 42 ;
+}
+
+print proc1 ;  # prints 42|
+
+
+    Expressions
+
+The simplest expressions in Perl are literals: string constants like
+|'foo'| and numeric constants like |3| or |3.14|.
+
+Many complex expressions in Perl are procedure or primitive calls of
+some kind.
+
+Most other expressions types are constructed from binary, unary or
+ternary operators.
+
+Perl supports the usual arithmetic operators:
+
+|print 10 + 20 ;  # prints 30 
+print 10 - 20 ;  # prints -10 
+print 10 / 20 ;  # prints 0.5 
+print 10 * 20 ;  # prints 200 
+
+print 2 ** 3 ;   # prints 8 (exponentiation)|
+
+Perl also supports unary increment and decrement:
+
+|$foo = 13 ;
+print $foo++ ;   # prints 13 
+print $foo   ;   # prints 14 
+print ++$foo ;   # prints 15
+print $foo   ;   # prints 15
+
+print $foo-- ;   # prints 15 
+print $foo   ;   # prints 14 
+print --$foo ;   # prints 13
+print $foo   ;   # prints 13|
+
+Perl also supports the common Boolean operators:
+
+|print "and: ", (20 && 10) ;  # prints 10
+print "and: ", (0 && 20) ;   # prints 0
+
+print "or: ", (1 || 2) ;     # prints 1
+print "or: ", (0 || 1) ;     # prints 1
+
+print "not: ", !0 ;          # prints 1 
+print "not: ", !42 ;         # prints nothing
+
+
+print "and: ", (20 and 10) ;  # prints 10
+print "and: ", (0 and 20) ;   # prints 0
+
+print "or: ", (1 or 2) ;      # prints 1
+print "or: ", (0 or 1) ;      # prints 1
+
+print "not: ", not 0 ;        # prints 1 
+print "not: ", not 42 ;       # prints nothing|
+
+The word forms of each operator act identically, but have the lowest
+possible precedence.
+
+Perl supports the common comparison operators as well:
+
+|if (10 == 10) { print "true" }   # prints true 
+if (20 == 10) { print "false" }  # prints nothing 
+if (10 <= 20) { print "true" }   # prints true
+if (10 > 20) { print "false" }   # prints nothing|
+
+But, Perl requires named operators for string comparisons:
+
+|if (10 lt 20)  { print "true" }       # prints true
+if (101 lt 20) { print "yikes!" }     # prints yikes!
+if ("101" lt "20") { print "true" }   # prints true
+
+if ("cat" lt "hat") { print "true" }  # prints true
+if ("cat" gt "bat") { print "false" } # prints nothing
+if ("cat" le "cat") { print "true" }  # prints true
+if ("cat" ge "cat") { print "true" }  # prints true
+
+if ("alice" == "bob") { print "uh-oh!" } # prints uh-oh!
+if ("alice" eq "bob") { print "false" }  # prints nothing
+if ("cat" eq "cat") { print "true" }     # prints true|
+
+Perl allows C-like bitwise and bitshift operators – |&|, |||, |~|, |<<|
+and |>>| – as well, but caution should be taken when using them, since
+their interpretation changes depending on whether |use integer| or |use
+bigint| are in effect.
+
+To a get a sense of how these operators work, we can use |printf| to
+print binary:
+
+|$a = 23 ;
+$b = 71 ;
+printf "%b\n", $a ;       # prints   10111
+printf "%b\n", $b ;       # prints 1000111
+
+printf "%b\n", $a & $b ;  # prints     111
+printf "%b\n", $a | $b ;  # prints 1010111
+printf "%b\n", ~$a ;      # prints 
+ # 1111111111111111111111111111111111111111111111111111111111101000|
+
+Perl supports a C-style ternary operator for conditionals too:
+
+|$name = "Alice" ;
+print ($name eq "Alice" ? 1 : 2) ;  # prints 1|
+
+Some Perl operators are different, or have no counterpart in other
+languages.
+
+The dot operator |.| is concatenation:
+
+|$foo = "Hello, " ;
+$bar = "world!" ;
+$foobar = $foo . $bar ;
+print $foobar ;          # prints Hello, world!|
+
+The repetition operator |x| repeats a scalar (coerced to a list) or a
+list, depending on context:
+
+|$rrr = "r" x 10 ; 
+print $rrr ;       # prints rrrrrrrrrr
+
+@rrr = ("r") x 10 ;
+print "@rrr" ;     # prints r r r r r r r r r r 
+
+@rrr = "r" x 10 ;
+print "@rrr" ;     # prints rrrrrrrrrr
+
+@nums = (1,2) x 5 ;
+print "@nums" ;    # prints 1 2 1 2 1 2 1 2 1 2|
+
+The parentheses on the left-hand side are required to force the list
+context.
+
+The operator |~~| is “smartmatch,” which has “smart” comparison behavior:
+
+|@arr1 = (1,2,3) ;
+@arr2 = (2,3) ;
+
+@keys = ("foo") ;
+%hash = (foo => 42, bar => 1701) ;
+
+print "match" if @arr1 ~~ \@arr1 ; # prints match
+print "match" if @arr2 ~~ @arr1 ;  # prints nothing
+
+print "match" if @keys ~~ %hash ; # prints match|
+
+To predict the behavior of smartmatch, consult the offical Perl docs.
+
+In a list context, the range operator |...| produces an array starting
+with the left-hand side and going up to the right-hand side:
+
+|@range = 3...6 ;
+print "@range" ;  # prints 3 4 5 6|
+
+In scalar context, the |...| operator has a very different
+interpretation; the scalar |...| operator is meant to emulate the range
+behavior of |awk| and |sed|.
+
+In a scalar context, /lhs/ |...| /rhs/ will be false until /lhs/
+evaluates to true. Then, it will be true until after /rhs/ evaluates to
+false. Then, it will evaluate to false and wait for /lhs/ to be true again:
+
+|$i = 0 ;
+while ($i < 10) {
+  print $i if ($i == 3) ... ($i == 7) ;
+  $i++ ; 
+} # prints 3 through 7|
+
+By introducing a toggle variable, the above code could be rewritten:
+
+|$toggle = true ;
+$toggle = 1 ;
+$i = 0 ;
+while ($i < 10) {
+  print $i if  ($toggle ? (($i == 3) ? !($toggle = 0) : 0)
+                        : (($i == 7) ?  ($toggle = 1) : 1)) ;
+  $i++ ; 
+} # prints 3 through 7|
+
+Of course, one naturally wonders in which block this implicit |$toggle|
+variable lives. It could be the nearest enclosing block, or it could be
+the nearest enclosing procedure.
+
+It appears that they are lexically scoped to the nearest procedure,
+which leads to suprises:
+
+|sub proc {  
+ 
+  my @a = (1,2) ;
+  my @b = (1,2,3,4) ;
+
+  foreach my $a (@a) {  # execute this loop twice
+    foreach my $b (@b) {
+
+      my $flip = ($b == 3) ... ($b == 11) ;
+
+      if ($flip) {
+        print "\$b: 3 <= $b <= 11" ;
+      }
+    }
+  }
+}
+
+proc() ;  # prints:
+
+# $b: 3 <= 3 <= 11  # OK
+# $b: 3 <= 4 <= 11  # OK
+# $b: 3 <= 1 <= 11  # uh-oh!
+# $b: 3 <= 2 <= 11  # uh-oh!
+# $b: 3 <= 3 <= 11  # looks OK, but it's not
+# $b: 3 <= 4 <= 11  # looks OK, but it's not|
+
+Constants have a special interpretation if they appear in a |...|
+operator. A constant implicitly compares for equality against the
+current line number of the input (stored in the variable |$.|).
+
+The following program will print first 10 lines of input:
+
+|while (<>) {
+ print if 1 ... 10 ;
+}|
+
+because it is equivalent to:
+
+|while (<>) {
+ print if ($. == 1) ... ($. == 10) ;
+}|
+
+The |..| operator is an alternative to |...| with a minor difference: in
+the scalar context, |..| will test the right-hand side when the
+left-hand side matches. If both match, then the |..| evaluates to true
+once, and then resumes evaluating to false:
+
+|$i = 0 ;
+while ($i < 10) {
+  print $i if ($i == 3) .. ($i == 3) ;
+  $i++ ; 
+} # prints only 3 
+
+
+$i = 0 ;
+while ($i < 10) {
+  print $i if ($i == 3) ... ($i == 3) ;
+  $i++ ; 
+} # prints 3 through 9|
+
+
+    Scope
+
+Perl supports several scoping disciplines.
+
+By default, variables are scoped globally.
+
+But, the keywords |my| and |local| can scope variables lexically and
+dynamically.
+
+
+      Global scope
+
+If a variable has no explicit scope, then it is globally scoped, and it
+is visible to all blocks:
+
+|$g = 3.14 ;
+
+{
+  $g = $g * 2 ;
+}
+
+print $g ; # prints 6.28
+
+sub mod_g {
+  $g = $g / 2 ;
+}
+
+mod_g ;
+
+print $g ; # prints 3.14|
+
+
+      Lexical scoping
+
+To scope variable lexically, mark it with |my|:
+
+|my $lexical_scalar ;
+my ($lexical_scalar1,$lexical_scalar2) ;
+my @lexical_array ;
+my %lexical_hash ;|
+
+With lexical scoping, a variable is visible only to the block in which
+it is defined, and all inner blocks.
+
+|{
+  my $x = 3 ;
+  {
+    my $y = 10 ;
+    print $x ; # prints 3 
+  }
+  print $y ; # prints nothing 
+}|
+
+Lexically scoped variables are also visible to procedures defined within
+the block and anonymous procedures defined within the block.
+
+Anonymous subroutines “close over” their lexically scoped variables:
+
+|$x = "global x" ;
+{
+  my $x = "inner x" ;
+  $f = sub {
+    return $x ;
+  }
+}
+
+print &{$f} ; # prints "inner x" ;
+print $x ;    # prints "global x" ;|
+
+The operator |my| can actually appear anywhere within the block and it
+will cause lexical scoping for the variable within that block, /once
+it’s been evaluated/:
+
+|$x = 10 ;
+{
+  $x = 3 ;   # $x is global
+  my $x = 20 ;
+  print $x ; # prints 20
+}
+print $x;    # prints 3
+
+$x = 10 ;
+{
+  goto SKIP;
+  BACK:
+  $x = 3 ;   # by the time this hits, $x is lexical
+  last ;
+
+  SKIP:
+  my $x = 20 ;
+  print $x ; # prints 20
+}
+print $x;    # prints 10 |
+
+Unfortunately, it is not hard to extend the prior example into a proof
+that the scope of a variable in Perl is (statically) undecidable in general.
+
+Under the hood, |my| should really be seen as both a keyword and as an
+operator, since a |my| expression acts like an alias for the variable(s)
+it receives. This means it can appear almost anywhere that a variable
+can appear:
+
+|$x = 10 ;
+{
+  (my $x) = 20 ;
+  print $x ;      # prints 20 
+}
+print $x;         # prints 10 
+
+
+@stack = (1,2,3) ;
+
+while (my $el = pop @stack) {
+  print $el ;
+}
+
+
+sub half ($$) {
+  $_[1] = $_[0] / 2 ;
+}
+
+$x = 1000 ;
+{ 
+  half 10, (my $x) ;
+  print $x ;           # prints 5
+} 
+print $x ;             # prints 1000
+
+
+$x = 10  ;
+foreach my $x (1,2,3) {
+ print $x ;
+}                     # prints 1 through 3
+print $x ;            # prints 10
+|
+
+
+      Dynamic scope
+
+Dynamic scope could fairly be termed stack scope: when a local variable
+is evaluated, the topmost stack frame with a binding of that variable
+provides its value.
+
+In Perl, the |local| keyword declares a variable to have local scope.
+
+At first glance, dynamic scope seems to act like lexical scope:
+
+|{
+  local $x = 3 ;
+  {
+    local $y = 10 ;
+    print $x ;        # prints 3 
+  }
+  print $y ;          # prints nothing 
+}|
+
+But, procedures can discriminate between lexical and dynamic scope:
+
+|sub get_x {
+  return $x ;
+}
+
+{ 
+  my $x = 10 ;
+  print get_x() ;  # prints nothing
+}
+
+{
+  local $x = 10 ;   
+  print get_x() ;  # prints 10
+}
+
+print get_x() ;    # prints nothing|
+
+
+      Static (state) variables
+
+If |use feature "state"| is in effect, then Perl also has a lexically
+scoped variables that are initialized only once known as |state| variables.
+
+These behave similar to |static| local variables in C:
+
+|use feature "state" ;
+
+sub inc_count() {
+  state $count = 0 ;
+  return ++$count ;
+}
+
+print inc_count() ;   # prints 1
+print inc_count() ;   # prints 2
+print inc_count() ;   # prints 3|
+
+
+      Lexical versus dynamic versus global
+
+The following program illustrates the difference between the three
+scoping disciplines:
+
+|$foo = 20 ;
+
+sub print_foo() {
+  print $foo ;
+}
+
+
+# Lexically scoped $foo:
+sub lexical_foo() {
+  my $foo = 50 ;
+  print_foo() ;
+}
+
+lexical_foo() ;  # prints 20
+print_foo() ;    # prints 20
+
+
+# Dynamically scoped $foo:
+sub dynamic_foo() {
+  local $foo = 40 ;
+  print_foo() ;
+}
+
+dynamic_foo() ;  # prints 40
+print_foo() ;    # prints 20 
+
+
+# Globally scoped $foo:
+sub global_foo() {
+  $foo = 60 ;
+  print_foo() ;
+}
+
+global_foo() ;   # prints 60
+print_foo() ;    # prints 60 |
+
+
+    Quote operators: Strings and regex
+
+Perl is filled with quote forms and quote-like operators.
+
+Singly-quoted strings are literal strings, with no interpolation:
+
+|print 'This is a $string' ;  # prints This is a $string|
+
+There is an “quote operator” form for non-interpolated strings: |q|:
+
+|print q(This is a $string.) ;   # prints This is a $string.
+print q{This is a $string.} ;   # prints This is a $string.
+print q|This is a $string.| ;   # prints This is a $string.
+print q<This is a $string.> ;   # prints This is a $string.
+print q/This is a $string./ ;   # prints This is a $string.
+print q#This is a $string.# ;   # prints This is a $string.
+print q"This is a $string." ;   # prints This is a $string.
+print q zThis is a $string.z ;  # prints This is a $string.
+|
+
+A quote operator takes a delimiter character, and then it looks for a
+matching delimiter.
+
+Most characters act as their own matching delimiter, but the balanced
+delimiters |<|, |(|, |{| and |[| match with |>|, |)|, |}| and |]|
+respectively.
+
+If a balanced delimiter is in use, it all internal uses of those
+balanced delimiters must be balanced:
+
+|print q(This (and this) run.) ;  # prints This (and this) run.
+print q(This (and this fails.) ; # error
+|
+
+The advantage of quote operators is that |'| and |"| do not have to be
+escaped within them (unless of course, they were chosen as the delimiter
+character):
+
+|print 'I don\'t like escaping.' ; # prints I don't like escaping.
+print q(I don't like esacping.) ; # prints I don't like escaping.|
+
+
+      Strings and interpolation
+
+Double-quoted strings are literal strings, but with interpolation:
+
+|$pi = 3.14 ;
+@a = ("of","a","circle") ;
+print "$pi is the circumference @a over its diameter." ;
+ # prints 3.14 is the circumference of a circle over its diameter.|
+
+When an array variable appears within an string, it expands, by default,
+with single spaces between its elements.
+
+But, it is possible to change the separator by assigning it to the
+special variable |$"|:
+
+|@array = (1,2,3) ;
+
+{ 
+  local $" = '::' ;
+  print "@array" ;    # prints 1::2::3 
+}
+
+print "@array" ;|
+
+The quote operator form of double quotes is |qq|:
+
+|$string = "dog" ;
+print qq(This is a $string.) ;   # prints This is a dog. 
+print qq{This is a $string.} ;   # prints This is a dog.
+print qq[This is a $string.] ;   # prints This is a dog.
+print qq<This is a $string.> ;   # prints This is a dog.
+print qq|This is a $string.| ;   # prints This is a dog.
+print qq/This is a $string./ ;   # prints This is a dog.
+print qq#This is a $string.# ;   # prints This is a dog.
+print qq"This is a $string." ;   # prints This is a dog.
+print qq zThis is a $string.z ;  # prints This is a dog.
+|
+
+If necessary for differentiation, interpolated variables can be
+delineated with |{}|:
+
+|$prefix = "bi" ;
+
+print "$prefixmodal" ;   # prints nothing, $prefixmodal not a var
+print "${prefix}modal" ; # prints bimodal|
+
+String interpolation even attempts array and hash indexing:
+
+|@registries = (42,1701) ;
+
+print "NCC-$registries[1]" ;  # prints NCC-1701|
+
+
+      Backtick: Shell process expansion
+
+Backtick quotes, `, work like they do in bash
+<http://matt.might.net/articles/bash-by-example/>: they execute the
+shell command, and evaluate to its output as a Perl value:
+
+|print `ls` ; # prints all files in the current directory|
+
+In an list context, it splits the output along newlines, unless the
+variable |$/| is set to a different separator:
+
+|@files = `ls` ;
+foreach $file (@files) {
+  chomp $file ;            # remove newline from end of $file
+  print "file: $file" ;
+} # prints each file, but with file: first
+
+
+{
+  local $/ = ':';
+  @last_user = `tail -1 /etc/passwd` ;
+  print "@last_user" ; # prints passwd entry for the last user, 
+                       # with space after each :
+
+  # looks like:
+  # robot: *: 239: 239: robot: /var/empty: /usr/bin/false
+}|
+
+The quote operator form of backtick expansion is |qx|:
+
+|@files = qx|ls| ;
+foreach $file (@files) {
+  chomp $file ;            # remove newline from end of $file
+  print "file: $file" ;
+} # prints each file, but with file: first|
+
+As with doubly-quoted strings, interpolation works on backtick expanded
+quote forms as well:
+
+|$passwd = '/etc/passwd';
+$password_file = `cat $passwd` ; 
+print $password_file ;            # Prints contents of /etc/passwd|
+
+But, using the |qx| quote operator with |'| as a delimiter will /not/
+interpolate:
+
+|$user = `echo $USER` ;     # runs echo with no args
+print $user ;              # prints nothing
+
+$user = qx'echo $USER' ;   
+print $user ;              # prints value of shell var $USER|
+
+Quote operators that allow interpolation (except |qq| itself) disable
+interpolation when the delimiter is the single quote, |'|.
+
+
+      Quote words
+
+For quickly creating an array of whitespace-separated words, the quote
+operator |qw| is convenient:
+
+|@names = qw(Harry     Larry 
+ Moe) ;
+print "@names" ; # prints Harry Larrry Moe|
+
+
+      Regular expressions
+
+If you’re not familiar, with regular expressions you will want to read
+my guide to regular expressions
+<http://matt.might.net/articles/sculpting-text/>.
+
+Regular expressions are yet another form of quote operator in Perl.
+
+The default quote for a /matching/ regular expression operation is |/|.
+
+A regular expression, by default, attempts to match against the contents
+of the default variable, |$_|.
+
+|$_ = "foobar" ;
+print "yes" if /foo/ ; # prints yes
+print "yes" if /bar/ ; # prints yes
+print "no"  if /baz/ ; # does not print|
+
+The matching operator |=~| allows testing against a specific variable:
+
+|$fb = "facebook" ;
+print "yes" if $fb =~ /face/ ;  # prints yes
+print "yes" if $fb =~ /book/ ;  # prints yes
+print "no"  if $fb =~ /apple/ ; # does not print|
+
+If the right-hand side is not a regular expression quote, then run-time
+value of the expression is dynamically interpreted as a regular expression:
+
+|$fb = "facebook" ;
+$face = "face" ;
+$book = "bo+k" ;
+$apple = "ap*le" ;
+print "yes" if $fb =~ $face ;   # prints yes
+print "yes" if $fb =~ $book ;   # prints yes
+print "no"  if $fb =~ $apple ;  # does not print|
+
+The matching quote operator |m| allows one to change the quotes on a
+matching regular expression:
+
+|$fb = "facebook" ;
+print "yes" if $fb =~ m(face) ;  # prints yes
+print "yes" if $fb =~ m|book| ;  # prints yes
+print "no"  if $fb =~ m"apple" ; # does not print|
+
+To quote (and potentially invest time optimizing) a regular expression
+for later use (rather than match with it immediately), use the |qr|
+quote operator:
+
+|$fb = "facebook" ;
+$face = qr{face} ;
+$book = qr|bo+k| ;
+print "yes" if $fb =~ $face ;      # prints yes
+print "yes" if $fb =~ $book ;      # prints yes
+print "no"  if $fb =~ qr/ap*le/ ;  # does not print|
+
+With regular expression quotes, interpolation of variables /is/ allowed,
+as it is in doubly-quoted stings:
+
+|$rx = "foo|bar" ;
+
+print "match" if "foobar" =~ /$rx/ ;     # prints match
+print "match" if "foobar" =~ /x${rx}x/ ; # prints nothing
+                                         # tries to match xfoo|barx|
+
+
+        Extracting matches from regular expressions
+
+Directly after a successful match, Perl binds variables to submatches.
+
+Parentheses do more than dictate precedence; they indicate submatches.
+
+The /n/th leftmost parenthesis denotes the /n/th submatch, and the
+variable |$|/n/ holds the /n/th submatch:
+
+|$words = "foo bar baz qux" ;
+$words =~ /(\w+) (\w+) (\w+) (\w+)/ ;
+
+print $1 ; # prints foo
+print $2 ; # prints bar
+print $3 ; # prints baz
+print $4 ; # prints qux
+
+
+$head = "## This is a title [ref] ##" ;
+if ($head =~ /^##[ ]*((\w|\s)+)\s*\[(\w*)\][ ]*##$/) {
+  print $1 ; # prints This is a title
+  print $3 ; # prints ref
+} else {
+  print "No match!"
+}|
+
+The entire matched segment is availale in the variable |$&|:
+
+|$in = "foobarrrrrrrrrrrrbaz" ;
+$in =~ /bar*/ ;
+print $& ; # prints barrrrrrrrrrrr|
+
+
+        Regular expression modifiers
+
+Regular expression quotes may be directly followed flags that modify
+both the parsing and the behavior of the regular expressions.
+
+The multiline modifier |m| modifies the behavior of the anchors |^| and
+|$| so that each can match where a linebreak happens:
+
+|$in = "foo\nbar\nbaz" ;
+
+print "no"  if $in =~ /^bar$/ ;  # prints nothing
+print "yes" if $in =~ /^bar$/m ; # prints yes|
+
+The “single line” modifier |s| changes the behavior of |.| so that it
+/can/ match newline:
+
+|$in = "foo\nbar" ;
+print "no"  if $in =~ /foo.bar/ ;  # prints nothing
+print "yes" if $in =~ /foo.bar/s ; # prints yes|
+
+The |p| modifier copies the string prior to the match, the matched
+string and the string after the match into |${^PREMATCH}|, |${^MATCH}|
+and |${^POSTMATCH}| respectively:
+
+|$in = "This is foo." ; 
+$in =~ /foo/p;
+print ${^PREMATCH} ;   # prints This is 
+print ${^MATCH} ;      # prints foo
+print ${^POSTMATCH} ;  # prints .|
+
+The case-insensitive modifier |i| ignores case according to the current
+locale:
+
+|$in = "fooBAR" ;
+print "no"  if $in =~ /foobar/ ;  # prints nothing
+print "yes" if $in =~ /foobar/i ; # prints yes|
+
+The modifier |x| ignores whitespace and comments in the pattern:
+
+|$in = "foobar" ;
+print "no"  if $in =~ /foo bar/ ;  # prints nothing
+print "yes" if $in =~ /foo bar/x ; # prints yes|
+
+This permits nicely document regular expressions:
+
+|$ipchunk = qr{(
+    [0-9]        # 0   - 9
+ |  [1-9][0-9]   # 10  - 99
+ |  1[0-9][0-9]  # 100 - 199
+ |  2[0-4][0-9]  # 200 - 249
+ |  25[0-5]      # 250 - 255
+)}x ;
+
+print "no"  if "256" =~ /^$ipchunk$/ ; # prints nothing
+print "yes" if "255" =~ /^$ipchunk$/ ; # prints yes|
+
+In an list context, the “global” modifier |g| returns an array of all
+matches within the search string:
+
+|$in = "123,456,789";
+@allmatches = ($in =~ /\d+/g) ;
+print $allmatches[0] ; # prints 123
+print $allmatches[1] ; # prints 456
+print $allmatches[2] ; # prints 789|
+
+In a scalar context, the modifier |g| causes the match operator to
+remember matches, and return each one successively for each evaluation:
+
+|$in = "123,456,789";
+while ($in =~ /(\d+)/g) {
+  print $1 ;
+} # prints 123, then 456, then 789|
+
+The special pattern |\G| matches the last match point on a per-string
+basis. The current procedure |pos| yields the current match point for
+string:
+
+|$in = "123,456,789";
+print pos $in ;   # prints nothing 
+$in =~ /(\d+)/g ;
+print pos $in ;   # prints 3
+$in =~ /(\d+)/g ; 
+print pos $in ;   # prints 7
+$in =~ /(\d+)/g ;
+print pos $in ;   # prints 11|
+
+The procedure |pos| can also /set/ the last match point for a string:
+
+|$in = "123,456,789";
+$in =~ /(\d+)/g ;
+print $1;            # prints 123
+$in =~ /(\d+)/g ; 
+print $1 ;           # prints 456
+pos($in) = 3 ;
+$in =~ /(\d+)/g ;
+print $1      ;      # prints 456|
+
+Caution must be taken, because while the last-match position is held
+per-string copying the string will reset it:
+
+|$in = "123,456,789";
+$in =~ /(\d+)/g ;
+print pos $in ;       # prints 3 
+$inref = \$in ;
+print pos ${$inref} ; # prints 3
+$in2 = $in ;
+print pos $in2 ;      # prints nothing!|
+
+The modifier |c|, in conjunction with |g|, does not reset the match
+position for the string on a failed match.
+
+This makes it easy to build lightweight lexical analyzers:
+
+|$in = "if (cond) { print ; }" ;
+ 
+$in =~ /^/g ;
+while (1) {
+  print "IF"    if $in =~ /\Gif/gc ;
+  print ""      if $in =~ /\G\s+/gc ;
+  print "PRINT" if $in =~ /\Gprint/gc ;
+  print "ID"    if $in =~ /\G\w+/gc ;
+  print "LP"    if $in =~ /\G\(/gc ;
+  print "RP"    if $in =~ /\G\)/gc ;
+  print "LB"    if $in =~ /\G\{/gc; 
+  print "RB"    if $in =~ /\G\}/gc ;
+  print "SEMI"  if $in =~ /\G;/gc ;
+  last if $in =~ /\G$/gc ;
+}
+
+# prints
+# IF
+# 
+# LP
+# ID
+# RP
+# 
+# LB
+# 
+# PRINT
+# 
+# SEMI
+# 
+# RB|
+
+
+      Substitution operators
+
+Perl borrows and significantly extends sed’s substitution quote
+operator, |s|.
+
+The general form for substitution is
+|s/|/pattern/|/|/replacement/|/|/modifiers/.
+
+The balanced delimiter forms must balance pattern and replacement:
+
+|$in = "foo" ;
+$in =~ s{foo}{bar} ;
+print $in ; # prints bar|
+
+The |s| operator returns true if a substitution succeeds, and false
+otherwise:
+
+As with the match operator |m|, it operatos on |$_| by default, and it
+places the result in |$_| by default, but the |=~| operator can force it
+to operator on a different variable:
+
+|$_ = "foo" ; 
+s/foo/bar/ ;
+print $_ ;          # prints bar
+
+$in = "foo" ; 
+$in =~ s/foo/bar/ ;
+print $in ;         # prints bar|
+
+The same flags that apply to the match quote operator |m| also work with
+substitution:
+
+|$in = "This is a foo foo." ;
+$in =~ s/foo/bar/ ;
+print $in ; # prints This is a bar foo.
+
+$in = "This is a foo foo." ;
+$in =~ s/foo/bar/g ;
+print $in ; # prints This is a bar bar.|
+
+The submatch variables |$|/n/ are visible in the replacement:
+
+|$in = "Triple: this" ;
+$in =~ s/(Triple: )(\w+)/$1$2$2$2/ ;
+print $in ; # prints "Triple: thisthisthis" |
+
+Since the |s| operator destroys its target string by default, it also
+accepts an |r| modifier which causes it to (non-destructively) return
+the result instead:
+
+|$in = "foo" ;
+$out = ($in =~ s/foo/bar/r) ;
+print $in ;   # prints foo
+print $out ;  # prints bar|
+
+
+    Exception-handling and |eval|
+
+Perl allows run-time evaluation of code. |eval| runs the interpreter on
+the string or block that it’s given.
+
+For scoping purposes, the code run in |eval| runs in its own block:
+
+|my $foo ;
+eval '$foo = 3;' ;
+print $foo ;                        # prints 3
+
+eval 'sub f { print "Hello" ; }' ;
+f() ;                               # prints Hello
+
+my $x = 42 ;
+eval 'print $x;'                    # prints 42
+
+eval '$y = 10;' ;
+print $y ;                          # prints 10
+
+eval 'my $z = 20;' ;
+print $z ;                          # prints nothing|
+
+If the code run by |eval| fails, then the failure does not terminate the
+script; rather, it returns from the |eval| expression, and places the
+error in the special variable |$@|.
+
+Perl does not have proper exception-handling constructs that programmers
+from languages like Java or C++ would recognize.
+
+The idiom for exception-handling is to |eval| a risky block of code, and
+then to check if it called |die| by examining the value of |$@| afterward.
+
+|sub fail_on_one {
+  if ($_[0] == 1) {
+    die("fail") ;
+  }
+  print "success" ;
+}
+
+eval {
+  fail_on_one 2 ;          # prints success
+} ;
+if ($@) {
+  print "failure: " . $@ ; # does not print
+}
+
+eval {
+  fail_on_one 1 ;          # does not print
+} ;
+if ($@) {
+  print "failure: " . $@ ; # prints fail at <file> line <number>.
+}|
+
+In some sense, |eval| acts like |try|, |die| acts like |throw| and |if
+($@)| acts like |catch|.
+
+Because Perl allows blocks as parameters to procedures, many Perl
+resources (such as this one
+<http://c2.com/cgi/wiki?ExceptionHandlingInPerl>) point out that it is
+possible to mimic a |try|-|catch|:
+
+|# try evals the block, and then calls the handler for errors:
+sub try (&$) {
+  my ($tryblock,$handler) = @_ ;
+
+  eval { &{$tryblock} } ; 
+
+  if ($@) {
+    &{$handler}($@) ;
+  }
+}
+
+# catch returns a procedure that handles an error, if any:
+sub catch (&) {
+  my ($handler) = @_ ;
+  return sub {
+    my ($error) = @_ ;
+    $handler->($error) ;
+  } ;
+}
+
+sub throw ($) {
+  my ($error) = @_ ;
+  die $error ;
+}
+
+sub fail_on_one {
+  if ($_[0] == 1) {
+    die("fail") ;
+  }
+  print "success" ;
+}
+
+try {
+  fail_on_one 2 ;       # prints success
+} 
+catch {
+  print "caught: @_" ;  # does not execute
+} ;
+
+
+try {
+  fail_on_one 1 ;       # fails
+} 
+catch {
+  print "caught: @_" ;  # prints caught: ...
+} ;|
+
+
+    Packages
+
+In Perl, the |package| keyword creates a package.
+
+Typically, a Perl named /name/ package would go into a file named
+/name/|.pm|:
+
+The simplest valid package in Perl is just returns true:
+
+|# Foo.pm
+package Foo;
+1|
+
+A program can import a package /name/ in file /name/|.pm| with |require|
+/name/ |;|
+
+|require Foo ;|
+
+To give parameters to a package, import it with the |use| keyword
+instead. The |use| keyword passes the parameters it receives directly to
+the |import| procedure within the module, but adds the package itself as
+the first parameter:
+
+|# Foo.pm
+package Foo;
+
+sub import {
+  my ($package,%params) = @_ ;
+  print $package ;
+  print $params{'life'} ;
+}
+
+1|
+
+It is common to pass parameters as a hash:
+
+|# main.pl
+use Foo (life => 42, ship => 1701) ; # prints Foo, then 42|
+
+Perl also allows packages inlined within a file by placing all of the
+package within a block:
+
+|package Bar {
+}
+print "Bar is imported." ; # prints Bar is imported.|
+
+Inlined packages do not need to return true.
+
+The package is immediately imported after the declaration.
+
+To declare an externally visible variable in a Perl package, use the
+scoping operator |our|, and access package variables with |::| in the
+namespace:
+
+|package Bar {
+  my $hidden = 10 ;
+  our $foo = 20 ; 
+} ;
+
+print $Bar::foo ;    # prints 20
+print $Bar::hidden ; # prints nothing; can't see $hidden|
+
+Procedures are visible as package members by default:
+
+|package Bar {
+
+  our $foo = 20 ; 
+
+  sub proc {
+    print "visible: $foo" ;
+  }
+
+} ;
+
+Bar::proc() ;  # prints visible: 20
+proc() ;       # error: proc not visible|
+
+Modules can export procedure names into the main module user’s namespace
+as well. In order to do so, modules should use the base |Exporter|
+module, and then specify the names of the procedures to export in |our
+@EXPORT|:
+
+|# Baz.pm
+package Baz;
+
+use base 'Exporter' ;
+
+our @EXPORT = qw(my_proc) ;
+
+sub my_proc {
+  print "My procedure!" ;
+} |
+
+Be careful when using the |Exporter| package: it provides its own
+|import| method to handle exporting.
+
+When using the package, exported names are directly available:
+
+|use Baz ;
+
+my_proc() ; # prints My procedure!|
+
+
+    Objects
+
+[*Warning*: Nothing in this article is idiomatic Perl, but this section
+is /especially/ unidiomatic in its rank abuse of |bless| and packages
+while exposing the underlying semantics of objects.]
+
+Any reference in Perl can be turned into an object by |bless|ing it:
+
+|$o = {} ;   # an anonymous hash
+
+print $o ;  # prints HASH(0xAddr)
+
+bless $o ;  # $o is now an object
+
+print $o ;  # prints main=HASH(0xAddr) |
+
+A blessed object is allowed to use the |->| operator to call methods.
+
+The |->| operator will look for a procedure with the method’s name in
+the namespace associated with the object.
+
+If |bless| wasn’t given a namespace when the object was created, then
+|->| looks the default (global) namespace, known as |main|:
+
+|sub some_method {
+  print "called a method" ;
+}
+
+$a = bless {} ;
+$a->some_method ; # prints called a method
+
+$b = {} ;
+$b->some_method ; # error: $b is not blessed|
+
+By creating a package and passing that to |bless| when the object is
+created, method look-up happens in the package:
+
+|package Dog {
+
+  sub growl {
+    print "grrrrr" ;
+  }
+
+}
+
+$rex = bless {}, Dog ;
+
+print $rex ;     # prints Dog=HASH(0xAddr) 
+
+$rex->growl() ;  # prints grrrr|
+
+Curiously, if a procedure is invoked with an object as its first
+argument, then the procedure will be looked up in the /packages/’s scope
+rather than the current scope:
+
+|package Dog {
+
+  sub growl {
+    print "grrrrr" ;
+  }
+
+}
+
+$rex = bless {}, Dog ;
+$max = {} ;
+
+$rex->growl() ;  # prints grrrr
+
+growl $rex ;     # also prints grrrr
+
+growl $max ;     # error: growl not defined in this scope|
+
+So, Perl’s object-oriented system has been grafted on top of its module
+system. Packages do double duty as class definitions.
+
+When a procedure gets invoked as a method, the first parameter it
+receives is the object itself:
+
+|sub print_args {
+  print "@_" ;
+}
+
+$o = bless {} ;
+
+$o->print_args (1, 2, 3) ;  # prints main=HASH(0xAddr) 1 2 3|
+
+Blessed hashes can then store fields in the hash itself:
+
+|sub set_x {
+  $_[0]->{"x"} = $_[1] ;
+}
+
+sub get_x {
+  return $_[0]{"x"} ;
+}
+ 
+$o = bless {} ;
+
+$o->set_x(42) ;
+
+print $o->get_x() ; # prints 42|
+
+Class inheritance in Perl is specified in the |our @ISA| variable for a
+package.
+
+If a method isn’t on the blessed package, then it checks the packages in
+|@ISA| for the method:
+
+|package Animal {
+  sub eat {
+    print "nom nom" ;
+  }
+}
+
+package Cat {
+  our @ISA = (Animal) ;
+}
+
+$max = bless {}, Cat ;
+
+$max->eat() ;  # prints nom nom|
+
+There is an alternate method call syntax, in which the method name is
+specified as a string or an procedure reference in a variable:
+
+|sub my_method {
+  print "called my_method" ;
+}
+
+$o = bless {} ;
+
+$name = 'my_method' ;
+
+$o->$name () ;  # prints called my_method|
+
+By convention, Perl packages acting as classes provide a |new| procedure
+to construct objects. Because packages themselves (interpreted as
+strings) act as objects, |new| may be invoked as a method from the
+package itself:
+
+|package Ship {
+
+  sub new {
+    my ($class,@args) = @_ ;
+
+    $self = bless {}, $class ;
+
+    $self->{'x'} = $args[0] ;
+    $self->{'y'} = $args[1] ;
+
+    return $self ;
+  }
+
+  sub print_position {
+    my ($self) = @_ ;
+
+    print "($self->{'x'},$self->{'y'})" ;
+  }
+
+}
+
+$enterprise = Ship->new(-32, 17) ;
+$enterprise->print_position ; # prints (-32,17)|
+
+
+    Special variables
+
+Perl makes use of many special variables.
+
+The official Perl documentation on special variables
+<http://perldoc.perl.org/perlvar.html> contains an in-depth discussion.
+
+In same cases, changing these variables globally leads to unintended
+interactions with other components of the program.
+
+Binding them as |local| (dynamically scoped) variables within a block
+directly before their use can prevent these interactions.
+
+
+      |$_| : Default input/output
+
+|$_| is, by convention, the default input and output for many procedures
+and operators (when none other is specified), including |print|,
+|chomp|, the regex quote operators and many input operators.
+
+
+      |@_| : Arguments to a procedure
+
+All arguments to a procedure are passed in the special variable |@_|:
+
+|sub proc {
+  my ($first,$second,$third) = @_ ;
+  print $second ;
+}
+
+proc 1, 2, 3 ; # prints 2|
+
+
+      |$"| : Array string interpolation separator
+
+If an array is inteprolated within a quote operator, then the value of
+|$"| is spliced between elements:
+
+|$" = "-" ;
+@a = (1,2,3) ;
+print @a ;      # prints 123
+print "@a" ;    # prints 1-2-3|
+
+
+      |$$| : Current process id
+
+The variable |$$| holds the process id for the current process.
+
+
+      |$0| : Program name
+
+As in many shell langugaes, |$0| contains the program that was executed.
+
+
+      |$;| : Subscript separator
+
+There is a convention in Perl that allows hashes to accept multiple keys
+in order to simulate multidimensional arrays using hashes.
+
+By default, when multiple keys are given, they are joined together with
+concatenated as a single string to act as a key.
+
+But, if the special |$;| variable is non-empty, then it will be placed
+between keys during concatenation:
+
+|$; = ";" ;
+%hash = () ;
+$hash{0,0} = 1 ;
+$hash{1,1} = 1 ;
+$hash{2,2} = 1 ;
+print $hash{'0;0'} ; # prints 1|
+
+
+      |%ENV| : Environment variables
+
+The special hash |%ENV| contains the environment variables for this process.
+
+Modifying the entries in |%ENV| will change the environment for newly
+created child processes as well.
+
+
+      |%SIG| : Signal handlers
+
+If the process receives a signal /name/ (e.g. |INT|, |PIPE|), it will
+invoke the procedure referenced in in |$SIG{|/name/|}|.
+
+
+      |$\| : Output record separator
+
+By default, |$\| is empty, but if it is set, then this will print at the
+end of every |print| command.
+
+
+      |$/| : Input record separator
+
+Normally, when reading from a filehandle with |<>|, it reads until a
+newline. If |$/| is set to something else, then it reads until the next
+instance of this string.
+
+
+      |$,| : Output field separator
+
+When set, |print| inserts the contents of |$,| between its arguments:
+
+|$, = "::" ;
+print "foo", "bar", "baz" ; # prints foo::bar::baz|
+
+
+      |$.| : Current line number for most recent filehandle
+
+The variable |$.| holds the line number of the most recently accessed
+filehandle.
+
+For example, to number each line from STDIN:
+
+|print "$.: $_" while (<STDIN>) ;|
+
+
+    What’s next?
+
+The goal of this article was to provide an experimental understanding of
+Perl’s syntax and its semantics.
+
+Perl’s standard library contains many routines useful for common tasks,
+particularly with respect to text and basic data structure manipulation.
+
+New users to Perl should take the time to browse the standard library.
+
+Perl also has a large ecosystem of libraries and packages.
+
+The CPAN repository <http://www.cpan.org/> contains most of them, and
+the |cpan| tool can automatically download and install many of them.
+
+Several Perl programmers felt it irresponsible for me not to mention
+|use strict| and |use warnings|.
+
+When |use strict| and |use warnings| are in effect, many of the abuses I
+used to poke at the internal workings of the Perl interpreter won’t work
+anymore (or you’ll be warned), and it is generally considered good
+practice to program with them in effect.
+
+
+    Related resources and posts
+
+  * Several readers recommend Modern Perl
+    <http://onyxneon.com/books/modern_perl/>.
+  * For learning the Perl, the (modern) classic Learning Perl
+    <http://www.amazon.com/gp/product/1449303587/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1449303587&linkCode=as2&tag=mmamzn06-20>
+    is a great introduction:
+    <http://www.amazon.com/gp/product/1449303587/ref=as_li_ss_il?ie=UTF8&camp=1789&creative=390957&creativeASIN=1449303587&linkCode=as2&tag=mmamzn06-20>
+
+  * If you're serious about writing good Perl (and yes, you can), then
+    bryan d foy's (recently updated!) Mastering Perl
+    <http://www.amazon.com/gp/product/144939311X/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=144939311X&linkCode=as2&tag=mmamzn06-20>
+    is required reading:
+    <http://www.amazon.com/gp/product/144939311X/ref=as_li_ss_il?ie=UTF8&camp=1789&creative=390957&creativeASIN=144939311X&linkCode=as2&tag=mmamzn06-20>
+
+  * And, an excellent companion is the Perl Cookbook
+    <http://www.amazon.com/gp/product/0596003137/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=0596003137&linkCode=as2&tag=mmamzn06-20>:
+
+    <http://www.amazon.com/gp/product/0596003137/ref=as_li_ss_il?ie=UTF8&camp=1789&creative=390957&creativeASIN=0596003137&linkCode=as2&tag=mmamzn06-20>
+
+  * Church encodings and the Y Combinator in Python
+    <http://matt.might.net/articles/python-church-y-combinator/>
+  * A quick overview of programming with bash
+    <http://matt.might.net/articles/bash-by-example/>
+  * 3 shell scripts that can improve your writing
+    <http://matt.might.net/articles/shell-scripts-for-passive-voice-weasel-words-duplicates/>
+  * Console productivity hack: Exploiting task frequency
+    <http://matt.might.net/articles/console-hacks-exploiting-frequency/>
+
+------------------------------------------------------------------------
+[article index <https://matt.might.net/articles/>] [email me
+<mailto:matt-blog@might.net>] [@mattmight
+<http://twitter.com/mattmight>] [rss
+<https://matt.might.net/articles/feed.rss>]
+*Latest:* HOWTO: Get tenure <https://matt.might.net/articles/tenure/>
+*Next:* A short guide to Salt Lake City
+<https://matt.might.net/articles/when-in-salt-lake/>
+*Prev:* A quick overview of programming with bash
+<https://matt.might.net/articles/bash-by-example/>
+*Rand:* Writing an interpreter, CESK-style
+<https://matt.might.net/articles/cesk-machines/>
+matt.might.net is powered by *linode
+<http://www.linode.com/?r=bf5d4e7c8a1af61855b5227279a6744c3bde8a8a>* |
+legal information <https://matt.might.net/articles/legal/>
+
+Hide Download Bar
+Ctrl + Shift + Z = Show/Hide Download Bar
+Downloads
+Download Manager (S3)
+Clear
+Left Click: Clear All Finished
+Right Click: Undo last clear
+100%
+Download History
+Download list is empty
+hbash.txt
+Unk.
+Unk.
+136 KB
+455 KB/s
+hbash.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbash.txt
+Status:
+	
+136 KB / Unknown ( 455 KB/s )
+File Size:
+	
+505 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:21:49
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+1.62 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashman.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashman.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashman.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+398 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:23:48
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+863 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hfilesys.txt
+Unk.
+Unk.
+-.--
+-.--
+hfilesys.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hfilesys.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+122 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:51:42
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+192 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdeblic.txt
+Unk.
+Unk.
+-.--
+-.--
+hdeblic.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdeblic.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+40 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:52:06
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+91 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebdev
+Unk.
+Unk.
+96 KB
+963 KB/s
+hdebdev
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebdev
+Status:
+	
+96 KB / Unknown ( 963 KB/s )
+File Size:
+	
+291 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:11
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+3.60 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebmaint
+Unk.
+Unk.
+79 KB
+395 KB/s
+hdebmaint
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebmaint
+Status:
+	
+79 KB / Unknown ( 395 KB/s )
+File Size:
+	
+322 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:31
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+2.02 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebmaintnew
+100%
+00:00
+54 KB
+538 KB/s
+hdebmaintnew
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebmaintnew
+Status:
+	
+54 KB / 54 KB ( 538 KB/s )
+File Size:
+	
+175 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:46
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+1.26 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+debpackaging-tutorial.en.pdf
+100%
+00:00
+388 KB
+3.79 MB/s
+debpackaging-tutorial.en.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\debpackaging-tutorial.en.pdf
+Status:
+	
+388 KB / 388 KB ( 3.79 MB/s )
+File Size:
+	
+388 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:54:09
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+3.91 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebconfig
+100%
+00:00
+6 KB
+60 KB/s
+hdebconfig
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebconfig
+Status:
+	
+6 KB / 8 KB ( 60 KB/s )
+File Size:
+	
+27 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:54:23
+Time to Complete:
+	
+00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+32 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+debhamradio-maintguide.en.pdf
+100%
+00:00
+193 KB
+Infinity GB/s
+debhamradio-maintguide.en.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\debhamradio-maintguide.en.pdf
+Status:
+	
+193 KB / 193 KB ( Infinity GB/s )
+File Size:
+	
+193 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:57:27
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+2.58 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hgoogbashstyle.txt
+Unk.
+Unk.
+-.--
+-.--
+hgoogbashstyle.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hgoogbashstyle.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+44 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:02:34
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+46 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hposixsh.txt
+Unk.
+Unk.
+-.--
+-.--
+hposixsh.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hposixsh.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+177 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:09:12
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+183 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+htextsculpt.txt
+Unk.
+Unk.
+-.--
+-.--
+htextsculpt.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\htextsculpt.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+43 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:10:16
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+47 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hrelalgbash.txt
+Unk.
+Unk.
+-.--
+-.--
+hrelalgbash.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hrelalgbash.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+27 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:11:49
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+25 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashex.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashex.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashex.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+39 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:13:13
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+34 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+New York, NY, USA
+There was a problem connecting to the weather service.
+Reload Weather Data
+Click for hourly forecast.
+Click to expand
+Click to collapse
+New York, NY, USA : 65°F
+Today : 	
+New York, NY, USA
+Today	2/23/2022
+Clearing
+The temperature approaching the record of 72 ...
+	68°F
+Feels like 69°F
+Sunrise:	6:39 AM
+UV Index:	Moderate (3)
+Sunburn: 45 minutes
+Winds:	7 mph
+Precipitation:	0.01 in
+
+Tonight	2/23/2022
+Partly cloudy and much colder
+	31°F
+Feels like 55°F
+Sunset:	5:40 PM
+Winds:	8 mph
+Precipitation:	0 in
+Moon:	21
+
+68°F
+	31°F
+Tomorrow : 	
+New York, NY, USA
+Tomorrow	2/24/2022
+Mostly cloudy and much colder
+	37°F
+Feels like 39°F
+Sunrise:	6:38 AM
+UV Index:	Low (1)
+Winds:	4 mph
+Precipitation:	0 in
+
+Tomorrow Night	2/24/2022
+A wintry mix late, up to 1 in
+Snow and sleet late in the evening followed b...
+	32°F
+Feels like 28°F
+Sunset:	5:41 PM
+Winds:	4 mph
+Precipitation:	0.6 in
+Moon:	22
+
+37°F
+	32°F
+Friday : 	
+New York, NY, USA
+Friday	2/25/2022
+Cloudy with rain tapering off
+	38°F
+Feels like 34°F
+Sunrise:	6:36 AM
+UV Index:	Low (1)
+Winds:	7 mph
+Precipitation:	0.67 in
+
+Friday Night	2/25/2022
+Clear to partly cloudy
+	22°F
+Feels like 23°F
+Sunset:	5:42 PM
+Winds:	7 mph
+Precipitation:	0 in
+Moon:	23
+
+38°F
+	22°F
+Saturday : 	
+New York, NY, USA
+Saturday	2/26/2022
+Mostly sunny and cold
+	34°F
+Feels like 37°F
+Sunrise:	6:35 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	5 mph
+Precipitation:	0 in
+
+Saturday Night	2/26/2022
+Clear
+	28°F
+Feels like 22°F
+Sunset:	5:43 PM
+Winds:	5 mph
+Precipitation:	0 in
+Moon:	24
+
+34°F
+	28°F
+Sunday : 	
+New York, NY, USA
+Sunday	2/27/2022
+Partly sunny
+	42°F
+Feels like 38°F
+Sunrise:	6:33 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	9 mph
+Precipitation:	0 in
+
+Sunday Night	2/27/2022
+Mainly clear and colder
+Mainly clear and colder; hypothermia likely w...
+	20°F
+Feels like 25°F
+Sunset:	5:45 PM
+Winds:	9 mph
+Precipitation:	0 in
+Moon:	25
+
+42°F
+	20°F
+Monday : 	
+New York, NY, USA
+Monday	2/28/2022
+Colder with plenty of sun
+	29°F
+Feels like 23°F
+Sunrise:	6:32 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	9 mph
+Precipitation:	0 in
+
+Monday Night	2/28/2022
+Clear and cold
+	22°F
+Feels like 7°F
+Sunset:	5:46 PM
+Winds:	4 mph
+Precipitation:	0 in
+Moon:	26
+
+29°F
+	22°F
+Tuesday : 	
+New York, NY, USA
+Tuesday	3/1/2022
+Partly sunny and not as cold
+	43°F
+Feels like 46°F
+Sunrise:	6:30 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	5 mph
+Precipitation:	0 in
+
+Tuesday Night	3/1/2022
+Partly cloudy
+	37°F
+Feels like 29°F
+Sunset:	5:47 PM
+Winds:	4 mph
+Precipitation:	0 in
+Moon:	27
+
+43°F
+	37°F
+

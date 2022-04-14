@@ -1,0 +1,262 @@
+<html>
+  <head>
+  <script>
+ function encurl(u){
+var txt=document.getElementById("q").value;
+txt= encodeURI(txt);
+//alert(u);
+//alert(txt);
+//alert(encodetxt);
+//var encodetxt=encodeURIComponent(txt);
+//document.getElementById("encodingresult").innerHTML=encodetxt;
+  // alert (u+txt);
+return (u + txt);
+ }
+function genbutt(u,k,t){
+var bh='<button type="submit" formaction=\"' + u + '\" accesskey=\" + k + '\" formmethod="get" formtarget="_blank">' + t + ' </button>';
+
+return 1;  
+}
+  </script>
+  <script>
+function getTimeDate() {
+  var d = new Date();
+  var n = d.toTimeString();
+  var dd = d.toDateString();
+  //alert(dd+n);
+  var ttt=document.getElementById("tt");
+  //alert(ttt.value);
+  ttt.innerHTML+=dd+"<br/>"+n;
+}
+//sleep(3); getTimeDate();
+/*   setTimeout(function()
+    {
+        getTimeDate();
+
+    }, 3000);
+*/
+
+function createSiteButton(){
+var textArea = document.getElementById('sites');
+var lines = textArea.value.split('\n');    // lines is an array of strings
+var sitebutton="";
+// Loop through all lines
+ var site;
+  var sitebuttons=document.getElementById("sitebuttons");
+for (var j = 0; j < lines.length; j++) {
+   site=lines[j].split('/')[2];
+ sitebutton="<input type=\"button\" onclick=\"window.open(\'";
+ sitebutton += lines[j] + "\'+encodeURI(document.getElementsByName(\'qq\')[0].value) , \'_blank\');\" value=\"" + site + "\">";
+  sitebuttons.innerHTML += sitebutton;
+//alert(sitebutton);
+ //alert(sitebuttons.value);
+}
+
+}
+
+</script>
+  </head>
+
+  <body onload="createSiteButton();">
+  <input name="qq" value="" size="30" autofocus> 
+    <br/>
+    <input accesskey="p" type="button" onclick="window.open('https://pubmed.ncbi.nlm.nih.gov/?term='+encodeURI(document.getElementsByName('qq')[0].value) , '_blank');" value="pubmed"> 
+ <input accesskey="q" type="button" onclick="window.open('https://www.walmart.ca/search/'+encodeURI(document.getElementsByName('qq')[0].value) , '_blank');" value="walmartca">  
+ <input  accesskey="g" type="button" onclick="window.open('https://google.com/search?q='+encodeURI(document.getElementsByName('qq')[0].value) , '_blank');" value="goog">  
+ <input  accesskey="d" type="button" onclick="window.open('https://duckduckgo.com/'+encodeURI(document.getElementsByName('qq')[0].value) , '_blank');" value="ddg">  
+ <input  accesskey="b" type="button" onclick="window.open('https://www.bing.com/search?q='+encodeURI(document.getElementsByName('qq')[0].value) , '_blank');" value="bing">  
+ <input type="button" onclick="window.open('https://www.qwant.com/?t=web&q='+encodeURI(document.getElementsByName('qq')[0].value) , '_blank');" value="qw">  
+ <input  accesskey="s" type="button" onclick="window.open('https://startpage.com/do/search?q='+encodeURI(document.getElementsByName('qq')[0].value) , '_blank');" value="sp">  
+ <input  accesskey="t" type="button" onclick="window.open('https://twitter.com/search/'+encodeURI(document.getElementsByName('qq')[0].value) , '_blank');" value="tws">  
+ <input  accesskey="y" type="button" onclick="window.open('https://www.youtube.com/results?search_query='+encodeURI(document.getElementsByName('qq')[0].value) , '_blank');" value="yt">  
+ <input  accesskey="x" type="button" onclick="window.open('https://xhamster.com/search/'+encodeURI(document.getElementsByName('qq')[0].value) , '_blank');" value="xh">  
+ <input  accesskey="p" type="button" onclick="window.open('https://www.pornhub.com/video/search?search='+encodeURI(document.getElementsByName('qq')[0].value) , '_blank');" value="ph">  
+ <input  accesskey="i" type="button" onclick="window.open('https://instagram.com/'+encodeURI(document.getElementsByName('qq')[0].value) , '_blank');" value="ig">  
+ <input  accesskey="r" type="button" onclick="window.open('http://www.tumblr.com/search/'+encodeURI(document.getElementsByName('qq')[0].value) , '_blank');" value="tblr">  
+ <input accesskey="n" type="button" onclick="window.open('https://nutritiondata.self.com/foods-'+encodeURI(document.getElementsByName('qq')[0].value)+'000000000000000000000.html' , '_blank');" value="selfnutr">  
+ <input  accesskey="f" type="button" onclick="window.open('https://finance.yahoo.com/quote/'+encodeURI(document.getElementsByName('qq')[0].value)+'?p='+encodeURI(document.getElementsByName('qq')[0].value)+'&.tsrc=fin-srch' , '_blank');" value="yahfin">  
+
+ <input  accesskey="w" type="button" onclick="window.open('https://en.wikipedia.org/wiki/'+encodeURI(document.getElementsByName('qq')[0].value) , '_blank');" value="wp">  
+ <input  accesskey="a" type="button" onclick="window.open('https://archive.org/search.php?query='+encodeURI(document.getElementsByName('qq')[0].value), '_blank');" value="ar">  
+  <div id="sitebuttons" rows=10></div>>
+<textarea id="sites">
+https://www.pdfdrive.com/search?q=
+https://archive.org/search.php?query=
+https://www.ncbi.nlm.nih.gov/pubmed/
+https://www.walmart.com/search/
+https://yandex.com/search/?text=
+https://www.gutenberg.org/ebooks/search/
+https://www.bing.com/images/search?FORM=HDRSC2&q=
+https://www.qwant.com/?t=images&q=
+https://yandex.com/images/search?text=
+https://duckduckgo.com/?t=h_&ia=images&iax=images&q=
+https://www.qwant.com/?t=news&q=
+https://duckduckgo.com/?t=h_&ia=news&iax=news&q=
+https://www.bing.com/videos/search?FORM=HDRSC3&q=
+https://www.qwant.com/?t=videos&q=
+https://duckduckgo.com/?t=h_&ia=videos&iax=videos&q=
+https://yandex.com/video/search?text=
+https://www.qwant.com/?t=shopping&q=
+https://duckduckgo.com/?iax=shopping&ia=shopping&q=
+https://toronto.craigslist.org/d/computers/search/sya
+https://toronto.craigslist.org/d/free-stuff/search/zip
+https://www.thesource.ca/en-ca/search?text=
+https://www.amazon.ca/s?k=
+https://www.amazon.com/s?k=
+https://www.bestbuy.ca/en-ca/search?search=
+https://www.bestbuy.com/en-ca/search?search=
+https://www.costco.ca/CatalogSearch?keyword=
+https://www.costco.com/CatalogSearch?keyword=
+https://duckduckgo.com/?iaxm=maps&q=
+https://duckduckgo.com/?ia=news&q=
+https://duckduckgo.com/?ia=videos&q=
+https://duckduckgo.com/?ia=images&q=
+https://duckduckgo.com/?iaxm=maps&q=
+https://www.bing.com/shop?q=
+https://www.bing.com/news/search?q=
+https://www.bing.com/maps?q=
+https://www.bing.com/videos/search?q=
+https://www.bing.com/images/search?q=
+https://www.bestbuy.ca/en-ca/search?search=
+https://www.canadiantire.ca/en/search-results.html?q=
+
+https://www.newegg.ca/Product/ProductList.aspx?
+https://www.newegg.com/Product/ProductList.aspx?
+https://www.localharvest.org/search.jsp?jmp&scale=7&lat=43.725597&lon=-79.34265&nm=
+https://www.ebay.ca/sch/i.html?_nkw=
+https://www.ebay.com/sch/i.html?_nkw=
+https://www.loc.gov/search/?in=&new=true&st=&q=
+https://www.chapters.indigo.ca/en-ca/home/search/?keywords=
+https://wolframalpha.com/input?i=
+https://www.passmark.com/search/zoomsearch.php?zoom_query=
+https://nfl.com/
+https://toronto.craigslist.org/search/tor/sss?query=
+https://www.openstreetmap.org/search?query=
+https://www.google.com/maps/place/
+https://www.google.com/search?tbm=bks&q=
+https://scholar.google.com/scholar?hl=en&q=
+https://twitter.com/search?src=typd&q=
+https://news.google.com/search?hl=en-US&q=
+https://www.tumblr.com/search/
+https://www.thefreedictionary.com/
+https://www.merriam-webster.com/dictionary/
+https://fdc.nal.usda.gov/fdc-app.html#/?query=
+https://www.google.com/search?tbm=fin&q=
+https://finance.yahoo.com/quote/
+https://web.archive.org/web/*/
+https://www.torontopubliclibrary.ca/search.jsp?Ntt=
+https://www.torontopubliclibrary.ca/search.jsp?N=38537&view=grid&Erp=20&Ntt=
+https://www.utoronto.ca/search?query=
+https://onesearch.library.utoronto.ca/onesearch/
+https://query.library.utoronto.ca/index.php/search/q?from_onesearch=1&kw=
+https://query.library.utoronto.ca/index.php/search/q?from_onesearch=1&kw=
+https://search.library.utoronto.ca/search?N=0&Ntx=mode+matchallpartial&Nu=p_work_normalized&Np=1&Ntk=Anywhere&Ntt=
+https://discoverarchives.library.utoronto.ca/index.php/informationobject/browse?topLod=0&sort=relevance&repos=&query=
+https://mdl.library.utoronto.ca/onesearch/
+https://www.ncbi.nlm.nih.gov/pmc/?term=
+http://www.businessdictionary.com/search.php?ie=UTF-8&q=+
+https://www.worldcat.org/search?qt=owc_search&q=
+https://openlibrary.org/search?mode=ebooks&m=edit&m=edit&has_fulltext=true&q=
+https://catalog.hathitrust.org/Search/Home?searchtype=all&ft=&setft=false&lookfor=
+https://www.chapters.indigo.ca/en-ca/home/search/?keywords=
+https://www.loc.gov/search/?in=&new=true&st=&q=
+</textarea>
+
+    <div position="relative" id="tt"></div>
+   <br/>
+   <br/>
+   <br/>
+   <!--
+ <form>
+  <input name="q" value="" size="30" autofocus> 
+ 
+
+ <button type="submit" formaction='http://google.com' accesskey="g"  formmethod="get" formtarget="_blank">google</button>  
+<button type="submit" formaction='http://duckduckgo.com' accesskey="d"  formmethod="get" formtarget="_blank">duck</button>  
+
+ <button type="submit" formaction='http://youtube.com' accesskey="y"  formmethod="get" formtarget="_blank">youtube</button>  
+
+
+
+<input type="submit" formaction="http://anonymouse.org/cgi-bin/anon-redirect.cgi?what=" formmethod="POST" value="anonmsurf">
+<br/>
+ <button type="submit" formaction='http://walmart.ca/search/' accesskey="q"  formmethod="get" formtarget="_blank">walmartca</button>  
+ 
+
+
+ </form>
+-->
+
+ <br/>
+ <br/>
+ <br/>
+ <br/>
+ <br/>
+ <br/>
+ <br/>
+ <br/>
+ <br/>
+
+<div id="ddd" style="font-size:36" >date:<textarea id="ttt"></textarea> </div>
+<form action="http://proxify.com/p/011110A0000110/x/start" method="post"><input type="hidden" name="if" value="1">
+		<input type="hidden" name="hc" value="0"><input type="hidden" name="rc" value="0"><input type="hidden" name="rs" value="1"><input type="hidden" name="fa" value="1"><input type="hidden" name="so" value="1">
+		<input type="hidden" name="ri" value="0"><input type="hidden" name="rt" value="0"><input type="hidden" name="mc" value="0"><input type="hidden" name="hb" value="1"><input type="hidden" name="ov" value="0">
+		<input type="hidden" name="br" value="1"><input type="text" name="url" size="50" value="Enter a URL to visit securely" onfocus="if(this.value=='Enter a URL to visit securely'){this.value='';}">&nbsp;<input type="submit" value="Proxify">
+		<input type="hidden" name="af" value="the-cloak.com">
+		</form>
+
+<FORM action="anonymouse.org/cgi-bin/anon-email.cgi" method="POST"><INPUT type="text" name="to" size="39" maxlength="60"><INPUT type="text" name="subject" size="39" maxlength="60"><TEXTAREA name="text" rows="5" cols="40" wrap="on" style="overflow:auto;"><INPUT type="submit" value="Send Anonymously"></form>
+
+
+<FORM action="anonymouse.org/cgi-bin/anon-news.cgi" method="POst"><INPUT type="text" name="to" size="39" maxlength="60"><INPUT type="text" name="subject" size="39" maxlength="40"><TEXTAREA name="text" rows="5" cols="40" wrap="off" style="overflow:auto;"></TEXTAREA><INPUT type="submit" value="Post Anonymously"></FORM>
+
+
+
+     <form action="http://www.the-cloak.com/login-accept" method="post">
+                      <input type="hidden" name="test-cookie" value="testing-cookies-rrt9v80BNvzlhrJDx10V">
+
+
+                   
+                  <input type="radio" name="nuke-scripts" value="true" checked="yes">
+
+                    <input type="radio" name="nuke-scripts" value="true">
+
+                    <input type="radio" name="nuke-java" value="true" checked="yes">
+                          <input type="radio" name="nuke-java" value="true">
+
+                     
+                    <input type="radio" name="nuke-objects" value="true" checked="yes">
+
+<input type="radio" name="nuke-objects" value="true">
+
+                          <input type="radio" name="nuke-cookies" value="true" checked="yes">
+
+                          <input type="radio" name="nuke-cookies" value="true">
+
+                          <input type="radio" name="nuke-https" value="false" checked="yes">&nbsp;Proxy&nbsp;HTTPS&nbsp;&nbsp;&nbsp;</td>
+
+<input type="radio" name="nuke-https" value="false">
+
+<input type="radio" name="block-ads" value="true" checked="yes"><input type="radio" name="block-ads" value="true">
+                                    </tr>
+
+      <input type="text" size="50" name="starting-uri" value="http://">
+
+                      <input type="submit" name="submit" value="Start Surfing">
+                    </form>
+
+                    <script> getTimeDate();
+
+
+
+                    </script>
+
+
+
+</body>
+
+
+</html>
+
+
+

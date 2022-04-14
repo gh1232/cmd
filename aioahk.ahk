@@ -31,12 +31,22 @@ msgbox %wpppp%
 return (round(p * A_ScreenWidth)) 
 
 }
-wmoveminus(x:=0,y:=0,w:=1,h:=1){
+wmoveminus6x(x:=0,y:=0,w:=1,h:=1){
  
  px := wpx + x 
  py := wpy + y 
  pw := A_ScreenWidth - w 
  ph := A_ScreenHeight - h
+
+  WinMove,A,,%px%,%py%,%pw%,%ph%
+}
+
+wmoveminus(x:=0,y:=0,w:=0,h:=0){
+ 
+ px := 0 + x 
+ py := 0 + y 
+ pw := A_ScreenWidth + w 
+ ph := A_ScreenHeight + h
 
   WinMove,A,,%px%,%py%,%pw%,%ph%
 }
@@ -59,7 +69,8 @@ pre :=""
 } 
 ;msgbox %pre%%cmd% %cargs%
 	run %pre%%cmd% %cargs%
-
+ ;winwait 
+ send {f2}
 }
 
 getwb(wb,num,wp)
@@ -135,16 +146,16 @@ global k :=">!"
 global ev := "g.bat"  
 global env := "n.bat"  
 global envq := "b.bat"  
-global enpp := "%predir%npp\notepad++.exe"  
-global ee24 := "%predir%emacs245\bin\emacs.exe"  
-global ee245 := "%predir%emacs245\bin\emacs-24.5.exe"  
-global ee24cw := "%predir%emacs245\bin\emacsclientw.exe"  
-global ee24re := "%predir%emacs245\bin\runemacs.exe"  
-global ee27 := "%predir%emacs\bin\emacs.exe"  
-global ee271 := "%predir%emacs\bin\emacs-27.1.exe"  
-global ee27cw := "%predir%emacs\bin\emacsclientw.exe"  
-global ee27c := "%predir%emacs\bin\emacsclient.exe"  
-global ee27re := "%predir%emacs\bin\runemacs.exe"  
+global enpp := "npp\notepad++.exe"  
+global ee24 := "emacs245\bin\emacs.exe"  
+global ee245 := "emacs245\bin\emacs-24.5.exe"  
+global ee24cw := "emacs245\bin\emacsclientw.exe"  
+global ee24re := "emacs245\bin\runemacs.exe"  
+global ee27 := "emacs\bin\emacs.exe"  
+global ee271 := "emacs\bin\emacs-27.1.exe"  
+global ee27cw := "emacs\bin\emacsclientw.exe"  
+global ee27c := "emacs\bin\emacsclient.exe"  
+global ee27re := "emacs\bin\runemacs.exe"  
 
 global awtb1 := wb("tb",1,"tb1")
 global awtb2 := wb("tb",2,"tb2")
@@ -227,12 +238,14 @@ wb(b,num=0,wp="")
 		if ( wp=""){
 
 			wbr = %predir%wb\tb%num%\Browser\firefox.exe   
-				return wbr 
+  return wbr 
 		} else {
 
 			wbr = %predir%wb\tb%num%\Browser\firefox.exe -P %wp%   
-				return wbr
-		} 
+  return wbr 
+		}
+
+  return wbr 
 	} else if (b = "ff"){
 
 		if ( wp=""){
@@ -414,10 +427,13 @@ global msgb := "msgbox"
 ;#()
 ;f3:: %msgb%()
 ;>#delete:: %msgb%("ho") 
+>^\:: run c:\a\vifm\vifm.exe
 >!z:: run %ffox% %ffpriv% loblaws.ca
 >!+z:: run %ffox% %ffpriv% essenceoflifeorganics.com 
->!\:: run "C:\Users\a\Desktop\Search Everything.lnk"
->#e:: run %ee27re% --load "%cmddir%.emacs" 
+>^/:: run "C:\Program Files\Everything\Everything.exe"
+;"C:\Users\a\Desktop\Search Everything.lnk"
+;"C:\Program Files\Everything\Everything.exe"
+>#e:: exec(ee27re, "--load %cmddir%.emacs") 
 >#+e:: run %ee27re% --load %cmddir%init.el
 ;>#s::run %ee27re% --load "init.el"
 >!>^+h:: run %predir%
@@ -448,7 +464,7 @@ end:: send {pgdn}
 ;>#end:: send {end}
 >!<!f:: fire("https://www.covers.com/sport/football/nfl/printsheet",wb("f"))
 global uvncp:=5500
->#+u:: run "%predir%uvnc bvba\UltraVNC\vncviewer.exe" -dsmplugin SecureVNCPlugin.dsm -listen %uvncp%
+>#+u:: exec("uvnc bvba\UltraVNC\vncviewer.exe", "-dsmplugin SecureVNCPlugin.dsm -listen" . %uvncp%)
 >#u:: exec("UltraVNC\vncviewer.exe")
 >#;:: gourl("walmart.ca/search/")
 >^+l:: fire("https://www.youtube.com/results?search_query=news+live",wop2y)
@@ -480,7 +496,7 @@ q(u,b :="o")
 ;f3:: q("https://en.wikipedia.org/wiki/")
 ;%k%z:: msgbox ,, works
 
->!>^#+s:: run %ev% c:/users/z/desktop/bin2/search.html 
+>!>^#+s:: run %ev% c:/cmd/search.html 
 >!+>^p:: run "C:\Users\Public\Desktop\Advanced Port Scanner.lnk"
 >^.::send !{click}
 
@@ -534,10 +550,10 @@ pause::SendInput, ^w
 >^h:: run %predir%sumatra\SumatraPDF-3.3-64.exe %userprofile%\AutoHotkey.chm
 >^+h:: run %predir%sumatra\SumatraPDF-3.3-64.exe %predir%AutoIt3\AutoIt.chm
 >!>^h:: run %userprofile%\AppData\Local\documentalist\Documentalist.exe
->#>!l:: run "%predir%console\Console2\Console.exe"
->#>^l:: run  "%predir%cmdrmini\Cmder.exe"
->!+r:: run %predir%TightVNC\tvnviewer.exe
-;>#7:: run %predir%TightVNC\tvnviewer.exe -host=192.168.1.7 -password=yo
+>#>!l:: exec("console\Console2\Console.exe")
+>#>^l:: exec( "cmdrmini\Cmder.exe")
+>!+r:: exec("Tight\tvnviewer.exe")
+;>#6:: exec("Tight\tvnviewer.exe" . " -host=192.168.1.6 -password=yo ")
 >#1:: fire("192.168.1.1",wb("f"))
 >#+1:: fire("192.168.0.1",wb("f"))
 >#>!2::  exec("putty\putty","user@192.168.1.2 -pw live")
@@ -548,7 +564,7 @@ pause::SendInput, ^w
 >#>!7:: exec("putty\putty","user@192.168.1.7 -pw live")
 >#>!8:: exec("putty\putty","user@192.168.1.8 -pw live")
 >#>!9:: exec("putty\putty","user@192.168.1.9 -pw live")
-;%predir%TightVNC\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w3.vnc"
+;%predir%tight\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w3.vnc"
 
 >#r:: exec("mstsc","","x")
 >#+2:: exec("mstsc","/v:192.168.1.2  ","x")
@@ -560,15 +576,23 @@ pause::SendInput, ^w
 >#+8:: exec("mstsc","/v:192.168.1.8  ","x")
 >#+9:: exec("mstsc","/v:192.168.1.9  ","x")
 
->#2:: run %predir%TightVNC\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w2.vnc"
->#3:: run %predir%TightVNC\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w3.vnc"
->#4:: run %predir%TightVNC\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w4.vnc"
->#5:: run %predir%TightVNC\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w5.vnc"
->#6:: run %predir%TightVNC\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w6.vnc"
->#7:: run %predir%TightVNC\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w7.vnc"
->#8:: run %predir%TightVNC\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w8.vnc"
->#9:: run %predir%TightVNC\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w9.vnc"
->^l:: run %predir%TightVNC\tvnviewer.exe -listen 5000
+>#6:: exec("Tight\tvnviewer.exe" . " -host=192.168.1.6 -password=yo ")
+>#7:: exec("Tight\tvnviewer.exe" . " -host=192.168.1.7 -password=yo ")
+>#8:: exec("Tight\tvnviewer.exe" . " -host=192.168.1.8 -password=yo ")
+>#9:: exec("Tight\tvnviewer.exe" . " -host=192.168.1.9 -password=yo ")
+>#2:: exec("Tight\tvnviewer.exe" . " -host=192.168.1.2 -password=yo ")
+>#3:: exec("Tight\tvnviewer.exe" . " -host=192.168.1.3 -password=yo ")
+>#4:: exec("Tight\tvnviewer.exe" . " -host=192.168.1.4 -password=yo ")
+>#5:: exec("Tight\tvnviewer.exe" . " -host=192.168.1.5 -password=yo ")
+;>#2:: run %predir%tight\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w2.vnc"
+;>#3:: run %predir%tight\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w3.vnc"
+;>#4:: run %predir%tight\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w4.vnc"
+;>#5:: run %predir%tight\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w5.vnc"
+;>#6:: run %predir%tight\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w6.vnc"
+;>#7:: run %predir%tight\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w7.vnc"
+;>#8:: run %predir%tight\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w8.vnc"
+;>#9:: run %predir%tight\tvnviewer.exe -optionsfile="%userprofile%\Desktop\w9.vnc"
+>^l:: run %predir%tight\tvnviewer.exe -listen 5000
 ;fire("https://mail.rediff.com/cgi-bin/login.cgi",wb("f"))
 ;>!+g:: fire("https://accounts.google.com/signin/v2/identifier?service=mail&passive=true&rm=false&continue=https%3A%2F%2Fmail.google.com%2Fmail%2F&ss=1&scc=1&ltmpl=default&ltmplcache=2&emr=1&osid=1&flowName=GlifWebSignIn&flowEntry=ServiceLogin",wb("f"))
 ;>!+d:: fire("http://dropbox.com",wb("f"))
@@ -580,10 +604,10 @@ pause::SendInput, ^w
 ;>!+:: fire("",wb("f"))
 ;>#>^+/::  fire("%userprofile%\Desktop\bin2\finance.html",wb("o"))
 ;>!+/::  fire("https://gh1232.github.io/search.html",wb("o"))
->#/::  fire("file:///c:/users/z/desktop/bin2/search.html",wb("t"))
+>#/::  fire("file:///c:/cmd/search.html",wb("t"))
 ;>#^n::  fire("%userprofile%\desktop\bin2\news.html",wb("t"))
->^/::  fire("file:///u:\d\newslinks.html",wb("t"))
->!>^/::  fire("%userprofile%\Desktop\bin2\surf.html",wb("t"))
+>#+/::  fire("file:///u:\d\newslinks.html",wb("t"))
+>!>^/::  fire("file:///c:\cmd\surf.html",wb("t"))
 ;>!>!/::  fire("%userprofile%\Desktop\bin2\email.html",wb("o"))
 >!+d:: run  %ffox%  %ffpriv% "https://www.draftkings.com/mycontests"
 ;>^+,:: fire("https://speedof.me/",wb("f"))
@@ -639,9 +663,9 @@ input seled, l1 c ,, %fmt%
 return
 ;appskey::send #
 ;lalt::alt
->#^l:: run "%predir%cmdrmini\Cmder.exe"
->#!l:: run "%predir%console\Console2\Console.exe"
->^>#f9:: run "%predir%AHKCommandPicker-1.3.1\AHKCommandPicker-1.3.1\src\AHKCommandPicker.ahk"
+>#^l:: exec("cmdrmini\Cmder.exe")
+>#!l:: exec("console\Console2\Console.exe")
+>^>#f9:: exec("AHKCommandPicker-1.3.1\AHKCommandPicker-1.3.1\src\AHKCommandPicker.ahk")
 ;>^f7::    Run %predir%vim82\gvim.exe -u c:\cmd\vimkeys.vim  --noplugin "%A_ScriptFullPath%"
 ;>^f9:: run %predir%vim82\gvim.exe -u c:\cmd\vimkeys.vim  --noplugin "%userprofile%\desktop\bin2\myruns.ahk"
 ;>^f10::    Run %predir%vim82\gvim.exe -u c:\cmd\vimkeys.vim  --noplugin "%predir%AHKCommandPicker-1.3.1\AHKCommandPicker-1.3.1\src\Commands\MyCommands.ahk"
@@ -739,7 +763,6 @@ return
 >!>^+d:: fire("https://www.dropbox.com/login",wb("o"))
 >#+p:: run G:\game\PokerStars\PokerStars.exe
 ;^f12:: exitapp
-f9:: send !^{tab}
 >#m:: run g:\webbr\pale moon\Palemoon.exe
 >!x:: fire("https://xhamster.com/search.php?from=&q=busty+&qcat=video",wb("o1"))
 ;>^e::run C:\Users\Grandpa\Desktop\z\b\emacs\emacs\bin\runemacs.exe -fg white -bg black -fs  -g 700x240+0+0
@@ -823,9 +846,9 @@ soundset, 0
 run shutdown /s /t 2
 }
 
->!>^0::run shutdown /r
+>!>^-::run shutdown /r
 >!>^`::run shutdown /r /t 1800
->!>^-::
+>!>^=::
 run shutdown /a
 msgbox shutdown aborted
 return 
@@ -936,12 +959,30 @@ return
 ; Send {Volume_Down 3} 
 ;f8:: send !{esc}
 printscreen:: winminimize, A
-;send #^{tab}
-f10:: send !{tab}					
+f9::
+send ^!{tab}
+sendmode input 
+coordmode mouse , window 
+MouseMove, 400 ,720 
+return
+f10::
+send !{tab}
+sendmode input 
+coordmode mouse , relative 
+MouseMove, 400 ,720 
+return
+#f10::
+send !{esc}					
+;sendmode input 
+;coordmode mouse , window 
+;MouseGetPos,xpos,ypos
+;Click 987,851
+;MouseMove, 400 ,720 
+return
 ; winmaximize, A
 ;;f1 f1:: msgbox hi q
 ;^f9:: winmove,a,,%wpx%,%wpy%,1450,%wph%
-f2:: wmoveminus(-2,0,0,-5)
+f2:: wmoveminus(0,0,-1,-1)
 ;winmaximize, A  
 ;winmove,a,,%wpx%,%wpy%,1450,%wph%
 ;winmaximize, A
@@ -958,7 +999,7 @@ winmaximize,A
 }
 return 
 ; WinMove,A,,%wpx%,%wpy%,1450,%wph% 
->#SPACE:: Winset, Alwaysontop, , A
+>#!^SPACE:: Winset, Alwaysontop, , A
 >^f8::
 Winset, Alwaysontop, , A
 winmove,A,,940,600,772,476
@@ -975,11 +1016,18 @@ return
 wpw :=500 
 >!f5:: wmove(0,0,.7,1) 
 
-
->#f6:: wmove(0,0.54,.32,.7) 
+>#f8:: wmove(.63,.66,.32,.66)
+>#!^f8::
+  wmove(0,0,1,.7)
+  send {>!f6^l}
+  send {^l}
+ return  
+>#f6:: wmove(0,0.52,.32,.7) 
 ;>#f6:: wmove(0,0.5,1,.7) 
 >!f6:: wmove(0,0,1,.7) 
 ;>!f6::WinMove,A,,%wpx%,%wpy%,%A_ScreenWidth%,700
+>#f5:: wmove(0,0.37,.32,.66)
+>#f7:: wmove(-.03,0.46,.32,.66)
 >!f8:: wmove(0,.3,1,.7)
 ;>!f7::WinMove,A,,415,0,1050,%wph%
 >!f7:: wmove(0.37,0,.63,1)
@@ -991,7 +1039,7 @@ wpw :=500
 >!+f8:: wmove(0,-.15,.3,.52)
 ;WinMove,A,,-100,0,390,700
 ;inMove,A,,0,430,300,500
->!+f7:: wmove(0,0,.3,.5)
+>!+f7:: wmove(0,0,.3,.99)
 ;WinMove,A,,0,-260,390,500
 
 >+f5:: winmove,A,,-140,570,772,376
@@ -1048,7 +1096,7 @@ wpw :=500
 ;>!>^+f5::WinMove,A,,%wpx%,%wpy%,750,%wph% 
 ;>!>#+f6::winmove,a,,%wpx%,%wpy%,%wph44%,%wph%
 f1:: winclose, A
-;>#q:: run "%predir%Q-Dir_Portable_x64\Q-Dir\Q-Dir.exe"
+;>#q:: exec("Q-Dir_Portable_x64\Q-Dir\Q-Dir.exe"
 ;f2:: Send {Volume_Up 10}
 >^p:: run  powershell
 >^+p:: run  runas /user:hd\a powershell
@@ -1094,9 +1142,14 @@ f1:: winclose, A
 >^i:: run %windir%\system32\WindowsPowerShell\v1.0\PowerShell_ISE.exe
 >^+i:: run runas /user:aio\a "%windir%\system32\WindowsPowerShell\v1.0\PowerShell_ISE.exe "
 >!t:: run %twb%,, max 
+;  winwaitactive, connected,
+;  send {>!f6}
+;  send {^t}
+
+;return 
 >!b:: fire("https://www.google.ca/search?q=busty+granny&ie=utf-8&oe=utf-8&gws_rd=cr&ei=t0pDWOaGLunZjwSa1LXYAw")
 >#^n:: run notepad
->#!n:: run "%predir%npp\notepad++.exe"
+>#!n:: exec("npp\notepad++.exe")
 ;>#+c:: run calc
 ;!\:: run "%ProgramFiles(x86)%\Windows Media Player\wmplayer.exe /prefetch:1"
 ;#^e:: run explorer
@@ -1117,25 +1170,35 @@ f1:: winclose, A
 >!>#>^+v:: run  %predir%vim82\gvim.exe -u c:\cmd\vimkeys.vim   %cmddir%vimkeys.vim
 ;>!>#>^+v:: run  %predir%vim82\gvim.exe -u c:\cmd\vimkeys.vim   %userprofile%\_vimperatorrc
 ;FormatTime, bootDateTime,, ddd MMM ddk yyyy Fri Feb 22 2019 20190222FebFriday
+>+1::
+   FormatTime, CurrentDateTime,, hhmm
+   SendInput %CurrentDateTime%,1st&eat
+return
+#!^>+2::
+   FormatTime, CurrentDateTime,, hhmm
+   SendInput %CurrentDateTime%,2nd&eat
+return
+
 >+e::
    FormatTime, CurrentDateTime,, hhmm
-   SendInput %CurrentDateTime%eat
+   SendInput %CurrentDateTime%,3rd&eat
 return
->+o::
+
+>+i::
    FormatTime, CurrentDateTime,, hhmm
-   SendInput %CurrentDateTime%pisfl
+   SendInput %CurrentDateTime%pisfl2x10
 return
 >+l::
    FormatTime, CurrentDateTime,, hhmm
    SendInput %CurrentDateTime%loudfridgoff
 return
->+c::
-   FormatTime, CurrentDateTime,, hhmm
-   SendInput %CurrentDateTime%closup
-return
 >+n::
    FormatTime, CurrentDateTime,, hhmm
-   SendInput %CurrentDateTime%noisup
+   SendInput %CurrentDateTime%bangup
+return
+>+c::
+   FormatTime, CurrentDateTime,, hhmm
+   SendInput %CurrentDateTime%chrup
 return
 >+g::
    FormatTime, CurrentDateTime,, hhmm
@@ -1146,6 +1209,34 @@ return
    SendInput %CurrentDateTime%polsiren
 return
 
+>+x::
+   FormatTime, CurrentDateTime,, hhmm
+   SendInput %CurrentDateTime%choomup
+return
+>+m::
+   FormatTime, CurrentDateTime,, hhmm
+   SendInput %CurrentDateTime%boomup
+return
+>+k::
+   FormatTime, CurrentDateTime,, hhmm
+   SendInput %CurrentDateTime%closup
+return
+>+z::
+   FormatTime, CurrentDateTime,, hhmm
+   SendInput %CurrentDateTime%scrape
+return
+>+w::
+   FormatTime, CurrentDateTime,, hhmm
+   SendInput %CurrentDateTime%fart
+return
+>+j::
+   FormatTime, CurrentDateTime,, hhmm
+   SendInput %CurrentDateTime%htron
+return
+>+7::
+   FormatTime, CurrentDateTime,, hhmm
+   SendInput habovnew
+return
 >+s::
    FormatTime, CurrentDateTime,, hhmm
    SendInput %CurrentDateTime%smbarkup
@@ -1154,9 +1245,25 @@ return
    FormatTime, CurrentDateTime,, hhmm
    SendInput %CurrentDateTime%drbangsl
 return
+>+9::
+   FormatTime, CurrentDateTime,, hhmm
+   SendInput %CurrentDateTime%drbang290
+return
+>+8::
+   FormatTime, CurrentDateTime,, hhmm
+   SendInput %CurrentDateTime%drbang308
+return
+>+6::
+   FormatTime, CurrentDateTime,, hhmm
+   SendInput %CurrentDateTime%drbang306
+return
 >+3::
    FormatTime, CurrentDateTime,, hhmm
-   SendInput %CurrentDateTime%drbang303
+   SendInput %CurrentDateTime%drbangchutedrbang303
+return
+>+2::
+   FormatTime, CurrentDateTime,, hhmm
+   SendInput %CurrentDateTime%clos303
 return
 >+4::
    FormatTime, CurrentDateTime,, hhmm
@@ -1169,13 +1276,18 @@ return
 
 >+b::
    FormatTime, CurrentDateTime,, hhmm
-   SendInput %CurrentDateTime%bigbarku
+   SendInput %CurrentDateTime%bigbarkhw
 return
 >+v::
    FormatTime, CurrentDateTime,, hhmm
    SendInput %CurrentDateTime%vroom
 return
->+k::
+>+o::
+
+   FormatTime, CurrentDateTime,, hhmm
+   SendInput %CurrentDateTime%fridgonvsl
+return
+>+u::
 
    FormatTime, CurrentDateTime,, hhmm
    SendInput %CurrentDateTime%loudup
@@ -1185,6 +1297,10 @@ return
    SendInput %CurrentDateTime%hwaytalk
 return
 
+>+q::
+   FormatTime, CurrentDateTime,, hhmm
+   SendInput %CurrentDateTime%==
+return
 >+a::
    FormatTime, CurrentDateTime,, hhmm
    SendInput %CurrentDateTime%airpl
@@ -1241,11 +1357,11 @@ once = 1
 >!+b:: run %userprofile%\VirtualBox\VirtualBox.exe
 >#d:: run %predir%freedler\fdm.exe 
 >!v:: run %predir%vim82\gvim.exe -u c:\cmd\vimkeys.vim  -R
->#v:: run %predir%vim82\gvim.exe -u c:\cmd\vimkeys.vim  
+>#v:: run  %predir%vim82\gvim.exe -u  c:\cmd\vimkeys.vim  
 >#+v::run %predir%vim82\gvim.exe -u c:\cmd\vimkeys.vim  --noplugin 
 >#>^v::run %predir%vim82\gvim.exe --noplugin -u "%predir%vim82\pack\SpaceVim-master\init.vim"
->#n::run "%predir%\Neovim\bin\nvim-qt.exe" 
->#+n::run "%predir%\Neovim\bin\nvim.exe" 
+>#+n::exec("Neovim\bin\nvim-qt.exe") 
+>#n::exec("Neovim\bin\nvim.exe -u c:\cmd\vimkeys.vim ")
 >!o:: fire("",wo)
 >!^d:: run %predir%ditto.exe
 >#b:: run %userprofile%\VirtualBox VMs\deb95l\deb95l.vbox

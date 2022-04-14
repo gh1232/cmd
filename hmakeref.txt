@@ -1,0 +1,1165 @@
+*Latest:* HOWTO: Get tenure <https://matt.might.net/articles/tenure/>
+*Next:* A quick overview of programming with bash
+<https://matt.might.net/articles/bash-by-example/>
+*Prev:* Parsing S-Expressions in Scala
+<https://matt.might.net/articles/parsing-s-expressions-scala/>
+*Rand:* A pipelined, non-blocking, extensible web server in Scala
+<https://matt.might.net/articles/pipelined-nonblocking-extensible-web-server-with-coroutines/>
+
+
+  A short introduction to make
+
+[article index <https://matt.might.net/articles/>] [email me
+<mailto:matt-blog@might.net>] [@mattmight
+<http://twitter.com/mattmight>] [rss
+<https://matt.might.net/articles/feed.rss>]
+
+|make| is a simple but powerful tool for managing a build process in a
+language-independent manner. (It won the ACM Software Systems award.)
+
+|make| is a domain-specific language for encoding a dependence graph.
+
+In this graph, a node is a file, and each node contains instructions on
+how to synthesize that file from its dependencies.
+
+By invoking |make /file/|, the user instructs |make| to synthesize
+|/file/|.
+
+|make| is widely available on Unix systems and easy to use with little
+set up, yet, in my experience, few students have ever touched it.
+
+This article covers the basics of |make| for new users.
+
+
+    Quick start
+
+If you're working in a project that already uses |make|, there should be
+a file called |Makefile| in the top-level directory.
+
+Running:
+
+$ make
+
+should build the project from source.
+
+
+    What is |make|?
+
+|make| is a tool designed to manage dependencies in a build process.
+
+For instance, if you have two source files, |a.in| and |b.in|, and you
+need to build |b.in| before you build |a.in|, then you might have a
+|Makefile| in the same directory that looks like this:
+
+a.out: a.in b.out
+	/commands to generate a.out from a.in and b.out/
+
+b.out: b.in
+	/commands to generate b.out from b.in/
+
+Now, suppose you want to build |a.out|; you run:
+
+$ make a.out
+
+At this point, |make|'s thought process becomes:
+
+ 1. Run |make b.out|.
+ 2. If |a.out| is newer than |a.in| and |b.out|, halt.
+ 3. If |a.out| is older than |a.in| or |b.out|, run:
+
+        /commands to generate a.out from a.in and b.out/
+      
+
+If you run:
+
+$ make b.out
+
+then |make|'s thought process becomes:
+
+ 1. If |b.out| is newer than |b.in|, halt.
+ 2. If |b.out| is older than |b.in|, run:
+
+       /commands to generate b.out from b.in/
+     
+
+In short, when ordered to build a file, |make| will ensure that all
+dependencies are up to date, and it will not rebuild any those which
+need not be rebuilt.
+
+
+    Makefile structure
+
+Makefiles contain definitions and rules.
+
+A definition has the form:
+
+/VAR/=/value/
+
+A rule has the form:
+
+/output files/: /input files/
+	/commands to turn inputs to outputs/
+
+All commands must be tab-indented.
+
+To reference the variable /|VAR|/, surround it with |$(/VAR/)|.
+
+
+    A simple example for C
+
+Here's a simple example for a C program that defines |foo()| in |foo.c|,
+but uses it in |bar.c|.
+
+CC=gcc
+
+bar: bar.c foo.h foo.o
+	$(CC) -o bar bar.c foo.o
+
+foo.o: foo.c foo.h
+	$(CC) -c foo.c
+
+run:
+	./bar
+
+clean:
+	rm -f bar foo.o
+
+
+    Conventions
+
+It's common to include pseudo-targets in makefiles to automate other
+parts of the development process.
+
+
+      |make clean|
+
+The rule for |clean| in the previous example doesn't build a file called
+|clean|.
+
+Rather, it deletes all of the build targets to allow a fresh build from
+scratch.
+
+Including a |clean| rule is a common convention for |make|.
+
+
+      |make test|
+
+Running |make test| often runs the test suite for the software.
+
+
+      |make install|
+
+Running |make install| typically installs the compiled binary in a
+|PATH|-accessible location.
+
+For software using the |autoconf| toolchain, the installation directory
+is set by running |./configure| command prior to using |make|.
+
+
+      |make run|
+
+For simple programs, |make run| acts like an alias to the compiled binary.
+
+
+    Generic rules
+
+If a project contains many conversions of one file type to another,
+/e.g./ |.c| to |.o|, it gets tedious to write the commands over and over.
+
+First, define file suffixes with a |.SUFFIXES| declaration; for example:
+
+.SUFFIXES: .tex .pdf
+
+Then, create a generic rule for converting one suffix to another:
+
+./input/./output/:
+	/commands to convert something.input into something.output/
+
+Within the commands, you can reference the input filename with |$<|.
+
+You can reference the output filename with |$@|.
+
+For a complete example with LaTeX:
+
+all: doc.pdf
+
+.SUFFIXES: .tex .pdf
+
+.tex.pdf:
+	pdflatex $<
+
+Running |make /file/.pdf| will now run |pdflatex /file/.tex|.
+
+
+    Complex generic rules
+
+For complex generic rules, the pattern |%| may be used in both inputs
+and outputs.
+
+For example, we might want a LaTeX build to depend on both the source
+file and the auto-generated bibliography file:
+
+%.dvi: %.tex %.blg
+	latex $<
+
+Somewhat confusingly, the commands for these generic rules cannot
+reference |%| to insert the basename of the build target.
+
+To refer to the basename of the target file, use |$(basename $@)|.
+
+
+    Substituting shell commands
+
+To substitute in the value of a shell command, use |$(shell /command/)|.
+
+For instance, suppose you wanted to compile all |.java| files
+simultaneously, you might have this rule:
+
+Foo.class: $(shell find . -name *.java)
+	javac $<
+
+
+    Further reading
+
+Robert Mecklenberg provides one of the few comprehensive overviews of
+(GNU) make in book form
+<http://www.amazon.com/gp/product/0596006101/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=0596006101&linkCode=as2&tag=mmamzn06-20>:
+
+
+<http://www.amazon.com/gp/product/0596006101/ref=as_li_ss_il?ie=UTF8&camp=1789&creative=390957&creativeASIN=0596006101&linkCode=as2&tag=mmamzn06-20>
+
+
+It's also available as an O'Reilly open book
+<http://oreilly.com/catalog/make3/book/index.csp>.
+
+And, after |make|, there is the autotool site
+<http://www.amazon.com/gp/product/1593272065/ref=as_li_ss_tl?ie=UTF8&camp=1789&creative=390957&creativeASIN=1593272065&linkCode=as2&tag=mmamzn06-20>:
+
+
+<http://www.amazon.com/gp/product/1593272065/ref=as_li_ss_il?ie=UTF8&camp=1789&creative=390957&creativeASIN=1593272065&linkCode=as2&tag=mmamzn06-20>
+
+
+
+    Related pages
+
+  * Learn Perl by experiment
+    <http://matt.might.net/articles/perl-by-example/>
+  * A quick overview of programming with bash
+    <http://matt.might.net/articles/bash-by-example/>
+  * SSH hacks <http://matt.might.net/articles/ssh-hacks/>
+  * Standalone lexers with lex: synopsis, examples, and pitfalls
+    <http://matt.might.net/articles/standalone-lexers-with-lex/>
+  * Sculpting text with regex, grep, sed and awk
+    <http://matt.might.net/articles/sculpting-text/>
+  * Relational shell programming
+    <http://matt.might.net/articles/sql-in-the-shell/>
+  * Settling into Unix <http://matt.might.net/articles/settling-into-unix/>
+  * A survival guide for Unix beginners
+    <http://matt.might.net/articles/basic-unix/>
+  * Console productivity hack: Exploiting task frequency
+    <http://matt.might.net/articles/console-hacks-exploiting-frequency/>
+  * HOWTO: Word, Excel and PowerPoint without MS Office
+    <http://matt.might.net/articles/how-to-read-and-create-microsoft-word-documents-excel-spreadsheets-powerpoint-presentations-without-microsoft-office/>
+  * Tips, tricks and tools for Linux and Unix
+    <http://matt.might.net/articles/best-tools-for-using-and-learning-linux-and-unix/>
+
+------------------------------------------------------------------------
+[article index <https://matt.might.net/articles/>] [email me
+<mailto:matt-blog@might.net>] [@mattmight
+<http://twitter.com/mattmight>] [rss
+<https://matt.might.net/articles/feed.rss>]
+*Latest:* HOWTO: Get tenure <https://matt.might.net/articles/tenure/>
+*Next:* A quick overview of programming with bash
+<https://matt.might.net/articles/bash-by-example/>
+*Prev:* Parsing S-Expressions in Scala
+<https://matt.might.net/articles/parsing-s-expressions-scala/>
+*Rand:* A pipelined, non-blocking, extensible web server in Scala
+<https://matt.might.net/articles/pipelined-nonblocking-extensible-web-server-with-coroutines/>
+matt.might.net is powered by *linode
+<http://www.linode.com/?r=bf5d4e7c8a1af61855b5227279a6744c3bde8a8a>* |
+legal information <https://matt.might.net/articles/legal/>
+
+Hide Download Bar
+Ctrl + Shift + Z = Show/Hide Download Bar
+Downloads
+Download Manager (S3)
+Clear
+Left Click: Clear All Finished
+Right Click: Undo last clear
+100%
+Download History
+Download list is empty
+hbash.txt
+Unk.
+Unk.
+136 KB
+455 KB/s
+hbash.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbash.txt
+Status:
+	
+136 KB / Unknown ( 455 KB/s )
+File Size:
+	
+505 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:21:49
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+1.62 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashman.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashman.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashman.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+398 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:23:48
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+863 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hfilesys.txt
+Unk.
+Unk.
+-.--
+-.--
+hfilesys.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hfilesys.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+122 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:51:42
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+192 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdeblic.txt
+Unk.
+Unk.
+-.--
+-.--
+hdeblic.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdeblic.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+40 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:52:06
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+91 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebdev
+Unk.
+Unk.
+96 KB
+963 KB/s
+hdebdev
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebdev
+Status:
+	
+96 KB / Unknown ( 963 KB/s )
+File Size:
+	
+291 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:11
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+3.60 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebmaint
+Unk.
+Unk.
+79 KB
+395 KB/s
+hdebmaint
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebmaint
+Status:
+	
+79 KB / Unknown ( 395 KB/s )
+File Size:
+	
+322 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:31
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+2.02 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebmaintnew
+100%
+00:00
+54 KB
+538 KB/s
+hdebmaintnew
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebmaintnew
+Status:
+	
+54 KB / 54 KB ( 538 KB/s )
+File Size:
+	
+175 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:46
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+1.26 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+debpackaging-tutorial.en.pdf
+100%
+00:00
+388 KB
+3.79 MB/s
+debpackaging-tutorial.en.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\debpackaging-tutorial.en.pdf
+Status:
+	
+388 KB / 388 KB ( 3.79 MB/s )
+File Size:
+	
+388 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:54:09
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+3.91 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebconfig
+100%
+00:00
+6 KB
+60 KB/s
+hdebconfig
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebconfig
+Status:
+	
+6 KB / 8 KB ( 60 KB/s )
+File Size:
+	
+27 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:54:23
+Time to Complete:
+	
+00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+32 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+debhamradio-maintguide.en.pdf
+100%
+00:00
+193 KB
+Infinity GB/s
+debhamradio-maintguide.en.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\debhamradio-maintguide.en.pdf
+Status:
+	
+193 KB / 193 KB ( Infinity GB/s )
+File Size:
+	
+193 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:57:27
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+2.58 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hgoogbashstyle.txt
+Unk.
+Unk.
+-.--
+-.--
+hgoogbashstyle.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hgoogbashstyle.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+44 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:02:34
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+46 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hposixsh.txt
+Unk.
+Unk.
+-.--
+-.--
+hposixsh.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hposixsh.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+177 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:09:12
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+183 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+htextsculpt.txt
+Unk.
+Unk.
+-.--
+-.--
+htextsculpt.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\htextsculpt.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+43 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:10:16
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+47 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hrelalgbash.txt
+Unk.
+Unk.
+-.--
+-.--
+hrelalgbash.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hrelalgbash.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+27 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:11:49
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+25 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashex.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashex.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashex.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+39 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:13:13
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+34 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hperlguide.txt
+Unk.
+Unk.
+-.--
+-.--
+hperlguide.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hperlguide.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+95 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:13:32
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+87 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+New York, NY, USA
+There was a problem connecting to the weather service.
+Reload Weather Data
+Click for hourly forecast.
+Click to expand
+Click to collapse
+New York, NY, USA : 65°F
+Today : 	
+New York, NY, USA
+Today	2/23/2022
+Clearing
+The temperature approaching the record of 72 ...
+	68°F
+Feels like 69°F
+Sunrise:	6:39 AM
+UV Index:	Moderate (3)
+Sunburn: 45 minutes
+Winds:	7 mph
+Precipitation:	0.01 in
+
+Tonight	2/23/2022
+Partly cloudy and much colder
+	31°F
+Feels like 55°F
+Sunset:	5:40 PM
+Winds:	8 mph
+Precipitation:	0 in
+Moon:	21
+
+68°F
+	31°F
+Tomorrow : 	
+New York, NY, USA
+Tomorrow	2/24/2022
+Mostly cloudy and much colder
+	37°F
+Feels like 39°F
+Sunrise:	6:38 AM
+UV Index:	Low (1)
+Winds:	4 mph
+Precipitation:	0 in
+
+Tomorrow Night	2/24/2022
+A wintry mix late, up to 1 in
+Snow and sleet late in the evening followed b...
+	32°F
+Feels like 28°F
+Sunset:	5:41 PM
+Winds:	4 mph
+Precipitation:	0.6 in
+Moon:	22
+
+37°F
+	32°F
+Friday : 	
+New York, NY, USA
+Friday	2/25/2022
+Cloudy with rain tapering off
+	38°F
+Feels like 34°F
+Sunrise:	6:36 AM
+UV Index:	Low (1)
+Winds:	7 mph
+Precipitation:	0.67 in
+
+Friday Night	2/25/2022
+Clear to partly cloudy
+	22°F
+Feels like 23°F
+Sunset:	5:42 PM
+Winds:	7 mph
+Precipitation:	0 in
+Moon:	23
+
+38°F
+	22°F
+Saturday : 	
+New York, NY, USA
+Saturday	2/26/2022
+Mostly sunny and cold
+	34°F
+Feels like 37°F
+Sunrise:	6:35 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	5 mph
+Precipitation:	0 in
+
+Saturday Night	2/26/2022
+Clear
+	28°F
+Feels like 22°F
+Sunset:	5:43 PM
+Winds:	5 mph
+Precipitation:	0 in
+Moon:	24
+
+34°F
+	28°F
+Sunday : 	
+New York, NY, USA
+Sunday	2/27/2022
+Partly sunny
+	42°F
+Feels like 38°F
+Sunrise:	6:33 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	9 mph
+Precipitation:	0 in
+
+Sunday Night	2/27/2022
+Mainly clear and colder
+Mainly clear and colder; hypothermia likely w...
+	20°F
+Feels like 25°F
+Sunset:	5:45 PM
+Winds:	9 mph
+Precipitation:	0 in
+Moon:	25
+
+42°F
+	20°F
+Monday : 	
+New York, NY, USA
+Monday	2/28/2022
+Colder with plenty of sun
+	29°F
+Feels like 23°F
+Sunrise:	6:32 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	9 mph
+Precipitation:	0 in
+
+Monday Night	2/28/2022
+Clear and cold
+	22°F
+Feels like 7°F
+Sunset:	5:46 PM
+Winds:	4 mph
+Precipitation:	0 in
+Moon:	26
+
+29°F
+	22°F
+Tuesday : 	
+New York, NY, USA
+Tuesday	3/1/2022
+Partly sunny and not as cold
+	43°F
+Feels like 46°F
+Sunrise:	6:30 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	5 mph
+Precipitation:	0 in
+
+Tuesday Night	3/1/2022
+Partly cloudy
+	37°F
+Feels like 29°F
+Sunset:	5:47 PM
+Winds:	4 mph
+Precipitation:	0 in
+Moon:	27
+
+43°F
+	37°F
+

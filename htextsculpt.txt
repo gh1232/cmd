@@ -1,0 +1,1770 @@
+*Latest:* HOWTO: Get tenure <https://matt.might.net/articles/tenure/>
+*Next:* Standalone lexers with lex: synopsis, examples, and pitfalls
+<https://matt.might.net/articles/standalone-lexers-with-lex/>
+*Prev:* Relational shell programming
+<https://matt.might.net/articles/sql-in-the-shell/>
+*Rand:* A quick overview of programming with bash
+<https://matt.might.net/articles/bash-by-example/>
+
+
+  Sculpting text with regex, grep, sed, awk, emacs and vim
+
+[article index <https://matt.might.net/articles/>] [email me
+<mailto:matt-blog@might.net>] [@mattmight
+<http://twitter.com/mattmight>] [rss
+<https://matt.might.net/articles/feed.rss>]
+
+Unix is an alliance of loosely structured text files bound together and
+governed by scripts. Unix is the United Confederation of Strings:
+
+/The string is a stark data structure and
+everywhere it is passed there is much duplication of process.
+It is a perfect vehicle for hiding information./
+--Alan Perlis
+
+Tools built in the Unix tradition excel at manipulating strings as data.
+
+Yet many newer Unix users are unaware of the classic tools and their power.
+
+In this article, I'll provide a functional introduction to four
+important concepts and tools for sculpting text: regex, |grep|, |sed|
+and |awk|.
+
+In short:
+
+  * regex is a language for describing patterns in strings;
+  * |grep| filters its input against a pattern;
+  * |sed| applies transformation rules to each line; and
+  * |awk| manipulates an /ad hoc/ database stored as text, e.g. CSV files.
+
+With this functional introduction, my goal is to introduce enough of
+each tool to cover 80%-90% of their niche uses cases.
+
+Read on for a touch of history, theory and practice.
+
+------------------------------------------------------------------------
+
+This post is part of a "Unix fundamentals" series; see basic Unix
+<http://matt.might.net/articles/basic-unix/>, and settling into Unix
+<http://matt.might.net/articles/settling-into-unix/> for more.
+
+
+    Theory: Regular languages
+
+Many tools for searching and sculpting text rely on a pattern language
+known as regular expressions.
+
+The theory of regular languages underpins regular expressions.
+
+(Caveat: Some modern "regular" expression systems can describe irregular
+languages, which is why the term "regex" is preferred for these systems.)
+
+Regular languages are a class of formal language equivalent in power to
+those recognized by deterministic finite automata (DFAs) and
+nondeterministic finite automata
+<http://matt.might.net/articles/implementation-of-nfas-and-regular-expressions-in-java/>
+(NFAs).
+
+[See my post on converting regular expressions to NFAs
+<http://matt.might.net/articles/implementation-of-nfas-and-regular-expressions-in-java/>.]
+
+
+In formal language theory, a language is a set of strings.
+
+For example, {|"foo"|} and {|"foo"|, |"foobar"|} are formal (if small)
+languages.
+
+(Mathematicians don't typically put quotes around a string, preferring
+to let the fixed-width typewriter font distinguish it as one, but I'm
+guessing that programmers are more comfortable with the quotes around
+strings.)
+
+In regular language theory, there are two /atomic/ languages:
+
+  * ϵ-- the null language, which contains the string of length zero; and
+  * ∅-- the empty language, which contains no strings at all.
+
+In almost every programming language, the null string is written |""|.
+
+Mathematicians are often sloppy with the notation for the null language,
+using ϵto represent both the null language, {|""|}, and the null string,
+|""|.
+
+For each character |/c/| in the alphabet, there is a corresponding
+one-character /primitive/ language, {|"/c/"|}.
+
+(The alphabet is a set of characters, usually denoted Σor A.)
+
+Once again, mathematicians are often sloppy in their notation, using the
+character |/c/| to mean the language {|"/c/"|}.
+
+Regular languages are those that can be obtained by unrestricted
+composition of the operations union, concatenation and Kleene star on
+the atomic and primitive languages:
+
+  * The union of languages L1and L2, written L1∪L2, is set union:
+    L1∪L2={x|x∈L1 or x∈L2}.
+  * The concatenation of two languages L1and L2, written L1∘L2, is akin
+    to Cartesian product:
+    L1∘L2={"xy"|"x"∈L1 and "y"∈L2}.
+    Concatenation is often written as juxtaposition: L1L2=L1∘L2.
+  * The language Lto the nth power, written Ln, is the language
+    contaning nstrings from Lconcatenated together:
+    Ln={"x1⋯xn"|"xi"∈L for all i between 1 and n}.
+    Of course, L0=ϵ.
+  * The Kleene star (the "possible empty repetition") of a language L,
+    written L⋆, contains a language concatenated with itself for every
+    possible combination:
+    L⋆=⋃i=0∞Li.
+
+For example, the set ((a∘b)∪c)∗contains strings like |""|, |"ab"|,
+|"c"|, |"abab"|, |"ababc"| and |"cab"|.
+
+There are also a few common non-primtive regular operations:
+
+  * The non-empty repetition of a language L, written L+, is the same as
+    Kleene star, but at least one copy of Lmust be matched:
+    L+=L∘L⋆.
+  * The option of a language L, written L?, is either Lor the null string:
+    L?=L∪ϵ
+  * The bounded repetition of a language L, written L[n,m], consists of
+    between nand moccurrences of a language:
+    L⋆=⋃i=nmLi.
+
+The theory of regular languages provides algorithms and techniques to
+answer questions like:
+
+  * Given a string sand a language L, is sin L?
+  * Given a string sand a language L, which substrings of sare in L?
+  * Given a language L, is it regular?
+
+
+    Regular expressions in code
+
+In code, regular expressions describe matchable patterns over text.
+
+They are often used to describe locations in text (e.g. all lines that
+match this pattern) and to transform text (e.g. transform text matching
+a pattern into something different text).
+
+There is no standard for regular expressions in code, but most languages
+employ a dialect from a common ancestor.
+
+The three major dialects every programmer should know are:
+
+  * basic regular expressions (BRE);
+  * extended regular expressions (ERE); and
+  * Perl-compatible regular expressions (PCRE).
+
+Since this article is an introduction, it covers BRE and ERE. (PCRE is
+largely an extension of ERE).
+
+The notation used in all regular expression implementations is inspired
+by the mathematical formalism.
+
+The following table describes a generic regular expression pattern
+language:
+
+Math 	Pattern 	Pattern meaning
+∅	no equivalent
+ϵ	no character at all 	matches |""|
+|/c/| 	/|c|/ 	matches |"/c/"|
+L1∘L2	/p1//p2/ 	matches /p1/ then /p2/
+L1∪L2	/p1/|||/p2/ 	matches /p1/ or /p2/
+L⋆	/p/|*| 	matches |""| or /p/ repeated
+L+	/p/|+| 	matches /p/ repeated, but not |""|
+L?	/p/|?| 	matches /p/ or |""|
+Ln	/p/|{/n/}| 	matches /p/ repeated /n/ times
+L[n,m]	/p/|{/n/,/m/}| 	matches /p/ repeated /n/ to /m/ times
+Σ	|.| 	matches any character
+{c1,…,cn}	|[/c/_1 .../c_n /]| 	matches c1or c2or ... or cn
+Σ−{c1,…,cn}	|[^/c/_1 .../c_n /]| 	matches any char but c1or ... or cn
+(L)	|(|/p/|)| 	matches /p/, remembers submatch
+no equivalent 	|\|/n/ 	matches string from /n/th submatch
+no equivalent 	|\b| 	matches a word boundary
+no equivalent 	|\w| 	matches a word character, e.g., alphanumeric
+no equivalent 	|\W| 	matches a nonword character, e.g., punctuation
+no equivalent 	|\s| 	matches a whitespace character, e.g., space, tab,
+return
+no equivalent 	|\S| 	matches a non-whitespace character, e.g.,
+alphanumeric, punctuation
+no equivalent 	|\d| 	matches a digit character, i.e., 0-9
+no equivalent 	|\D| 	matches a non-digit character, e.g., alphanumeric,
+punctuation
+no equivalent 	|^| 	matches start of line/string
+no equivalent 	|$| 	matches end of line/string
+no equivalent 	|[/c/_1 -/c/_2 ]| 	matches c1through c2
+
+Backreferences are numbered by left parentheses: the nth left
+parenthesis denotes the nsubmatch.
+
+The sections ahead discussing individual tools will note individual
+differences for dialects like BRE and ERE.
+
+
+    grep: POSIX basic regular expressions
+
+The tool |grep| can filter a file, line by line, against a pattern.
+
+The command |grep /pattern/ /file/| prints each line of /file/ which
+contains a match for /pattern/. Given no file, it reads from the
+standard input.
+
+The equally useful command |grep -v /pattern/ /file/| prints each line
+of the file /file/ which does not contain a match for /pattern/.
+
+By default, |grep| uses basic regular expressions (BRE).
+
+BRE differs syntactically in several key ways. Specifically, the
+operators |{}|, |()|, |+|, ||| and |?| must be escaped with |\|, and
+many of the character class shortcuts have names instead:
+
+Math 	BRE 	Pattern meaning
+∅	no equivalent
+ϵ	no character at all 	matches |""|
+|/c/| 	/|c|/ 	matches |"/c/"|
+L1∘L2	/p1//p2/ 	matches /p1/ then /p2/
+L1∪L2	/p1/|\||/p2/ 	matches /p1/ or /p2/
+L⋆	/p/|*| 	matches |""| or /p/ repeated
+L+	/p/|\+| 	matches /p/ repeated, but not |""|
+L?	/p/|\?| 	matches /p/ or |""|
+Ln	/p/|\{/n/\}| 	matches /p/ repeated /n/ times
+L[n,m]	/p/|\{/n/,/m/\}| 	matches /p/ repeated /n/ to /m/ times
+Σ	|.| 	matches any character
+{c1,…,cn}	|[/c/_1 .../c_n /]| 	matches c1or c2or ... or cn
+Σ−{c1,…,cn}	|[^/c/_1 .../c_n /]| 	matches any char but c1or ... or cn
+(L)	|\(|/p/|\)| 	matches /p/, remembers submatch
+no equivalent 	|\|/n/ 	matches string from /n/th submatch
+no equivalent 	|\b| 	matches a word boundary
+no equivalent 	|[[:word:]]| 	matches a word character, e.g., alphanumeric
+no equivalent 	|[[:space:]]| 	matches a whitespace character, e.g.,
+space, tab, return
+no equivalent 	|[[:digit:]]| 	matches a digit character, i.e., 0-9
+no equivalent 	|[[:xdigit:]]| 	matches a hex digit character, i.e., A-F,
+a-f, 0-9
+no equivalent 	|[[:upper:]]| 	matches a upperspaced character
+no equivalent 	|[[:lower:]]| 	matches a lowerspaced character
+no equivalent 	|^| 	matches start of line/string
+no equivalent 	|$| 	matches end of line/string
+no equivalent 	|[/c/_1 -/c/_2 ]| 	matches c1through c2
+
+A common use case for grep is |/command/ | grep /word/|, which will dump
+out the lines from the output of /command/ containing the word.
+
+For instance, |ps u | grep matt| will dump out processes run by the user
+|matt| (and possibly a few others that happen to have |matt| on the line).
+
+A fun way to learn how to use |grep| is to run it against the dictionary
+file, |/usr/share/dict/words|.
+
+Suppose you're playing the crosswords, and you know a word is seven
+letters long, with |a| for it second letter and |x| for the sixth. Get a
+hint:
+
+ $ grep '^.a...x.$' /usr/share/dict/words
+ cachexy
+ carboxy
+ martext
+ panmixy
+
+We can submatch backreferences to print out words that repeat themselves:
+
+ $ grep '^\(.*\)\1$' /usr/share/dict/words
+ aa
+ adad
+ akeake
+ anan
+ arar
+ atlatl
+ baba
+ barabara
+ benben
+ beriberi
+ bibi
+ ...
+
+The |\1| refers back to the string matched by the first parenthesized
+submatch. In this case, that's |\(.*\)|.
+
+Recall that the nth left parenthesis denotes the nth submatch.
+
+(Technically, backreferences break the regularity of grep.)
+
+We could find strings that consist of a two different repeated strings:
+
+ $ grep '^\(.\+\)\1\(.\+\)\2$' /usr/share/dict/words
+ susurr
+
+Apparently, there's only one match in my dictionary!
+
+Using the start-of-line and end-of-line markers were necessary here.
+Without them, we get words that contain a substring that repeats itself:
+
+ $ grep '\(.\+\)\1' /usr/share/dict/words
+ aa
+ aal
+ aalii
+ aam
+ aardvark
+ aardwolf
+ abactinally
+ abaff
+ abaissed
+ abandonee 
+
+In this case, changing the |*| to |\+| also became necessary, since |.*|
+matches even the null string, which every string trivially contains.
+
+If you need to find a specific IP address, say 1.10.3.20, in a log file,
+you can do that by escaping the dots:
+
+ $ grep '\b1\.10\.3\.20\b' log
+
+The word-boundary pattern |\b| is necessary to prevent lines containing
+text like |101.10.3.20| from matching.
+
+
+      Useful grep flags
+
+  * |-v| inverts the match.
+  * |--color| colors the matched text.
+  * |-F| interprets the pattern as a literal string.
+  * |-H, -h| print (or don't print) the matched filename
+  * |-i| matches case insensitively.
+  * |-l| prints names of files that match instead.
+  * |-n| prints the line number.
+  * |-w| forces the pattern to match an entire word.
+  * |-x| forces patterns to match the whole line.
+
+
+    egrep: POSIX extended regular expressions
+
+The tool |egrep| is identical to grep, except that it uses POSIX
+extended regular expressions.
+
+POSIX extended regular expressions are identical to basic regular
+expressions, but the operators |{}|, |()|, |+|, ||| and |?| should not
+be escaped.
+
+This change substantially unclutters complex expressions, such as the
+double word example:
+
+ $ egrep '^(.*)\1$' /usr/share/dict/words
+ aa
+ adad
+ akeake
+ anan
+ arar
+ atlatl
+ baba
+ barabara
+ ...
+
+Consider a search for all words that have an |oo| at least one letter
+before and |ee|, or an |ee| at least one character before an |oo|:
+
+ $ egrep 'oo.+ee|ee.+oo' /usr/share/dict/words 
+ beechwood
+ beechwoods
+ beefwood
+ beetroot
+ beetrooty
+ bloodweed
+ bookkeeper
+ bookkeeping
+ bootee
+ brookweed 
+ ...
+
+Consider a search for words that contain between 5 and 7 vowels:
+
+$ egrep '^([^aieou]*[aieou]){5,7}[^aieou]*$' /usr/share/dict/words 
+ abacinate
+ abacination
+ abaisance
+ abalienate
+ abalienation
+ abandonable
+ abandonee
+ abarticular
+ abarticulation
+ abastardize
+ ...
+
+*Warning: * Due to strangeness with grep's handling of Unicode, the
+previous example only worked with the environment variable |LANG=C| set.
+
+
+      The power of backreferences: Prime-finding
+
+Backreferences, as noted, break the regularity of the pattern language.
+
+There's a famous regex which uses backreferences to match composite
+(non-prime) numbers in unary form:
+
+ $^(11+)(\1)+$
+
+Thus, |egrep -v '^(11+)\1+$'| will print out only lines of prime length:
+
+ $ egrep -v '^(11+)\1+$' <<EOF
+ 11
+ 111
+ 1111
+ 11111
+ 111111
+ 1111111
+ 11111111
+ 111111111
+ 1111111111
+ 11111111111
+ EOF
+ 11
+ 111
+ 11111
+ 1111111
+ 11111111111 
+
+Most variants of this reegx use the perl-extended |(11+?)| in place of
+|(11+)|.
+
+The |+?| means try the minimal match first, which directs the
+backtracking to be a little more intelligent in the order that it searches.
+
+But, for correctness, minimal-match-first is not necessary.
+
+If there exists a match at all, then the number is not prime.
+
+For more discussion of this (and related) regexen and its limits, see
+Andrei Zmievski's write-up
+<http://zmievski.org/2010/08/the-prime-that-wasnt>.
+
+According to the lore, Abigail <http://www.abigail.be/> created this regex.
+
+
+    sed
+
+|sed| is a "stream editor."
+
+It reads a file line-by-line, conditionally applying a sequence of
+operations to each line and (possibly) printing the result.
+
+By default, |sed| uses POSIX basic regular expression syntax. To use the
+(more comfortable) extended syntax, supply the flag |-E|.
+
+Most |sed| programs consist a single |sed| command: substitute.
+
+For example, to substitute instances of the regular expression |[ch]at|
+for |ball|, use:
+
+ $ sed 's/[ch]at/ball/g' < in > out
+
+A proper |sed| program is a sequence of |sed| commands.
+
+Most |sed| commands have one of three forms:
+
+ 1. /operation/ -- apply this operation to the current line.
+ 2. /address/ /operation/ -- apply this operation to the current line if
+    at the specified address.
+ 3. /address/_1 ,/address/_2 /operation/ -- apply this operation to the
+    current line if between the specified addresses.
+
+
+      Numeric addresses
+
+The simplest address is a line number.
+
+For example, to print the first 12 lines, use |sed '12q'|. The command
+|q| quits sed. So, this program prints after it hits the 12th line.
+
+To print only the fourth line, use |sed -n '4p'|. The flag |-n|
+suppresses the default printing behavior, while the command |p| prints
+the line.
+
+For convenience, the address |$| refers to the last line.
+
+
+      Pattern addresses
+
+Addresses can be regular expressions in the form of |//pattern//|.
+
+For example, to extract the text between |<body>| and |</body>| in a
+file use the following |sed| program:
+
+#!/usr/bin/sed -E -n -f
+/<body>/,/<\/body>/ p
+
+But, this also prints out the body tags.
+
+A group command |{ ... }| helps here:
+
+#!/usr/bin/sed -E -n -f
+/<body>/,/<\/body>/ {
+  /<body>/b
+  /<\/body>/b
+  p
+}
+
+In this case, the |b| command skips to the next line.
+
+But, this will miss text on the same line as the opening and closing tags.
+
+Using substitute commands to strip out the tags fixes this problem:
+
+#!/usr/bin/sed -E -n -f
+/<body>/,/<\/body>/ {
+  s/^.*<body>//
+  s/<\/body>.*$//
+  p
+}
+
+But, this breaks in the (rare) case of a body tag being on one line, as in:
+
+  <body> hello world </body>
+
+The problem is that ranges cannot start and end on the same line.
+
+To get around this, add a special case to catch it:
+
+ #!/usr/bin/sed -E -n -f
+ /<body>.*<\/body>/ {
+   s/<body>(.*)<\/body>/\1/
+   p
+   q
+ }
+ 
+ /<body>/,/<\/body>/ {
+   s/^.*<body>//
+   s/<\/body>.*$//
+   p
+ }
+
+But, this script still breaks if there are nested body tags in the
+document.
+
+If nesting in a pattern matters, it's probably time to switch to a
+formalism more powerful than regular languages, such as context-free
+languages.
+
+
+      Useful operations
+
+  * The group operation |{ /operation/_1 ; ... ; /operation_n / }|
+    executes all of the specified operations, in order, on the given
+    address.
+  * The operation |s//pattern///replacement///arguments/| replaces
+    instances of /pattern/ with /replacement/ according to the
+    /arguments/ in the current line. In the replacement, |\/n/| stands
+    for the /n/th submatch, while |&| represents the entire match.
+  * The operation |b| branches to a label, and if none is specified,
+    then |sed| skips to processing the next line. Think of this as a
+    |break| operation.
+  * The operation |y//from///to//| transliterates the characters in
+    /from/ to their corresponding character in /to/.
+  * The operation |q| quits |sed|.
+  * The operation |d| deletes the current line.
+  * The operation |w /file/| writes the current line to the specified file.
+
+
+      Common arguments to the substitute operation
+
+The most common argument to the substitute command is |g|, which means
+"globally" replace all matches on the current line, instead of just the
+first.
+
+Sometimes, other arguments are useful:
+
+  * |/n/| tells sed to replace the /n/th match only, instead of the first.
+  * |p| prints out the result if there is a substitution.
+  * |i| ignores case during the match.
+  * |w /file/| writes the current line to |/file/|.
+
+
+      Useful flags
+
+  * |-n| suppresses automatic printing of each result; to print a
+    result, use command |p|.
+  * |-f /sedfile/| uses /sedfile/ as the sed program.
+
+
+      Examples
+
+Strip comment lines starting with |#|:
+
+ $ sed '/^#/d' 
+
+Delete C++-style // comments
+
+ $ sed 's/\/\/.*$//'
+
+Encrypt with the Caeser cipher:
+
+ $ sed 'y/abcdefghijklmnopqrstuvwxyz/defghijklmnopqrstuvwxyzabc/' 
+
+Decrypt with the Caesar cipher:
+
+ $ sed 'y/defghijklmnopqrstuvwxyzabc/abcdefghijklmnopqrstuvwxyz/' 
+
+Change names from "Last, First [Middle/Middle Initial.]" to "First
+[Middle/Middle Initial.] Last":
+
+ $ sed -E 's/([A-Z][a-z]*), ([A-Z][a-z]*( [A-Z][a-z]*[.]?)?)/\2 \1/g'
+ Might, Matthew B.
+ Matthew B. Might
+
+
+      Next steps with sed
+
+|sed| is much more powerful than this summary alludes.
+
+There are label (|:|) and branching commands (|b|, |t|) that allow
+loops, and in theory, arbitrary (Turing-equivalent) computation.
+
+|sed| keeps track of both a pattern space (the current line) and hold
+space, and there are commands to manipulate both of them, e.g., |g|,
+|G|, |h| and |H|.
+
+That said, you should probably never use these commands!
+
+If you find yourself tempted to use these more advanced constructs, it's
+a sign that you want to use a tool like |awk| or Perl instead.
+
+
+    AWK
+
+The |awk| command provides a more traditional programming language for
+text processing than |sed|.
+
+Those accustomed to seeing only hairy |awk| one-liners might not even
+realize that AWK is a real programming language. For example, here's a
+comprehensible AWK program that prints the factorial of each line:
+
+#!/usr/bin/awk -f
+
+{ print factorial($0); }
+
+function factorial(n) {
+ if (n == 0) 
+   return 1;
+ else 
+   return n*factorial(n-1);
+}
+
+Of course, AWK can be terse and obtuse too. Here's a popular one-liner
+that prints out the unique lines of a file:
+
+awk '!a[$0]++' /file/
+
+The major difference in philosophy between AWK and sed is that AWK is
+/record/-oriented rather than /line/-oriented.
+
+Each line of the input to AWK is treated like a delimited record.
+
+The AWK philosophy melds well with the Unix tradition of storing data in
+/ad hoc/ line-oriented databases, e.g., |/etc/passwd|.
+
+That is, where |sed| sees a file like this:
+
+ /line/_1 
+ /line/_2 
+ /line/_3 
+ ...
+
+|awk| sees a files like this:
+
+ /record/_1 
+ /record/_2 
+ /record/_3 
+ ...
+
+where each /record/ is:
+
+ /field/_1  /field/_2  /field/_3  ...
+
+The command line parameter |-F /regex/| sets the regular expression
+/regex/ to be the field delimiter.
+
+For instance, |awk -F ","| sees each /record/ as:
+
+ /field/_1 ,/field/_2 ,/field/_3 ,...
+
+To print out the account name and uid from |/etc/passwd|, use:
+
+ $ awk -F : '/^[^#]/ { print $1, $3 }' /etc/passwd
+ nobody -2
+ root 0
+ daemon 1
+ ...
+
+
+      AWK programs
+
+An AWK program consists of pattern-action pairs:
+
+|/pattern/ { /statements/ }|
+
+followed by an (optional) sequence of function definitions.
+
+In fact, an action is optional, and a pattern by itself is equivalent to:
+
+|/pattern/ { print }|
+
+As each record is read, each pattern is checked in order, and if it
+matches, then the corresponding action is executed.
+
+
+      Function definition
+
+The form for function defintion is:
+
+|*function* /name/(/arg/_1 ,...,/arg_n /) { /statements/ }|
+
+As in C, a |return| statement returns the result of the function.
+
+
+      Patterns
+
+The most common one-line pattern in AWK is the blank pattern, which
+matches every line.
+
+The other pattern forms include:
+
+  * |//regex//|, which matches if the /regex/ matches something on the
+    line;
+  * /expression/, which matches if /expression/ is nonzero or non-null;
+  * /p1/|,| /p2/, which matches all records (inclusive) between /p1/ and
+    /p2/.
+  * |BEGIN|, which matches before the first line read;
+  * |END|, which matches after the last line is read;
+
+Some implementations of |awk|, like |gawk|, provide additional patterns:
+
+  * |BEGINFILE|, which matches before a new file is read; and
+  * |ENDFILE|, which matches after a file is read.
+
+
+      Expressions
+
+AWK expressions appear in both patterns and in statements.
+
+A basic AWK expression is either:
+
+  * a special variable, e.g., |$1| or |NF|;
+  * a regular variable, e.g., |foo|
+  * a string literal, e.g., |"foobar"|;
+  * a numeric constant, e.g., |3|, |3.1|;
+  * a regex constant, e.g., |/foo|bar/|
+
+A regex constant can be passed as a first-class value to a function.
+
+AWK supports a match expression form, |/exp1/ ~ /exp2/|, where the
+assumption is that |/exp1/| will evaluate to a string, |/exp2/| will
+evaluate to a regex, and the result of matching is returned.
+
+A lone regex constant in a conditional is implicitly equivalent to a
+match against the current record; that is, |//regex//| becomes |$0 ~
+//regex//|.
+
+For example, to filter lines that contain both |foo| and |bar|:
+
+ $ awk '/foo/ && /bar/ { print }'
+
+or just:
+
+ $ awk '/foo/ && /bar/'
+
+AWK brings the expected C-like arithmetic (like |+|), comparison (like
+|==|) and Boolean operators (like |&&|).
+
+As in C, variable assignment is an expression rather than a statement.
+
+For example, to print account names from |/etc/passwd| where the account
+number is |500|, use:
+
+ $ awk -F : '$3 == 500 { print $1 }' /etc/passwd
+
+String concatenation is simply juxtaposition. As a result, it may be
+necessary to surround strings to be concatenated with parentheses, e.g.,
+|("bar = " bar ".")|.
+
+Abutting a name with parentheses indicates function call; for example,
+the following program surrounds every line of input with curly braces:
+
+#!/usr/bin/awk -f
+
+{ print f($0) }
+
+function f(line) {
+    return ("{" line "}") ;
+}
+
+
+        Arrays
+
+AWK supports both scalars and arrays.
+
+Arrays in AWK are associative, much like objects in JavaScript.
+
+To reference an index in an array, use the C-style subcript notation,
+|/variable-name/[/index/]|, where /index/ can be any expression that
+evaluates to a scalar value.
+
+There is no need to create an array explicitly: just assign into an
+index in an undefined variable name.
+
+To check for the existence of an index, use the |in| operator: |/index/
+in /variable-name/|.
+
+For example, to print the account name with the highest uid run the
+following on |/etc/passwd|:
+
+#!/usr/bin/awk -F : -f
+
+/^#/ { next ; }
+
+{ users[$3] = $1 ; }
+
+END {
+ max = 0 ;
+ for (i in users) {
+  if ((i+0) > (max+0)) 
+   max = i ;
+ }
+ print users[max];
+}
+
+The |(i+0)| and |(max+0)| is necessary to forcibly convert them to
+numerics. Otherwise, |<| compares them lexically as strings.
+
+Arrays have a split first-/second-class status in AWK.
+
+Arrays are passed as parameters to procedures by reference.
+
+But, it is not possible to assign an array to a variable.
+
+#!/usr/bin/awk -f
+
+BEGIN {
+  arr[0] = 1 ;
+  print 0, arr[0] ;   # prints 0 1
+  modify_array(arr) ; # ok
+  print 0, arr[0] ;   # prints 0 2
+  brr = arr ;         # error
+  exit ;
+}
+
+function modify_array(array) {
+  for (k in array) {
+    array[k]++ ;
+  }
+}
+
+Arrays may not be returned from procedures either.
+
+
+      Special variables
+
+There are several special variables in AWK:
+
+Variable 	Meaning
+|$0| 	text of the matched record
+|$/n/| 	the /n/th entry in the current record
+|FILENAME| 	name of current file
+|NR| 	number of records seen thus far
+|FNR| 	number of records thus far in this file
+|NF| 	number of fields in current record
+|FS| 	input field delimiter, defaults to whitespace
+|RS| 	record delimiter, defaults to newline
+|OFS| 	output field delimiter, defaults to space
+|ORS| 	output record delimiter, defaults to newline
+
+These special variables can be used in patterns.
+
+For instance, one could print the even lines:
+
+ $ awk 'NR % 2 == 0 { print }'
+
+Special variables like |OFS| can also be assigned as the program executes.
+
+Technically, |$/n/| is not a variable.
+
+In fact, |$| is a special pseudoarray applied to the expression on its
+right.
+
+For example, |$(0)| is an expression, as are |$i| and |$(a[i])|.
+
+And, by extension, |$NF| is the last field.
+
+
+      Statements
+
+AWK is a small language, with only a handful of forms for statements.
+
+The man page lists all of them:
+
+  *if* (/expression/) /statement/ [ *else* /statement/ ]
+  *while* (/expression/) /statement/
+  *for* (/expression/; /expression/; /expression/) /statement/
+  *for* (/var/ *in* /array/) /statement/
+  *do* /statement/ *while* (/expression/)
+  *break*
+  *continue*
+  { [ /statement/ ... ] }
+  /expression/  
+  *print* [ /expression/-list ] [ > /expression/ ]
+  *printf* /format/ [ , /expression/-list ] [ > /expression/ ]
+  *return* [ /expression/ ]
+  *next*             
+  *nextfile*
+  *delete* array[/expression/]
+  *delete* array            
+  *exit* [ /expression/ ] 
+
+The most common statement is |print|, which is equivalent to |print $0|.
+
+If arguments to |print| are comma-separated, then they are spliced
+together with |OFS|.
+
+For example:
+
+ $ echo foo bar | awk '{ OFS="::" ; print $1, $2 ; exit }'
+ foo::bar
+
+Most of these statements should be familiar to programmers, and some
+look eerily similar to those found in JavaScript.
+
+The |delete| statement deletes an index from an array, or alternately,
+the entire array.
+
+
+        Control statements
+
+AWK supports C-style control constructs like |if|, |for| and |while|.
+
+It also supports a special |for| form for iterating over the keys in an
+associative array:
+
+|for (/var/ in /array-name/) /statement/|
+
+The control statements |next| and |nextfile| skip to the next line of
+input and the next file respectively.
+
+
+      Built-in functions
+
+AWK comes with a large set of built-in functions
+<http://www.gnu.org/software/gawk/manual/gawk.html#Built_002din>.
+
+These are also listed in the AWK man page.
+
+Perhaps the most useful is |gensub(/regex/, /replacement/, /params/ [ ,
+/input/ ])|, which returns roughly the result of |sed|'s
+|s//regex///replacement///params/| run on /input/ or |$0| by default.
+
+For example, to change C++-style // comments to C-style comments:
+
+ $ awk '{ print gensub(/\/\/[ ]?(.*)/, "/* \\1 */", "g" ) }'
+
+Not all AWK implementations support |gensub|, so you might have to use
+the specializations |sub| and |gsub| instead.
+
+
+      Useful flags
+
+  * |-f /filename/| uses the provided file as the AWK program.
+  * |-F /regex/| sets the input field separator.
+  * |-v /var/=/value/| sets a global variable. Multiple |-v| flags are
+    allowed.
+
+
+    vim and emacs
+
+Text editors in the Unix tradition excel at manipulating text.
+
+If you haven't yet taken the (brief) tutorial for both editors, do so at
+your earliest convenience.
+
+You can apply the knowledge from this article inside |vim| and |emacs|,
+which have their own rich regex-based search-and-replace systems:
+
+Command 	vim 	emacs
+search 	|//pattern/| 	|C-M-s /pattern/ RET|
+replace 	|:s//pat///new//| 	|M-x replace-regexp RET /pat/ RET /new/ RET |
+
+Both editors default to a BRE-like syntax.
+
+In both, the escape |\/n/| expands into the /n/th submatch.
+
+In emacs, the escape |\&| expands into the matched text, while just the
+character |&| expands into the matched text in vim.
+
+You can also direct both editors to interact with sed and AWK, or any
+other shell command for that matter:
+
+Command 	vim 	emacs
+insert output of command 	|:r!/command/| 	|M-1 M-! /command/|
+pipe selection to command 	|:'<'>!/command/| 	|M-1 M-| /command/ RET|
+
+
+    Related posts and further reading
+
+  * Learn Perl by experiment
+    <http://matt.might.net/articles/perl-by-example/>
+  * A quick overview of programming with bash
+    <http://matt.might.net/articles/bash-by-example/>
+  * A short introduction to make
+    <http://matt.might.net/articles/intro-to-make/>
+  * SSH hacks <http://matt.might.net/articles/ssh-hacks/>
+  * Standalone lexers with lex: synopsis, examples, and pitfalls
+    <http://matt.might.net/articles/standalone-lexers-with-lex/>
+  * Relational shell programming
+    <http://matt.might.net/articles/sql-in-the-shell/>
+  * Settling into Unix <http://matt.might.net/articles/settling-into-unix/>
+  * A survival guide for Unix beginners
+    <http://matt.might.net/articles/basic-unix/>
+  * Console productivity hack: Exploiting task frequency
+    <http://matt.might.net/articles/console-hacks-exploiting-frequency/>
+  * HOWTO: Word, Excel and PowerPoint without MS Office
+    <http://matt.might.net/articles/how-to-read-and-create-microsoft-word-documents-excel-spreadsheets-powerpoint-presentations-without-microsoft-office/>
+  * Tips, tricks and tools for Linux and Unix
+    <http://matt.might.net/articles/best-tools-for-using-and-learning-linux-and-unix/>
+  * Bruce Barnett's classic sed tutorial
+    <http://www.grymoire.com/Unix/Sed.html>.
+  * Bruce Barnett's classic AWK tutorial
+    <http://www.grymoire.com/Unix/Awk.html>.
+  * Eric Pement's AWK one-liners <http://www.pement.org/awk/awk1line.txt>.
+  * Eric Pement's sed one-liners <http://sed.sourceforge.net/sed1line.txt>.
+  * AWK, according to its creators, Aho, Weinberger and Kernighan
+    <http://www.amazon.com/gp/product/020107981X/ref=as_li_ss_tl?ie=UTF8&tag=mmamzn06-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=020107981X>:
+
+    <http://www.amazon.com/gp/product/020107981X/ref=as_li_ss_il?ie=UTF8&tag=mmamzn06-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=020107981X>
+
+  * O'Reilly's classic, sed & awk
+    <http://www.amazon.com/gp/product/1565922255/ref=as_li_ss_tl?ie=UTF8&tag=mmamzn06-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1565922255>:
+
+    <http://www.amazon.com/gp/product/1565922255/ref=as_li_ss_il?ie=UTF8&tag=mmamzn06-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1565922255>
+
+
+------------------------------------------------------------------------
+[article index <https://matt.might.net/articles/>] [email me
+<mailto:matt-blog@might.net>] [@mattmight
+<http://twitter.com/mattmight>] [rss
+<https://matt.might.net/articles/feed.rss>]
+*Latest:* HOWTO: Get tenure <https://matt.might.net/articles/tenure/>
+*Next:* Standalone lexers with lex: synopsis, examples, and pitfalls
+<https://matt.might.net/articles/standalone-lexers-with-lex/>
+*Prev:* Relational shell programming
+<https://matt.might.net/articles/sql-in-the-shell/>
+*Rand:* A quick overview of programming with bash
+<https://matt.might.net/articles/bash-by-example/>
+matt.might.net is powered by *linode
+<http://www.linode.com/?r=bf5d4e7c8a1af61855b5227279a6744c3bde8a8a>* |
+legal information <https://matt.might.net/articles/legal/>
+
+Hide Download Bar
+Ctrl + Shift + Z = Show/Hide Download Bar
+Downloads
+Download Manager (S3)
+Clear
+Left Click: Clear All Finished
+Right Click: Undo last clear
+100%
+Download History
+Download list is empty
+hbash.txt
+Unk.
+Unk.
+136 KB
+455 KB/s
+hbash.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbash.txt
+Status:
+	
+136 KB / Unknown ( 455 KB/s )
+File Size:
+	
+505 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:21:49
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+1.62 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashman.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashman.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashman.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+398 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:23:48
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+863 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hfilesys.txt
+Unk.
+Unk.
+-.--
+-.--
+hfilesys.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hfilesys.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+122 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:51:42
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+192 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdeblic.txt
+Unk.
+Unk.
+-.--
+-.--
+hdeblic.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdeblic.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+40 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:52:06
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+91 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebdev
+Unk.
+Unk.
+96 KB
+963 KB/s
+hdebdev
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebdev
+Status:
+	
+96 KB / Unknown ( 963 KB/s )
+File Size:
+	
+291 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:11
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+3.60 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebmaint
+Unk.
+Unk.
+79 KB
+395 KB/s
+hdebmaint
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebmaint
+Status:
+	
+79 KB / Unknown ( 395 KB/s )
+File Size:
+	
+322 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:31
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+2.02 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebmaintnew
+100%
+00:00
+54 KB
+538 KB/s
+hdebmaintnew
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebmaintnew
+Status:
+	
+54 KB / 54 KB ( 538 KB/s )
+File Size:
+	
+175 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:46
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+1.26 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+debpackaging-tutorial.en.pdf
+100%
+00:00
+388 KB
+3.79 MB/s
+debpackaging-tutorial.en.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\debpackaging-tutorial.en.pdf
+Status:
+	
+388 KB / 388 KB ( 3.79 MB/s )
+File Size:
+	
+388 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:54:09
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+3.91 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebconfig
+100%
+00:00
+6 KB
+60 KB/s
+hdebconfig
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebconfig
+Status:
+	
+6 KB / 8 KB ( 60 KB/s )
+File Size:
+	
+27 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:54:23
+Time to Complete:
+	
+00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+32 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+debhamradio-maintguide.en.pdf
+100%
+00:00
+193 KB
+Infinity GB/s
+debhamradio-maintguide.en.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\debhamradio-maintguide.en.pdf
+Status:
+	
+193 KB / 193 KB ( Infinity GB/s )
+File Size:
+	
+193 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:57:27
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+2.58 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hgoogbashstyle.txt
+Unk.
+Unk.
+-.--
+-.--
+hgoogbashstyle.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hgoogbashstyle.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+44 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:02:34
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+46 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hposixsh.txt
+Unk.
+Unk.
+-.--
+-.--
+hposixsh.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hposixsh.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+177 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:09:12
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+183 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+New York, NY, USA
+There was a problem connecting to the weather service.
+Reload Weather Data
+Click for hourly forecast.
+Click to expand
+Click to collapse
+New York, NY, USA : 65°F
+Today : 	
+New York, NY, USA
+Today	2/23/2022
+Clearing
+The temperature approaching the record of 72 ...
+	68°F
+Feels like 69°F
+Sunrise:	6:39 AM
+UV Index:	Moderate (3)
+Sunburn: 45 minutes
+Winds:	7 mph
+Precipitation:	0.01 in
+
+Tonight	2/23/2022
+Partly cloudy and much colder
+	31°F
+Feels like 55°F
+Sunset:	5:40 PM
+Winds:	8 mph
+Precipitation:	0 in
+Moon:	21
+
+68°F
+	31°F
+Tomorrow : 	
+New York, NY, USA
+Tomorrow	2/24/2022
+Mostly cloudy and much colder
+	37°F
+Feels like 39°F
+Sunrise:	6:38 AM
+UV Index:	Low (1)
+Winds:	4 mph
+Precipitation:	0 in
+
+Tomorrow Night	2/24/2022
+A wintry mix late, up to 1 in
+Snow and sleet late in the evening followed b...
+	32°F
+Feels like 28°F
+Sunset:	5:41 PM
+Winds:	4 mph
+Precipitation:	0.6 in
+Moon:	22
+
+37°F
+	32°F
+Friday : 	
+New York, NY, USA
+Friday	2/25/2022
+Cloudy with rain tapering off
+	38°F
+Feels like 34°F
+Sunrise:	6:36 AM
+UV Index:	Low (1)
+Winds:	7 mph
+Precipitation:	0.67 in
+
+Friday Night	2/25/2022
+Clear to partly cloudy
+	22°F
+Feels like 23°F
+Sunset:	5:42 PM
+Winds:	7 mph
+Precipitation:	0 in
+Moon:	23
+
+38°F
+	22°F
+Saturday : 	
+New York, NY, USA
+Saturday	2/26/2022
+Mostly sunny and cold
+	34°F
+Feels like 37°F
+Sunrise:	6:35 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	5 mph
+Precipitation:	0 in
+
+Saturday Night	2/26/2022
+Clear
+	28°F
+Feels like 22°F
+Sunset:	5:43 PM
+Winds:	5 mph
+Precipitation:	0 in
+Moon:	24
+
+34°F
+	28°F
+Sunday : 	
+New York, NY, USA
+Sunday	2/27/2022
+Partly sunny
+	42°F
+Feels like 38°F
+Sunrise:	6:33 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	9 mph
+Precipitation:	0 in
+
+Sunday Night	2/27/2022
+Mainly clear and colder
+Mainly clear and colder; hypothermia likely w...
+	20°F
+Feels like 25°F
+Sunset:	5:45 PM
+Winds:	9 mph
+Precipitation:	0 in
+Moon:	25
+
+42°F
+	20°F
+Monday : 	
+New York, NY, USA
+Monday	2/28/2022
+Colder with plenty of sun
+	29°F
+Feels like 23°F
+Sunrise:	6:32 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	9 mph
+Precipitation:	0 in
+
+Monday Night	2/28/2022
+Clear and cold
+	22°F
+Feels like 7°F
+Sunset:	5:46 PM
+Winds:	4 mph
+Precipitation:	0 in
+Moon:	26
+
+29°F
+	22°F
+Tuesday : 	
+New York, NY, USA
+Tuesday	3/1/2022
+Partly sunny and not as cold
+	43°F
+Feels like 46°F
+Sunrise:	6:30 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	5 mph
+Precipitation:	0 in
+
+Tuesday Night	3/1/2022
+Partly cloudy
+	37°F
+Feels like 29°F
+Sunset:	5:47 PM
+Winds:	4 mph
+Precipitation:	0 in
+Moon:	27
+
+43°F
+	37°F
+

@@ -1,0 +1,1287 @@
+*Latest:* HOWTO: Get tenure <https://matt.might.net/articles/tenure/>
+*Next:* Sculpting text with regex, grep, sed and awk
+<https://matt.might.net/articles/sculpting-text/>
+*Prev:* Settling into Unix
+<https://matt.might.net/articles/settling-into-unix/>
+*Rand:* Counting hash collisions with the birthday paradox
+<https://matt.might.net/articles/counting-hash-collisions/>
+
+
+  Relational shell programming
+
+[article index <https://matt.might.net/articles/>] [email me
+<mailto:matt-blog@might.net>] [@mattmight
+<http://twitter.com/mattmight>] [rss
+<https://matt.might.net/articles/feed.rss>]
+
+No one would mistake the average shell script for principled software.
+
+Yet, if we look at how scripts are used, patterns emerge.
+
+Unix is a bestiary of /ad hoc/ databases: comma-, colon-, tab- and
+space-separated tables. Think of |/etc/*| or |/var/log/*|, or of
+columnar commands.
+
+Shell scripts commonly, if unknowingly, compose five (of six) primitive
+relational-algebraic operations on these tables: union, difference,
+projection, selection and renaming:
+
+  * |cat| acts like union;
+  * |sed| and |grep| act like selection;
+  * |cut| acts like projection;
+  * |awk| can perform renaming; and
+  * |diff| acts (almost) like difference.
+
+Relational algebra (whose sixth primitive operation is Cartesian
+product) is equivalent to both relational calculus and SQL.
+
+Cartesian product (and equijoin) are not difficult to create in bash.
+
+If you find yourself stumbling into a relational design pattern in a
+shell script, consider making that relationality rigid and explicit.
+
+Read on to learn a little more about databases, shell scripts or both.
+
+------------------------------------------------------------------------
+
+*Update:* A few readers have pointed out the flexible join
+<http://linux.die.net/man/1/join> command. Others have pointed out that
+the classic text The AWK Programming Language
+<http://www.amazon.com/gp/product/020107981X/ref=as_li_ss_tl?ie=UTF8&tag=mmamzn06-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=020107981X>
+contains a section on how to implement a relational DB with awk.
+
+
+    Representing relations
+
+In mathematics, a relation is a set of tuples.
+
+[A tuple is an ordered collection of values, (v1,…,vn).]
+
+For example, {(Bob,31),(Judy,32)}is a relation.
+
+In database theory, a relation is a set of tuples with an assigned name
+for each column; that is, a relation is a /table/.
+
+For the earlier relation, we could define a header tuple (name,age)that
+names each column.
+
+We could then represent the relation explicitly as a table:
+
+name 	age
+Bob 	31
+Judy 	32
+
+Relational algebra <http://en.wikipedia.org/wiki/Relational_algebra> is
+a theory for manipulating relations whose power is equivalent to SQL and
+relational calculus.
+
+Remarkably, relational algebra has only six primitive operations.
+
+I define the six primitives below, but if you're looking for a
+comprehensive work on relational theory, particularly as it relates to
+modern databases, I recommend Date's SQL and Relational Theory
+<http://www.amazon.com/gp/product/0596523068/ref=as_li_ss_tl?ie=UTF8&tag=mmamzn06-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0596523068>:
+
+
+<http://www.amazon.com/gp/product/0596523068/ref=as_li_ss_il?ie=UTF8&tag=mmamzn06-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0596523068>
+
+
+
+      Relations in Unix
+
+Many Unix commands interpret files like relations: each line is a tuple.
+
+CSV or "comma-separated value" files are a crude, generic way to encode
+a relation. For example, see the MaxMind GeoIP database
+<http://www.maxmind.com/app/geolitecountry>:
+
+  "1.0.0.0","1.0.0.255","16777216","16777471","AU","Australia"
+  "1.0.1.0","1.0.3.255","16777472","16778239","CN","China"
+
+The password and group files for a Unix system (|/etc/passwd| and
+|/etc/group|), which store account and login information, are relations
+with elements of individual tuples separated by colons (|:|):
+
+  nobody:*:-2:-2:Unprivileged User:/var/empty:/usr/bin/false
+  root:*:0:0:System Administrator:/var/root:/bin/sh
+  daemon:*:1:1:System Services:/var/root:/usr/bin/false 
+
+The |/etc/hosts| file, which can fix a hostname to an IP address, is a
+space-separated relation:
+
+  127.0.0.1        localhost
+  255.255.255.255  broadcasthost
+  ::1              localhost 
+  fe80::1%lo0      localhost
+
+The |/etc/resolv.conf| file, which specifies domain name information, is
+a space-separated relation:
+
+  domain hsd1.ut.comcast.net.
+  nameserver 208.67.220.220
+  nameserver 208.67.222.222
+
+The command |netstat -nr| produces tables of routing information.
+
+  Destination     Gateway      Flags      Refs      Use   Netif 
+  127             127.0.0.1    UCS           0        0     lo0
+  127.0.0.1       127.0.0.1    UH            5   151051     lo0
+  224.0.0/4       lo0          UmCS          1        0     lo0
+  224.0.0.251     lo0          UHmW3I        0        0     lo0
+
+The command |traceroute| produces relation-like data:
+
+ 5  69.139.247.14  16.560 ms  26.933 ms  11.521 ms
+ 6  68.86.90.125  74.433 ms  40.330 ms  57.565 ms
+ 7  68.86.87.30  54.590 ms  52.155 ms  55.322 ms
+
+Many log files are, in effect, giant relations as well.
+
+
+    Union
+
+Mathematically, union (∪)combines the contents of two sets:
+
+A∪B={x|x∈A or x∈B}
+
+In the shell, union is straightforward--it's |cat|:
+
+ $ cat /relation-1/ /relation-2/ > /unioned-relation/
+
+After any operation in which duplicate entries are a possibility,
+compose with |sort| and |uniq|:
+
+ $ cat /relation-1/ /relation-2/ | sort | uniq > /unioned-relation/
+
+Since a relation is a set, duplicate entries are not allowed.
+
+Many other programs accept multiple files as arguments and print out
+their contents: |sed|, |grep|, |cut|, |awk|.
+
+Thus, these commands can combine /selection/ (and /projection/) with
+/union/.
+
+To "union" the output of one command with another, use a sequencing
+semicolon with an append:
+
+  $ /command-1/ > /relation/; /command-2/ >> /relation/
+
+
+    Selection
+
+Mathematically, selection (σϕ)is a filtering operation that applies a
+predicate ϕto each member of a set, retaining only those for which the
+predicate is true:
+
+σϕ(A)={x|x∈A and ϕ(x) is true }
+
+Many Unix commands in serve as selectors (and simultaneously as union);
+that is, many programs can filter a file, line by line.
+
+The most common selectors are |sed|, |grep| and |awk|.
+
+For example, |awk| can select entries from |/etc/passwd| where the user
+id and the primary group id are not equal:
+
+ awk -F ":" '{ if ( $3 != $4 ) print }' /etc/passwd
+
+
+    Projection
+
+Mathematically, projection (πc1,…,cn)is a reduction operator that
+retains the specified columns (c1,…,cn)in a relation and discards the rest.
+
+If a relation is table, then c1,…,cncan be the names of the columns (and
+the order in which to preserve them).
+
+Otherwise, c1,…,cncan be column numbers so that:
+
+πi1,…,in(R)={(xi1,…,xin)|(x1,…,xn)∈R}
+
+The Unix command |cut| is a projection-like command.
+
+For example, |cut| can project just the user names and shells out of
+|/etc/passwd|:
+
+ $ cut -d ":" -f 1,7 /etc/passwd
+
+The Unix commands |sed| and |awk| also behave like projectors.
+
+For example, |cut| cannot reorder colums, but |awk| can:
+
+ $ awk -F":" '{ print $7 ":" $1 }' /etc/passwd
+
+If the syntactic structure of each tuple is more complex, then |sed| can
+pull it apart with a regular expression.
+
+
+    Rename
+
+For tables, the rename operation (ρc/c′)changes the name of column c′to c.
+
+Since most Unix tables don't specify headers, or the structure is
+implicit, there is no equivalent of or need for rename.
+
+Columns are implicitly named positionally.
+
+|awk| can easily reorder columns.
+
+
+    Cartesian product
+
+Cartesian product is the source of much power for relational algebra,
+since it is the key ingredient in joins--the primitive operation that
+combines two tables together.
+
+Relational Cartesian product (×)fully combines two relations:
+
+A×B={(a1,…,an,b1,…,bm)|(a1,…,an)∈A and (b1,…,bm)∈B}
+
+Surprisingly, there is no shell equivalent of Cartesian product.
+
+Fortunately, it's not hard to write a |cartesian| script:
+
+#!/bin/bash
+
+delim="," # CSV by default
+
+# Parse flagged arguments:
+while getopts "td:" flag
+do
+  case $flag in
+    d) delim=$OPTARG;;
+    t) delim="\t";;
+    ?) exit;;
+  esac
+done
+
+# Delete the flagged arguments:
+shift $(($OPTIND -1))
+
+# Remaining args now in $*
+
+# Now join $1 and $2
+while read a; 
+ do while read b; 
+      do echo "$a${delim}$b"; 
+      done < $2;
+ done < $1 
+
+*Update*: Travis Johnson <http://traviscj.com/> wrote in to say that the
+Unix command |paste| seems to provide functionality of Cartesian
+product, but it doesn't quite do that. The |paste| joins corresponding
+lines, but does not compute a product:
+
+% cat f1
+a
+b
+c
+
+% cat f2
+d
+e
+f
+
+% paste -d "," f1 f2
+a,d
+b,e
+c,f
+
+% cartesian f1 f2
+a,d
+a,e
+a,f
+b,d
+b,e
+b,f
+c,d
+c,e
+c,f
+
+
+    Difference
+
+Mathematically, set difference (−)removes the elements of a set that are
+present in another set:
+
+A−B={a|a∈A and a∉B}
+
+The command |diff| reports the difference between two files, but it does
+not perform relational set difference.
+
+We need to implement relational set difference.
+
+It is simpler to implement |difference| if we assume the existence of a
+membership tester, |memberp|.
+
+The command |memberp /file/ /line/| exits successfully if the file
+/file/ contains the line /line/, and it fails otherwise.
+
+With access to |memberp|, |difference| becomes:
+
+#!/bin/bash
+
+while read a; 
+ do 
+   if ! memberp $2 "$a"; then
+     echo "$a"
+   fi
+ done < $1
+
+
+      Membership
+
+A membership script, |memberp|, searches line by line:
+
+#!/bin/bash
+
+# Usage: memberp file line
+
+file=$1
+
+shift
+
+while read a; 
+ do 
+   if [ "$a" = "$*" ]; then
+     exit 0
+   fi
+ done < $file
+
+exit -1
+
+
+      An alternative: |comm|
+
+The command |comm| can also compute the difference between two files /A/
+and /B/:
+
+comm -23 <(sort A) <(sort B)
+
+
+    Join
+
+A join is a synthetic operation composed of selection, projection and
+product.
+
+We could construct it from
+
+A common join is equijoin, where the product of two relations is
+filtered based on the equality of two columns.
+
+To peform an equijoin, we need two relations and columns to compare.
+
+The command |equijoin [ -d <delim> | -t ] /rel1/ /rel2/ /col1/ col2|
+uses |awk| to combine and compare two tables:
+
+#!/bin/bash
+
+delim="," # CSV by default
+
+# Parse flagged arguments:
+while getopts "td:" flag
+do
+  case $flag in
+    d) delim=$OPTARG;;
+    t) delim="\t";;
+    ?) exit;;
+  esac
+done
+
+# Delete the flagged arguments:
+shift $(($OPTIND -1))
+
+f1=$1
+f2=$2
+col1=$3
+col2=$4
+
+cols=`awk -F "${delim}" '{ print NF ; exit }' $f1`
+
+while read a
+ do while read b
+      do 
+        echo "$a${delim}$b"
+      done < $f2
+ done < $f1 |
+ awk -F "${delim}" "{ if ( \$${col1} == \$$(( col2 + cols )) ) print }"
+
+
+    Example: Deleting a list of bad users
+
+We're given a list of bad users to remove from |/etc/passwd|.
+
+They're in the file |bad.db|:
+
+matt
+bob
+
+Let's use a simplified |/etc/passwd| for this example:
+
+root:*:0:0:The Admin:/root:/bin/sh
+matt:*:500:500:Matt:/home/matt:/bin/bash
+john:*:501:501:John:/home/john:/bin/bash
+bob:*:502:502:Bob:/home/bob:/bin/bash
+
+How can we delete them relationally?
+
+Start with a product, |cartesian -d ":" bad.db /etc/passwd > badpasswd.db|:
+
+matt:root:*:0:0:The Admin:/root:/bin/sh
+matt:matt:*:500:500:Matt:/home/matt:/bin/bash
+matt:john:*:501:501:John:/home/john:/bin/bash
+matt:bob:*:502:502:Bob:/home/bob:/bin/bash
+bob:root:*:0:0:The Admin:/root:/bin/sh
+bob:matt:*:500:500:Matt:/home/matt:/bin/bash
+bob:john:*:501:501:John:/home/john:/bin/bash
+bob:bob:*:502:502:Bob:/home/bob:/bin/bash
+
+Then, select rows where the bad user matches the account name, with |awk
+-F: '{ if ( $1 == $2 ) print }' badpasswd.db > offenders.db |:
+
+matt:matt:*:500:500:Matt:/home/matt:/bin/bash
+bob:bob:*:502:502:Bob:/home/bob:/bin/bash
+
+Now, project out the columns that make the result compatible with the
+format of |/etc/passwd| with |cut -d ":" -f2- offenders.db > kill.db|:
+
+matt:*:500:500:Matt:/home/matt:/bin/bash
+bob:*:502:502:Bob:/home/bob:/bin/bash
+
+Finally, use |difference /etc/passwd kill.db| to generate a new password
+file /sans/ malefactors:
+
+root:*:0:0:The Admin:/root:/bin/sh
+john:*:501:501:John:/home/john:/bin/bash
+
+
+    Exercise
+
+Some of these scripts have quadratic time complexity.
+
+Add a |-s| flag to |equijoin| and |difference| that assumes the inputs
+have been sorted by |sort| and produces a sorted output.
+
+Show that |-s| can achieve better time complexity.
+
+Then, rewrite the account-deletion example to eliminate Cartesian
+product and use fast |equijoin| instead.
+
+
+    Good resources
+
+Sed and awk have become a lost art. They're the only languages I know
+that frequently beat perl in semantic density. If you haven't learned
+them yet, you'll be impressed with what they can do for you.
+
+I recommend the O'Reilly classic, sed & awk
+<http://www.amazon.com/gp/product/1565922255/ref=as_li_ss_tl?ie=UTF8&tag=mmamzn06-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1565922255>:
+
+
+<http://www.amazon.com/gp/product/1565922255/ref=as_li_ss_il?ie=UTF8&tag=mmamzn06-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=1565922255>
+
+
+I also recommend spending an hour or two going through the advanced bash
+scripting guide <http://tldp.org/LDP/abs/html/> and bash pitfalls
+<http://mywiki.wooledge.org/BashPitfalls>. It's worth the time invested.
+
+If you want a solid theoretical understanding of databases, I recommend
+Date's SQL and Relational Theory
+<http://www.amazon.com/gp/product/0596523068/ref=as_li_ss_tl?ie=UTF8&tag=mmamzn06-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0596523068>:
+
+
+<http://www.amazon.com/gp/product/0596523068/ref=as_li_ss_il?ie=UTF8&tag=mmamzn06-20&linkCode=as2&camp=1789&creative=390957&creativeASIN=0596523068>
+
+
+
+    Related pages
+
+  * Learn Perl by experiment
+    <http://matt.might.net/articles/perl-by-example/>
+  * A quick overview of programming with bash
+    <http://matt.might.net/articles/bash-by-example/>
+  * A short introduction to make
+    <http://matt.might.net/articles/intro-to-make/>
+  * SSH hacks <http://matt.might.net/articles/ssh-hacks/>
+  * Standalone lexers with lex: synopsis, examples, and pitfalls
+    <http://matt.might.net/articles/standalone-lexers-with-lex/>
+  * Sculpting text with regex, grep, sed and awk
+    <http://matt.might.net/articles/sculpting-text/>
+  * Settling into Unix <http://matt.might.net/articles/settling-into-unix/>
+  * A survival guide for Unix beginners
+    <http://matt.might.net/articles/basic-unix/>
+  * Console productivity hack: Exploiting task frequency
+    <http://matt.might.net/articles/console-hacks-exploiting-frequency/>
+  * HOWTO: Word, Excel and PowerPoint without MS Office
+    <http://matt.might.net/articles/how-to-read-and-create-microsoft-word-documents-excel-spreadsheets-powerpoint-presentations-without-microsoft-office/>
+  * Tips, tricks and tools for Linux and Unix
+    <http://matt.might.net/articles/best-tools-for-using-and-learning-linux-and-unix/>
+
+------------------------------------------------------------------------
+[article index <https://matt.might.net/articles/>] [email me
+<mailto:matt-blog@might.net>] [@mattmight
+<http://twitter.com/mattmight>] [rss
+<https://matt.might.net/articles/feed.rss>]
+*Latest:* HOWTO: Get tenure <https://matt.might.net/articles/tenure/>
+*Next:* Sculpting text with regex, grep, sed and awk
+<https://matt.might.net/articles/sculpting-text/>
+*Prev:* Settling into Unix
+<https://matt.might.net/articles/settling-into-unix/>
+*Rand:* Counting hash collisions with the birthday paradox
+<https://matt.might.net/articles/counting-hash-collisions/>
+matt.might.net is powered by *linode
+<http://www.linode.com/?r=bf5d4e7c8a1af61855b5227279a6744c3bde8a8a>* |
+legal information <https://matt.might.net/articles/legal/>
+
+Hide Download Bar
+Ctrl + Shift + Z = Show/Hide Download Bar
+Downloads
+Download Manager (S3)
+Clear
+Left Click: Clear All Finished
+Right Click: Undo last clear
+100%
+Download History
+Download list is empty
+hbash.txt
+Unk.
+Unk.
+136 KB
+455 KB/s
+hbash.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbash.txt
+Status:
+	
+136 KB / Unknown ( 455 KB/s )
+File Size:
+	
+505 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:21:49
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+1.62 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hbashman.txt
+Unk.
+Unk.
+-.--
+-.--
+hbashman.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hbashman.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+398 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:23:48
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+863 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hfilesys.txt
+Unk.
+Unk.
+-.--
+-.--
+hfilesys.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hfilesys.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+122 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:51:42
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+192 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdeblic.txt
+Unk.
+Unk.
+-.--
+-.--
+hdeblic.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdeblic.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+40 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:52:06
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+91 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebdev
+Unk.
+Unk.
+96 KB
+963 KB/s
+hdebdev
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebdev
+Status:
+	
+96 KB / Unknown ( 963 KB/s )
+File Size:
+	
+291 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:11
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+3.60 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebmaint
+Unk.
+Unk.
+79 KB
+395 KB/s
+hdebmaint
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebmaint
+Status:
+	
+79 KB / Unknown ( 395 KB/s )
+File Size:
+	
+322 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:31
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+2.02 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebmaintnew
+100%
+00:00
+54 KB
+538 KB/s
+hdebmaintnew
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebmaintnew
+Status:
+	
+54 KB / 54 KB ( 538 KB/s )
+File Size:
+	
+175 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:53:46
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+1.26 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+debpackaging-tutorial.en.pdf
+100%
+00:00
+388 KB
+3.79 MB/s
+debpackaging-tutorial.en.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\debpackaging-tutorial.en.pdf
+Status:
+	
+388 KB / 388 KB ( 3.79 MB/s )
+File Size:
+	
+388 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:54:09
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+3.91 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hdebconfig
+100%
+00:00
+6 KB
+60 KB/s
+hdebconfig
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hdebconfig
+Status:
+	
+6 KB / 8 KB ( 60 KB/s )
+File Size:
+	
+27 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:54:23
+Time to Complete:
+	
+00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+32 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+debhamradio-maintguide.en.pdf
+100%
+00:00
+193 KB
+Infinity GB/s
+debhamradio-maintguide.en.pdf
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\debhamradio-maintguide.en.pdf
+Status:
+	
+193 KB / 193 KB ( Infinity GB/s )
+File Size:
+	
+193 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 02:57:27
+Time to Complete:
+	
+<00:01
+Time Left:
+	
+00:00
+Percent Done:
+	
+100%
+Average Speed:
+	
+2.58 MB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hgoogbashstyle.txt
+Unk.
+Unk.
+-.--
+-.--
+hgoogbashstyle.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hgoogbashstyle.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+44 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:02:34
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+46 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+hposixsh.txt
+Unk.
+Unk.
+-.--
+-.--
+hposixsh.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\hposixsh.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+177 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:09:12
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+183 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+htextsculpt.txt
+Unk.
+Unk.
+-.--
+-.--
+htextsculpt.txt
+Source:
+	
+From:
+	
+To:
+	
+C:\cmd\htextsculpt.txt
+Status:
+	
+-.-- / Unknown ( -.-- )
+File Size:
+	
+43 KB
+Virus scan:
+	
+Time Start:
+	
+2022.02.24 - 03:10:16
+Time to Complete:
+	
+00:01
+Time Left:
+	
+Unknown
+Percent Done:
+	
+Unknown
+Average Speed:
+	
+47 KB/s
+
+mouse double click: download pause/resume
+mouse middle click: download cancel
+mouse double click: open file
+mouse double click + Ctrl: open dir
+mouse middle click: delete from list
+mouse middle click + Ctrl: delete from system
+press mouse button + Ctrl: drag & drop
+New York, NY, USA
+There was a problem connecting to the weather service.
+Reload Weather Data
+Click for hourly forecast.
+Click to expand
+Click to collapse
+New York, NY, USA : 65°F
+Today : 	
+New York, NY, USA
+Today	2/23/2022
+Clearing
+The temperature approaching the record of 72 ...
+	68°F
+Feels like 69°F
+Sunrise:	6:39 AM
+UV Index:	Moderate (3)
+Sunburn: 45 minutes
+Winds:	7 mph
+Precipitation:	0.01 in
+
+Tonight	2/23/2022
+Partly cloudy and much colder
+	31°F
+Feels like 55°F
+Sunset:	5:40 PM
+Winds:	8 mph
+Precipitation:	0 in
+Moon:	21
+
+68°F
+	31°F
+Tomorrow : 	
+New York, NY, USA
+Tomorrow	2/24/2022
+Mostly cloudy and much colder
+	37°F
+Feels like 39°F
+Sunrise:	6:38 AM
+UV Index:	Low (1)
+Winds:	4 mph
+Precipitation:	0 in
+
+Tomorrow Night	2/24/2022
+A wintry mix late, up to 1 in
+Snow and sleet late in the evening followed b...
+	32°F
+Feels like 28°F
+Sunset:	5:41 PM
+Winds:	4 mph
+Precipitation:	0.6 in
+Moon:	22
+
+37°F
+	32°F
+Friday : 	
+New York, NY, USA
+Friday	2/25/2022
+Cloudy with rain tapering off
+	38°F
+Feels like 34°F
+Sunrise:	6:36 AM
+UV Index:	Low (1)
+Winds:	7 mph
+Precipitation:	0.67 in
+
+Friday Night	2/25/2022
+Clear to partly cloudy
+	22°F
+Feels like 23°F
+Sunset:	5:42 PM
+Winds:	7 mph
+Precipitation:	0 in
+Moon:	23
+
+38°F
+	22°F
+Saturday : 	
+New York, NY, USA
+Saturday	2/26/2022
+Mostly sunny and cold
+	34°F
+Feels like 37°F
+Sunrise:	6:35 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	5 mph
+Precipitation:	0 in
+
+Saturday Night	2/26/2022
+Clear
+	28°F
+Feels like 22°F
+Sunset:	5:43 PM
+Winds:	5 mph
+Precipitation:	0 in
+Moon:	24
+
+34°F
+	28°F
+Sunday : 	
+New York, NY, USA
+Sunday	2/27/2022
+Partly sunny
+	42°F
+Feels like 38°F
+Sunrise:	6:33 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	9 mph
+Precipitation:	0 in
+
+Sunday Night	2/27/2022
+Mainly clear and colder
+Mainly clear and colder; hypothermia likely w...
+	20°F
+Feels like 25°F
+Sunset:	5:45 PM
+Winds:	9 mph
+Precipitation:	0 in
+Moon:	25
+
+42°F
+	20°F
+Monday : 	
+New York, NY, USA
+Monday	2/28/2022
+Colder with plenty of sun
+	29°F
+Feels like 23°F
+Sunrise:	6:32 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	9 mph
+Precipitation:	0 in
+
+Monday Night	2/28/2022
+Clear and cold
+	22°F
+Feels like 7°F
+Sunset:	5:46 PM
+Winds:	4 mph
+Precipitation:	0 in
+Moon:	26
+
+29°F
+	22°F
+Tuesday : 	
+New York, NY, USA
+Tuesday	3/1/2022
+Partly sunny and not as cold
+	43°F
+Feels like 46°F
+Sunrise:	6:30 AM
+UV Index:	Moderate (4)
+Sunburn: 45 minutes
+Winds:	5 mph
+Precipitation:	0 in
+
+Tuesday Night	3/1/2022
+Partly cloudy
+	37°F
+Feels like 29°F
+Sunset:	5:47 PM
+Winds:	4 mph
+Precipitation:	0 in
+Moon:	27
+
+43°F
+	37°F
+
