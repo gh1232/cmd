@@ -61,6 +61,7 @@ filetype plugin indent on
 hi Normal guifg=White guibg=Black
 set titlestring=%F_%l/%L
 au GUIEnter * simalt ~x
+nnoremap q <esc>:q<cr> 
 nnoremap <space> <c-f> 
 set hlsearch
 nnoremap <c-t> gg
@@ -88,14 +89,14 @@ nnoremap <c-d> :browse :sav<enter>
 inoremap <c-d> <esc>:browse :sav<enter>
 nmap <c-2> :set guifont=Font\ Awesome\ 24<enter>
 nmap <m-f> :set guifont=* <enter>
-nnoremap <leader>F2 :set gfn=Lucida_Console:h32:cANSI <enter>
-nnoremap <leader>F1 :set gfn=Lucida_Console:h30:cANSI <enter>
-nnoremap <leader>F6 :set gfn=Lucida_Console:h26:cANSI <enter>
-nnoremap <leader>F8 :set gfn=Lucida_Console:h28:cANSI <enter>
-nnoremap <leader>F5 :set gfn=Lucida_Console:h15:cANSI <enter>
-nnoremap <leader>F0 :set gfn=Lucida_Console:h20:cANSI <enter>
-nnoremap <leader>F4 :set gfn=Lucida_Console:h14:cANSI <enter>
-nnoremap <leader>F9 :set gfn=Lucida_Console:h9:cANSI <enter>
+nnoremap <leader>f2 :set gfn=Lucida_Console:h32:cANSI <enter>
+nnoremap <leader>f1 :set gfn=Lucida_Console:h30:cANSI <enter>
+nnoremap <leader>f6 :set gfn=Lucida_Console:h26:cANSI <enter>
+nnoremap <leader>f8 :set gfn=Lucida_Console:h28:cANSI <enter>
+nnoremap <leader>f5 :set gfn=Lucida_Console:h15:cANSI <enter>
+nnoremap <leader>f0 :set gfn=Lucida_Console:h20:cANSI <enter>
+nnoremap <leader>f4 :set gfn=Lucida_Console:h14:cANSI <enter>
+nnoremap <leader>f9 :set gfn=Lucida_Console:h9:cANSI <enter>
 set hi=20
 set gfn=Lucida_Console:h30:cANSI
 nmap <c--> :hi Normal guifg=White guibg=Black
@@ -137,12 +138,12 @@ set fileformats=dos,unix,mac
 "set timeoutlen=5000
 
 noremap <leader>\f :Files<CR>
-noremap <leader>ve :edit g:\bin\vimkeys.vim <cr>G
+noremap <leader>v :edit c:\cmd\vimkeys.vim <cr>G
 
-nnoremap <leader>Cw :hi Normal guifg=White guibg=Black <cr>
-nnoremap <leader>Cb :hi Normal guifg=Black guibg=lightgray <cr>
+nnoremap <leader>cw :hi Normal guifg=White guibg=Black <cr>
+nnoremap <leader>cb :hi Normal guifg=Black guibg=lightgray <cr>
 
-nnoremap <leader>F8 :set gfn=Lucida_Console:h28:cANSI <enter>
+nnoremap <leader>f8 :set gfn=Lucida_Console:h28:cANSI <enter>
 nnoremap <leader>nt :set number!<cr>
 nnoremap <leader>o :bro ol<cr>
 nnoremap <leader>wh :sp<cr>

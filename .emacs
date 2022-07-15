@@ -1,5 +1,5 @@
 ;(set-default-font "Lucinda 24")
-(set-face-attribute 'default nil :height 300)
+(set-face-attribute 'default nil :height 200)
 ;(custom-set-faces
 ; '(default ((t (:family "Courier New" :foundry "outline" :slant normal :weight normal :height 203 :width normal)))))
 (setq visible-bell t)
@@ -175,9 +175,13 @@ With prefix ARG, silently save all file-visiting buffers, then kill."
    :demand t
    :config 
 (which-key-mode))
-(use-package racer 
-:ensure t
-  :demand t)
+
+
+(use-package evil
+
+ :config (evil-mode 1))
+
+
 ;(custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -201,104 +205,11 @@ With prefix ARG, silently save all file-visiting buffers, then kill."
   (recentf-mode t)
   :diminish nil)
 
-;; Display possible completions at all places
-;; Enhance M-x to allow easier execution of commands
-'(use-package smex
-  :ensure t
-  ;; Using counsel-M-x for now. Remove this permanently if counsel-M-x works better.
-  :disabled t
-  :config
-  (setq smex-save-file (concat user-emacs-directory ".smex-items"))
-  (smex-initialize)
-  :bind ("M-x" . smex))
-
-;; Git integration for Emacs
 (use-package magit
   :ensure t
   :bind ("C-x g" . magit-status))
-
-;; Better handling of paranthesis when writing Lisps.
-;(use-package paredit
-;  :ensure t
-;  :init
-;  (add-hook 'clojure-mode-hook #'enable-paredit-mode)
-;  (add-hook 'cider-repl-mode-hook #'enable-paredit-mode)
-;  (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
-;  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
-;  (add-hook 'ielm-mode-hook #'enable-paredit-mode)
-;  (add-hook 'lisp-mode-hook #'enable-paredit-mode)
-;  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
-;  (add-hook 'scheme-mode-hook #'enable-paredit-mode)
-;  :config
-;  (show-paren-mode t)
-;  :bind (("M-[" . paredit-wrap-square)
-;         ("M-{" . paredit-wrap-curly))
-;  :diminish nil)
-
-(use-package company
-  :bind (:map company-active-map
-         ("C-n" . company-select-next)
-         ("C-p" . company-select-previous))
-  :config
-  (setq company-idle-delay 0.3)
-  (global-company-mode t)
-(company-mode 1)  
-(add-hook 'after-init-hook 'global-company-mode)
-  )
-
-   (use-package magit
-  :ensure t
-  :bind ("C-x g" . magit-status))
-
-;(use-package auto-complete
-;:config 
-; (auto-complete-mode 1))
-
-(use-package flycheck
-  :ensure t
-  :init
-  (global-flycheck-mode t)
-  )
-
-  (use-package try :ensure t)
-
-
-
-
-'(use-package ido-completing-read+
-  :ensure t
-  :config
-  ;; This enables ido in all contexts where it could be useful, not just
-  ;; for selecting buffer and file names
-  (ido-mode t)
-  (ido-everywhere t)
-  ;; This allows partial matches, e.g. "uzh" will match "Ustad Zakir Hussain"
-  (setq ido-enable-flex-matching t)
-  (setq ido-use-filename-at-point nil)
-  ;; Includes buffer names of recently opened files, even if they're not open now.
-  (setq ido-use-virtual-buffers t)
-  )
-
-;(load-file (concat spacemacs-start-directory "init.el"))
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(hi-blue-b ((t (:foreground "yellow" :weight bold)))))
-
-'(use-package evil
-
- :config (evil-mode 1))
-;(load-file "./cmd/fkey.el")
-;(load-file "./cmd/f5key.el")
-
-(add-to-list 'load-path "~/.emacs.d/elpa/xah-fly-keys/")
-(require 'xah-fly-keys)
-(xah-fly-keys-set-layout "qwerty") ; required
-;; possible layout values: azerty, azerty-be, colemak, colemak-mod-dh, dvorak, programer-dvorak, qwerty, qwerty-abnt, qwerty-no (qwerty Norwegian), qwertz, workman, norman,
-
+;; Display possible completions at all places
+;; Enhance M-x to allow easier execution of commands
 (global-set-key (kbd "<f5>") nil)
 (global-set-key (kbd "<f5>1") 'save-buffers-kill-terminal)
 (global-set-key (kbd "<f5>qq") 'my-kill-emacs)
@@ -1070,4 +981,93 @@ With prefix ARG, silently save all file-visiting buffers, then kill."
 ;comment-region
 ;menu-bar
 
+
+(use-package racer 
+:ensure t
+  :demand t)
+'(use-package smex
+  :ensure t
+  ;; Using counsel-M-x for now. Remove this permanently if counsel-M-x works better.
+  :disabled t
+  :config
+  (setq smex-save-file (concat user-emacs-directory ".smex-items"))
+  (smex-initialize)
+  :bind ("M-x" . smex))
+
+;; Git integration for Emacs
+
+;; Better handling of paranthesis when writing Lisps.
+;(use-package paredit
+;  :ensure t
+;  :init
+;  (add-hook 'clojure-mode-hook #'enable-paredit-mode)
+;  (add-hook 'cider-repl-mode-hook #'enable-paredit-mode)
+;  (add-hook 'emacs-lisp-mode-hook #'enable-paredit-mode)
+;  (add-hook 'eval-expression-minibuffer-setup-hook #'enable-paredit-mode)
+;  (add-hook 'ielm-mode-hook #'enable-paredit-mode)
+;  (add-hook 'lisp-mode-hook #'enable-paredit-mode)
+;  (add-hook 'lisp-interaction-mode-hook #'enable-paredit-mode)
+;  (add-hook 'scheme-mode-hook #'enable-paredit-mode)
+;  :config
+;  (show-paren-mode t)
+;  :bind (("M-[" . paredit-wrap-square)
+;         ("M-{" . paredit-wrap-curly))
+;  :diminish nil)
+
+(use-package company
+  :bind (:map company-active-map
+         ("C-n" . company-select-next)
+         ("C-p" . company-select-previous))
+  :config
+  (setq company-idle-delay 0.3)
+  (global-company-mode t)
+(company-mode 1)  
+(add-hook 'after-init-hook 'global-company-mode)
+  )
+
+;(use-package auto-complete
+;:config 
+; (auto-complete-mode 1))
+
+(use-package flycheck
+  :ensure t
+  :init
+  (global-flycheck-mode t)
+  )
+
+  (use-package try :ensure t)
+
+
+
+
+'(use-package ido-completing-read+
+  :ensure t
+  :config
+  ;; This enables ido in all contexts where it could be useful, not just
+  ;; for selecting buffer and file names
+  (ido-mode t)
+  (ido-everywhere t)
+  ;; This allows partial matches, e.g. "uzh" will match "Ustad Zakir Hussain"
+  (setq ido-enable-flex-matching t)
+  (setq ido-use-filename-at-point nil)
+  ;; Includes buffer names of recently opened files, even if they're not open now.
+  (setq ido-use-virtual-buffers t)
+  )
+
+;(load-file (concat spacemacs-start-directory "init.el"))
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(hi-blue-b ((t (:foreground "yellow" :weight bold)))))
+
+;(load-file "./cmd/fkey.el")
+;(load-file "./cmd/f5key.el")
+
+(add-to-list 'load-path "~/.emacs.d/elpa/xah-fly-keys/")
+(require 'xah-fly-keys)
+(xah-fly-keys-set-layout "qwerty") ; required
+;; possible layout values: azerty, azerty-be, colemak, colemak-mod-dh, dvorak, programer-dvorak, qwerty, qwerty-abnt, qwerty-no (qwerty Norwegian), qwertz, workman, norman,
 

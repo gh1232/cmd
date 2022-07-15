@@ -1,0 +1,219 @@
+<html>
+  <head>
+ <base target="_blank">
+
+    <script>
+      function newLinkButtons (n){
+        let dn=["dr" ,"dn","de","ds","dw"];
+        let vn=["vr" ,"vn","ve","vs","vw"];
+        let bn="";
+        let bs="";
+        dn.forEach((v,j)=>{
+          vn.forEach((v2,j1) =>{
+            bn= v + v2;
+            for (var i=1;i<=n;i++){
+              bs= "<button name=\"" + bn + "\" value=\"" + bn + "\" size='5' />";
+              console.log(bs);
+              document.body.innerHTML += bs ;
+            }
+          })
+        });
+      }
+function newLinks1(nn,diff){
+  let bnn=1;
+  let dn=["N","E","S","W"];
+  let vn=["NS","EW","none","all"];
+  let bn="";
+  let bs="";
+  let d =[ '2','3','4','5','6','7','8','9','T','J','Q','K','A'];
+  let c=[13,13,13,13]; 
+  let h=["" ,"", "", ""];
+  let r=0; let rr=r;
+  for (x=1;x<=4;x++){
+    for (y=12;y>=0;y--){
+      r=Math.floor(Math.random() * 4); 
+      console.log(r);
+      let rr=r; 
+      while(1){
+        if (c[r]<=0){
+          r=(r +1) % 4; 
+          //r=Math.floor(Math.random() * 4); 
+          if(rr==r) { break;}
+
+        } else { break; }
+
+      }
+      h[r] += d[y];
+      c[r]--;
+    }
+    bnn=r+1;
+    if (x<=3){
+      for (i=0;i<=3;i++){
+        h[i] += "."; console.log(h[i]);
+      }
+    }
+
+  }
+  let rdn=Math.floor(Math.random() * 4); 
+  let rvn=Math.floor(Math.random() * 4); 
+  let vdn=dn[rdn];
+  let vvn=vn[rvn];
+  if (nn==1){
+
+    as="https://dds.bridgewebs.com/bsol1/ddummy.htm?&dealer="+vdn+"&vul="+vvn+"&north="+h[0]+"&east="+h[1]+"&south="+h[2]+"&west="+h[3]+"&analyse=true&board="+bnn;
+    //document.body.innerHTML=as;
+    window.location=as;
+  } else {
+    if (diff==0){
+      document.body.innerHTML += "</br>\n" + bnn + "</br>\n"+ h[0] + " </br>\n " +h[1] + " </br>\n " +h[2] + " </br>\n " +h[3] + "</br>\n ";
+
+      dn.forEach((v,j)=>{
+        vn.forEach((v2,j1) =>{
+          an= v + v2;
+          as= "<a name=\"" + an + "\"" + "href=\"" + "https://dds.bridgewebs.com/bsol1/ddummy.htm?&dealer="+v+"&vul="+v2+"&north="+h[0]+"&east="+h[1]+"&south="+h[2]+"&west="+h[3]+"&analyse=true&board="+bnn+"\">" + v + " " + v2 + "</a>";
+          console.log(as);
+          document.body.innerHTML += as + "</br>\n";
+        })
+      })
+    } else {
+      for (x=1;x<=diff;x++){
+        let h=["" ,"", "", ""];
+        for (x=1;x<=4;x++){
+          for (y=12;y>=0;y--){
+            r=Math.floor(Math.random() * 4); 
+            console.log(r);
+            let rr=r; 
+            while(1){
+              if (c[r]<=0){
+                r=(r +1) % 4; 
+                //r=Math.floor(Math.random() * 4); 
+                if(rr==r) { break;}
+              } else { break; }
+            }
+            h[r] += d[y];
+            c[r]--;
+          }
+          bnn=r+1;
+          if (x<=3){
+            for (i=0;i<=3;i++){
+              h[i] += "."; console.log(h[i]);
+            }
+          }
+
+
+          let rdn=Math.floor(Math.random() * 4); 
+          let rvn=Math.floor(Math.random() * 4); 
+          let vdn=dn[rdn];
+          let vvn=vn[rvn];
+
+          an= vdn + vvn;
+          as= "<a name=\"" + an + "\"" + "href=\"" + "https://dds.bridgewebs.com/bsol1/ddummy.htm?&dealer="+vdn+"&vul="+vvn+"&north="+h[0]+"&east="+h[1]+"&south="+h[2]+"&west="+h[3]+"&analyse=true&board="+bnn+"\">" + vdn + " " + vvn + "</a>";
+          //console.log(as);
+          as += " " + bnn + " "+ h[0] + " " +h[1] + " " +h[2] + " " +h[3];
+          document.body.innerHTML += as + "</br>\n";
+
+        }
+      }
+    }
+  }
+}
+function newLinks2(nn,num,diff){
+  let bnn=1;
+  let dn=["N","E","S","W"];
+  let vn=["NS","EW","none","all"];
+  let d =[ '2','3','4','5','6','7','8','9','T','J','Q','K','A'];
+
+  for (xx=1;xx<=num;xx++){
+
+    let c=[13,13,13,13]; 
+    let h=["" ,"", "", ""];
+    let r=0; let rr=r;
+    let bn="";
+    let bs="";
+    for (x=1;x<=4;x++){
+      for (y=12;y>=0;y--){
+        r=Math.floor(Math.random() * 4); 
+        console.log(r);
+        let rr=r; 
+        while(1){
+          if (c[r]<=0){
+            r=(r +1) % 4; 
+            //r=Math.floor(Math.random() * 4); 
+            if(rr==r) { break;}
+
+          } else { break; }
+
+        }
+        h[r] += d[y];
+        c[r]--;
+      }
+      bnn=r+1;
+      if (x<=3){
+        for (i=0;i<=3;i++){
+          h[i] += "."; console.log(h[i]);
+        }
+      }
+
+    }
+    let rdn=Math.floor(Math.random() * 4); 
+    let rvn=Math.floor(Math.random() * 4); 
+    let vdn=dn[rdn];
+    let vvn=vn[rvn];
+    if (nn==1){
+
+      as="https://dds.bridgewebs.com/bsol1/ddummy.htm?&dealer="+vdn+"&vul="+vvn+"&north="+h[0]+"&east="+h[1]+"&south="+h[2]+"&west="+h[3]+"&analyse=true&board="+bnn;
+      //document.body.innerHTML=as;
+      window.location=as;
+    } else {
+      if (diff==0){
+        document.body.innerHTML += "</br>\n" + bnn + "</br>\n"+ h[0] + " </br>\n " +h[1] + " </br>\n " +h[2] + " </br>\n " +h[3] + "</br>\n ";
+
+        dn.forEach((v,j)=>{
+          vn.forEach((v2,j1) =>{
+            an= v + v2;
+            as= "<a  name=\"" + an + "\"" + "href=\"" + "https://dds.bridgewebs.com/bsol1/ddummy.htm?&dealer="+v+"&vul="+v2+"&north="+h[0]+"&east="+h[1]+"&south="+h[2]+"&west="+h[3]+"&analyse=true&board="+bnn+"\">" + v + " " + v2 + "</a>";
+            console.log(as);
+            document.body.innerHTML += as + "</br>\n";
+          })
+        })
+      } else {
+        let rdn=Math.floor(Math.random() * 4); 
+        let rvn=Math.floor(Math.random() * 4); 
+        let vdn=dn[rdn];
+        let vvn=vn[rvn];
+
+        an= vdn + vvn;
+        as= "<a name=\"" + an + "\"" + "href=\"" + "https://dds.bridgewebs.com/bsol1/ddummy.htm?&dealer="+vdn+"&vul="+vvn+"&north="+h[0]+"&east="+h[1]+"&south="+h[2]+"&west="+h[3]+"&analyse=true&board="+bnn+"\">" + vdn + " " + vvn ;
+        //console.log(as);
+        as += " " + bnn + " "+ h[0] + " " +h[1] + " " +h[2] + " " +h[3]+ "</a>";
+        document.body.innerHTML +=as + "</br>\n";
+
+      }
+    }
+  }
+}
+  </script> </head>
+  <body name=bod onload="newLinks2(0,3,1);">
+
+    dealer=random
+    dealer=n
+    dealer=e
+    dealer=s
+    dealer=w
+    vul=random 
+    vul=none
+    vul=ew
+    vul=ns
+    vul=both
+    </br>
+    </br>
+    </br>
+    </br>
+
+
+
+  </body>
+
+
+
+</html>
