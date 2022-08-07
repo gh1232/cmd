@@ -1,0 +1,54 @@
+"key maps
+inoremap kj <ESC>
+
+nnoremap L $
+nnoremap H ^
+
+nnoremap <C-]> >>
+nnoremap <C-[> <<
+
+vnoremap <C-]> >gv
+vnoremap <C-[> <gv
+
+" clipboard
+set clipboard=unnamedplus
+
+" encoding
+set encoding=utf-8
+set fileencodings=utf-8
+set ambw=double
+set t_u7=
+
+"white space visible
+set list
+"show line number
+set number
+
+"indent
+set autoindent
+set smartindent
+
+"command bar
+set laststatus
+set showmode
+set showcmd
+set ruler
+set wildmenu
+
+"search
+set smartcase
+set hlsearch
+
+" tab
+set tabstop=4
+set shiftwidth=4
+
+"ntrw
+let g:netrw_liststyle=3
+let g:netrw_banner=0
+let g:netrw_browse_split=3
+
+" Color scheme
+" syntax enable
+" colorscheme codedark
+

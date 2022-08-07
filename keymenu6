@@ -508,10 +508,8 @@ global urls1 := []
 global cons1 := []
 global km :=[] 
 global mb := "msgbox hi"
-global mab2 := ""
-global mabx := ""
-global allmabx := ""
-global allmab2 := ""
+global mab := ""
+global allmab := ""
 global mab1 := ""
 global allmab1 := ""
 global wincmds := []
@@ -559,25 +557,6 @@ s := ""
     }
   }
 }
-addMenuy(m,r,a*){
-  m[a] := r
-    return m
-}
-addMenuz(m,r,a*){
-l := a.length() - 1
-loop l  {
-aa := l - 1 
-  m[aa] := r
-}
-    return m
-}
-addMenux(m,r,a*){
-for index, param in a* {
-
-  m[aa] := r
-}
-    return m
-}
 hideMenu(m){
   gui, destroy 
 }
@@ -595,9 +574,9 @@ mab1 := m[a]
 }
 addMenu2(m,a,b,r){
   if m[a,b] {
-mab2 := m[a,b]
+mab := m[a,b]
        ; Transform, mab , Deref,  %kkk%
-       allmab2 := allmab2 . " " . a . " - " . b . " - " . mab2 . " = " . r . " `n"   
+       allmab := allmab . " " . a . " - " . b . " - " . mab . " = " . r . " `n"   
        return m 
   } 
   m[a,b] := r
@@ -880,62 +859,6 @@ runcmd(c)
 
 }
 
-keymenux(mm,wb="",mn:="")
-{
-  if (mn=""){
-   showMenu(mm)
-  } else {
-    showMenu(mn)
-  }
-  soundbeep
-    Input, kk, L1 c
-    ;msgbox, %kk%     
-    ;      input,kk2, L1 c 
-    hideMenu("")
-    if (kk ="["){
-      keymenux(os1)
-    }   
-    else if (kk ="]"){
-      keymenux(tvs1)
-    }   
-    else if (kk =";"){
-      keymenux(apps1)
-    }   
-    else if (kk ="'"){
-      keymenux(apps2)
-    }   
-    else if (kk ="-"){
-      winkeymenu1(wincmds)
-    } 
-    else if (kk ="="){
-      winkeymenu1(wincmds2)
-    } 
-    else if (kk ="\\"){
-      keymenux(wincmds3)
-    } 
-    else if (kk =","){
-      keymenux(apps7)
-    } 
-    else if (kk ="."){
-      keymenux(urls1)
-    } 
-    else if (kk ="/"){
-      keymenux(ext3)
-    } 
-    else {
-lll := mm[kk].Length()
-
-      if (lll <= 1) {
-
-      keymenu1(mm[kk],wb)
-      }
-      else {
-      keymenux(mm[kk],wb)
-      }
-      } 
-  return ; 
-
-}
 global menu2 := []
 
 menu2["n"] := "news"
@@ -980,22 +903,6 @@ lvl1["'"] := "apps2"
 lvl1["]"] := "apps7"
 lvl1["."] := "tvs1"
 lvl1["/"] := "extra3"
-
-global mmmm := []
-;(mmmm, eg, "a" ,"g" )
-
-;addMenuy(mmmm, eg, "b" ,"g","g" )
-;addMenuy(mmmm, eg, "c" ,"g" )
-;addMenuy(mmmm, eg, "d" ,"g" )
-;addMenuy(mmmm, eg, "e" ,"g" )
-
-
-mmmm["a","g"] := eg 
-mmmm["b","g"] := eg
-mmmm["c","b","g"] := eg
-
-
-
 addMenu2(lvl2,"k","x" ,"powershell.exe -Command 'Start-Process cmd /k cd /d c:\a\' -Verb RunAs")
 addMenu2(lvl2,"k","o" ,"powershell.exe -Command 'Start-Process powershell' -Verb RunAs")
 addMenu2(lvl2,"k","i" ,"%windir%\system32\WindowsPowerShell\v1.0\PowerShell_ISE.exe")
@@ -1613,7 +1520,7 @@ addMenu2(apps7,"g","p","G:\game\PokerStars\PokerStarsUpdate.exe")
 addMenu2(urls1,"s","n","%psport% https://www.covers.com/sport/football/nfl/printsheet")
 addMenu2(apps2,"u","l",getexec("UltraVNC\vncviewer.exe", "-dsmplugin SecureVNCPlugin.dsm -listen" . %uvncp%))
 addMenu2(apps2,"u","v",getexec("UltraVNC\vncviewer.exe"))
-;gourl("walmart.ca/search/")
+gourl("walmart.ca/search/")
 addMenu2(urls1,"n","l","%wep1y% https://www.youtube.com/results?search_query=news+live")
 addMenu2(apps7,"h","s","%predir%AHK-Studio.ahk")
 addMenu2(apps7,"e","s","%predir%AutoIt3\SciTE\SciTE.exe")
@@ -2192,15 +2099,15 @@ addMenu2(cons1,"]","e","%wt% https://www.erasingtheliberty.com/")
 >!#^f10:: run %ev% %A_ScriptFullPath%
   ; nowork <^f5:: run hi()
   appskey:: keymenu2(lvl2,wtb1)
-  >^appskey:: keymenux(mmmm,wtb1)
-  !appskey:: keymenu1(lvl1,wtb1)
-  ^+appskey:: keymenu2(apps7,wt,menu2)
+  ;appskey:: keymenu1(lvl1,wtb1)
+  !appskey:: keymenu2(apps7,wt,menu2)
 !+appskey:: keymenu2(apps1,wt,menu2)
 #+appskey:: keymenu2(apps2,wt,menu2)
 #appskey:: keymenu2(urls1,wt,menu2)
-  >^!#appskey:: keymenu2(tvs1,wt,menu2)
+  ^appskey:: keymenu2(tvs1,wt,menu2)
   >#appskey:: keymenu2(tvs1,wt,menu2)
   >!appskey:: keymenu2(tvs1,wo,menu2)
 >#!appskey:: keymenu2(tvs1,we,menu2)
-  ;msgbox %allmab2%
+ msgbox %urls1%["t"] 
+  ;msgbox %allmab%
   ;msgbox %allmab1%

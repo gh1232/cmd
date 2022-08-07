@@ -1,0 +1,27 @@
+" Autoload .vimrc when saving
+" autocmd! bufwritepost .vimrc source %
+
+" History
+"" set history=700
+"" set undolevels=700
+
+" Tabs and spaces
+"" set tabstop=4
+"" set softtabstop=4
+"" set shiftwidth=4
+"" set shiftround
+"" set expandtab
+
+" Search case insenstive
+"" set hlsearch
+"" set incsearch
+"" set ignorecase
+"" set smartcase
+
+" show line numbers and length
+"" set number " show line numbers
+"" set tw=79 " witdh of document (used by gd)
+"" set nowrap " don't automatically wrap on load
+"" set fo-=t " don't automatically wrap text when typing
+"" set colorcolumn=80
+"" highlight ColorColumn ctermbg=233

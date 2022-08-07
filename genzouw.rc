@@ -1,0 +1,128 @@
+syntax on
+
+" Bundle
+filetype off
+
+set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
+
+Bundle 'gmarik/vundle'
+Bundle 'mattn/zencoding-vim'
+Bundle 'othree/eregex.vim'
+Bundle 'scrooloose/nerdtree'
+Bundle 'Shougo/neocomplcache'
+Bundle 'Shougo/neocomplcache-snippets-complete'
+Bundle 't9md/vim-quickhl'
+Bundle 'thinca/vim-visualstar'
+Bundle 'tpope/vim-fugitive'
+Bundle 'tpope/vim-repeat'
+Bundle 'tpope/vim-speeddating'
+Bundle 'tyru/open-browser.vim'
+Bundle 'mfollett/groovy.vim'
+Bundle 'mattn/gist-vim'
+Bundle 'mattn/webapi-vim'
+
+Bundle 'DrawIt'
+Bundle 'mru.vim'
+Bundle 'MultipleSearch'
+Bundle 'quickrun'
+Bundle 'surround.vim'
+
+
+" 起動時に有効
+let g:neocomplcache_enable_at_startup = 1
+" snippet ファイルの保存先
+let g:neocomplcache_snippets_dir='~/.vim/snippets'
+" dictionary
+let g:neocomplcache_dictionary_filetype_lists = {
+    \ 'default' : '',
+    \ 'objc' : $HOME . '/.vim/dict/objc.dict'
+\ }
+" 補完候補の数
+let g:neocomplcache_max_list = 50
+" 1番目の候補を自動選択
+let g:neocomplcache_enable_auto_select = 1
+" 大文字が入力されるまで大文字小文字の区別を無視する
+let g:neocomplcache_enable_smart_case = 1
+let g:neocomplcache_enable_underbar_completion = 1
+"let g:neocomplcache_enable_camel_case_completion  =  1
+" シンタックスをキャッシュするときの最小文字長
+let g:neocomplcache_min_syntax_length = 3
+ 
+" 辞書読み込み
+noremap  <Space>d. :<C-u>NeoComplCacheCachingDictionary<Enter>
+" <TAB> completion.
+inoremap <expr><TAB> pumvisible() ? "\<C-n>" : "\<TAB>"
+
+" C-jでオムニ補完
+inoremap <expr> <C-j> &filetype == 'vim' ? "\<C-x>\<C-v>\<C-p>" : "\<C-x>\<C-o>\<C-p>"
+"" C-kを押すと行末まで削除
+inoremap <C-k> <C-o>D
+" C-nでneocomplcache補完
+inoremap <expr><C-n>  pumvisible() ? "\<C-n>" : "\<C-x>\<C-u>\<C-p>"
+" C-pでkeyword補完
+inoremap <expr><C-p> pumvisible() ? "\<C-p>" : "\<C-p>\<C-n>"
+" 補完候補が表示されている場合は確定。そうでない場合は改行
+inoremap <expr><CR>  pumvisible() ? neocomplcache#close_popup() : "<CR>"
+" 補完をキャンセル
+inoremap <expr><C-e>  neocomplcache#close_popup()
+
+imap <expr><TAB> neocomplcache#sources#snippets_complete#expandable() ? "\<Plug>(neocomplcache_snippets_force_expand)" : pumvisible() ? "\<C-n>" : "\<TAB>"
+smap <expr><TAB> neocomplcache#sources#snippets_complete#expandable() ? "\<Plug>(neocomplcache_snippets_force_expand)" : pumvisible() ? "\<C-n>" : "\<TAB>"
+
+"let g:NeoComplCacheAutoCompletionLength=2
+
+
+let g:NERDTreeShowBookmarks=1
+
+"augroup txt_group
+"    autocmd!
+"    autocmd FileType text set noexpandtab
+"augroup END
+
+augroup nerdtree
+    autocmd!
+"    autocmd VimEnter * NERDTree
+"    let g:winexpand=0
+"    function! s:winexpand_toggle()
+"        if g:winexpand == 0
+"            call winsize(100,100)
+"            let g:winexpand = 1
+"        else
+"            call winsize 50 500
+""            :60<c-w><
+"            let g:winexpand = 0<CR>
+"        endif
+"    endfunction
+"    autocmd FileType nerdtree noremap <SPACE> :call <SID>winexpand_toggle()<CR>
+    if !exists('g:proj_window_width')
+        let g:proj_window_width=31              " Default project window width
+    endif
+    if !exists('g:proj_window_increment')
+        let g:proj_window_increment=100         " Project Window width increment
+    endif
+    if !exists('g:proj_flags')
+        if has("win32") || has("mac")
+            let g:proj_flags='imst'             " Project default flags for windows/mac
+        else
+            let g:proj_flags='imstb'            " Project default flags for everything else
+        endif
+    endif
+    nnoremap <silent> <SPACE>  \|:silent exec 'vertical resize '.(match(g:proj_flags, '\Ct')!=-1 && winwidth('.') > g:proj_window_width?(g:proj_window_width):(winwidth('.') + g:proj_window_increment))<CR>
+augroup END
+
+let g:quickrun_config = {}
+let g:quickrun_config.groovy = {'command' : 'groovy', 'cmdopt' : ''}
+
+filetype plugin indent on
+
+
+scriptencoding utf-8
+
+augroup highlightIdegraphicSpace
+    autocmd!
+    autocmd ColorScheme * highlight IdeographicSpace term=underline ctermbg=DarkGreen guibg=DarkGreen
+    autocmd VimEnter,WinEnter * match IdeographicSpace /　/
+augroup END
+
+colorscheme delek

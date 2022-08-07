@@ -1,0 +1,3 @@
+source c:\cmd\vimkeys.vim
+set packpath+=c:\pack
+

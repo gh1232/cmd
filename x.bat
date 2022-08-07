@@ -4,27 +4,27 @@ if "%1" == "/a" (
   set /p user="user:"
   rem    set /p pwd="password:"
   rem    runas /u:%user% /p:%pwd% %*
- if "%2" == "/l" (
-   shift   
-   goto loginn
- ) else  (
-   shift 
-   runas /u:%user%  %*
- )
+  if "%2" == "/l" (
+    shift   
+    goto loginn
+  ) else  (
+    shift 
+    runas /u:%user%  %*
+  )
 ) else (
- 
- if "%1" == "/l" (
-   shift 
-   goto loginn
- ) else (
-   %*
- )
+
+  if "%1" == "/l" (
+    shift 
+    goto loginn
+  ) else (
+    %*
+  )
 )
 
 
 :loginn 
 shift 
- 
+
 @echo off 
 rem set nl=^
 
