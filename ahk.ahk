@@ -280,11 +280,11 @@ wmove(0,0,1,.7)
   ;>!f7::WinMove,A,,415,0,1050,%wph%
   >!f7:: wmove(0.336,-.01,.665,1)
   >!+f5:: wmove(0.67,0,.3,1)
-  >^f9:: wmove(0,0,.32,1) 
+  >^f9:: wmove(0,0,.32,.5) 
   >^f6:: wmove(-.025,0.40,.32,.7) 
-  >^f7:: wmove(-.025,0.643,.32,.7) 
+  >^f7:: wmove(-.025,0.604,.32,.7) 
   >^f5:: wmove(-.025,0.27,.32,.8) 
->^f8:: wmove(0,0,1,.775) 
+>^f8:: wmove(-.0056,-.01,1.05,.775) 
   ;WinMove,A,,960,0,390,%wph%
   >!+f6:: wmove(0,0.37,.32,.66)
 >!+f8:: wmove(0,-.15,.3,.52)
@@ -303,200 +303,200 @@ wmove(0,0,1,.7)
   f1:: winclose, A
   >+~::  ; 20180728Jul28,Sat20180728Jul28 Sat
   FormatTime, CurrentDateTime,, yyyyMMddMMMdd''ddd-hhmmtt-'finthnote'   ; 20190222043950 oc20190222043955 20190222Feb22Fri
-  sendinput, %CurrentDateTime%
+  send, %CurrentDateTime%
   return
   >+1::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%wtr1st&chknsaltbutr
+  send, %CurrentDateTime%wtr1st&chknsaltbutr
   return
 #!^>+2::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%wtr2nd&chknsaltbutr
+  send, %CurrentDateTime%wtr2nd&chknsaltbutr
   return
   >+e::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%wtr3rd&chknsaltbutr
+  send, %CurrentDateTime%wtr3rd&chknsaltbutr
   return
   >+i::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%pisfl10xx4
+  send, %CurrentDateTime%pisfl10xx4
   return
   >+l::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%loudfridgoff
+  send, %CurrentDateTime%loudfridgoff
   return
   >+n::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%bangup
+  send, %CurrentDateTime%bangup
   return
   >+c::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%chrup
+  send, %CurrentDateTime%chrup
   return
   >+g::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%grumbling
+  send, %CurrentDateTime%grumbling
   return
   >+p::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%polsiren
+  send, %CurrentDateTime%polsiren
   return
   >+x::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%choomup
+  send, %CurrentDateTime%choomup
   return
   >+m::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%boomup
+  send, %CurrentDateTime%boomup
   return
   >+k::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%closup
+  send, %CurrentDateTime%closup
   return
   >+z::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%scrape
+  send, %CurrentDateTime%scrape
   return
   >+w::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%fart
+  send, %CurrentDateTime%fart
   return
   !>+j::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%htron
+  send, %CurrentDateTime%htron
   return
   >+7::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, habovnew
+  send, habovnew
   return
   >+y::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%yawn
+  send, %CurrentDateTime%yawn
   return
   >+j::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%gungup
+  send, %CurrentDateTime%gungup
   return
   >+s::
   formattime, currentdatetime,, hhmm
-  sendinput, %currentdatetime%smbarku
+  send, %currentdatetime%smbarku
   return
   >+d::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%drbang
+  send, %CurrentDateTime%drbang
   return
   >+5::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%tap303.
+  send, %CurrentDateTime%tap303.
   return
   >+6::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%dropup
+  send, %CurrentDateTime%dropup
   return
   >+9::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%drbang290.
+  send, %CurrentDateTime%drbang290.
   return
   >+8::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%drbang308.
+  send, %CurrentDateTime%drbang308.
   return
   >+3::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%drbangchutedrbang303.
+  send, %CurrentDateTime%drbangchutedrbang303.
   return
   >+2::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%wtr2nd&chknbeefpsalt
+  send, %CurrentDateTime%wtr2nd&chknbeefpsalt
   return
   >+4::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%drbang304.
+  send, %CurrentDateTime%drbang304.
   return
   >+f::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%drflap
+  send, %CurrentDateTime%drflap
   return
   >+b::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%bigbarkh
+  send, %CurrentDateTime%bigbarkh
   return
   >+v::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%vroom
+  send, %CurrentDateTime%vroom
   return
   >+o::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%fridgonvsl
+  send, %CurrentDateTime%fridgonvsl
   return
   >+u::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%burp
+  send, %CurrentDateTime%burp
   return
   >+t::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%hwaytalk
+  send, %CurrentDateTime%hwaytalk
   return
   >+r::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%rmfdelrsid 
+  send, %CurrentDateTime%rmfdelrsid 
   return
   >+q::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%==
+  send, %CurrentDateTime%==
   return
   >+a::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%airpl
+  send, %CurrentDateTime%airpl
   return
   ;>#+f12:: msgbox booted at: %bootDa22teTime%
   >+h::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%helic
+  send, %CurrentDateTime%helic
   return
   >+f12::
   FormatTime, CurrentDateTime,, hhmm
-  sendinput, %CurrentDateTime%
+  send, %CurrentDateTime%
   return
   >^+f12::
   FormatTime, CurrentDateTime,, yyyyMMddhhmmss
-  sendinput, %CurrentDateTime%
+  send, %CurrentDateTime%
   return
   >!+f12:: 
   FormatTime, CurrentDateTime,,'soc'yyyyMMddhhmmss 
-  sendinput, %CurrentDateTime%
+  send, %CurrentDateTime%
   return
   >^f12:: 
   FormatTime, CurrentDateTime,, yyyyMMddMMMdd''ddd 
-  sendinput, %CurrentDateTime%
+  send, %CurrentDateTime%
   return
   !f9:: run, c:\cmd\g.bat c:\cmd\rkeys.ahk 
-  !f10:: run,  c:\cmd\g.bat c:\cmd\keymenu.ahk 
-  !f11:: run, c:\cmd\g.bat  c:\cmd\ahk.ahk 
+  !f10:: run,  c:\cmd\g.bat c:\cmd\keymenu.ahk, 
+  !f11:: run, c:\cmd\g.bat  c:\cmd\ahk.ahk, 
   ^f9:: run, c:\cmd\rkeys.ahk 
   ^f10:: run, c:\cmd\keymenu.ahk 
   ^f11:: run, c:\cmd\ahk.ahk 
 #f11:: reload  
-  >^f:: SendInput, lpfkflighton stdclk rmfkfaucon lpf
-  >^o:: SendInput, rmfkfaucoff4x4xx2 lpfkflightoff
+  >^f:: send, lpfkflighton stdclk rmfkfaucon lpf
+  >^o:: Send rmfkfaucoff4x4xx2 lpfkflightoff
   >^w:: 
-  sendinput,    1st sides xx4 fast 
-  sendinput,    2nd sides xx1 fast
-  sendinput,    3rd sides xx4 fast
-  sendinput,    4th sides xx1 fast
+  send,    1st sides xx4 fast 
+  send,    2nd sides xx1 fast
+  send,    3rd sides xx4 fast
+  send,    4th sides xx1 fast
   return 
-  >^p:: sendinput, pprsinbags 
-  >^h:: sendinput, lh2sht4x4xx4 rh2sht4x4xx4
-  >^7:: sendinput, habovnew 4x2 h4x2 habovnew h1s1s xx2 habovnew h6x1s
+  >^p:: send, pprsinbags 
+  >^h:: send, lh2sht4x4xx4 rh2sht4x4xx4
+  >^7:: send, habovnew 4x2 h4x2 habovnew h1s1s xx2 habovnew h6x1s
 
-  >^b:: sendinput, 4bigbwls 
+  >^b:: send, 4bigbwls 
 
-  >^t:: sendinput, throwboxchknlid
-  >^s:: sendinput, saveditto lockscreen kbdin pis, 
+  >^t:: send, throwboxchknlid
+  >^s:: send, saveditto lockscreen kbdin pis, 
 
-  >^u:: sendinput, mthbutr 
+  >^u:: send, mthbutr 
 
-  >^c:: sendinput, crmchees
-  >^4:: sendinput, 4x2s h4x2s
+  >^c:: send, crmchees
+  >^4:: send, 4x2s h4x2s
 
 

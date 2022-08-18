@@ -402,7 +402,7 @@ getwb(wb,num,wp)
 
     } else {
       wbr =  %predir%wb\tb%num%\Browser\firefox -P %wp%  --no-remote -new-tab 
-        
+
         return wbr
     }
   } else if (wb = "mf"){
@@ -471,7 +471,7 @@ global wep4 := getwb("ep","4","ep4")
 
 ; [ep1][ep4 ff1[op1][op4]
 ;[opa][opgx1][prof [tb1]            
-           
+
 ;[aop1t][aop1y] [ep1r]  [ep1std]
 ;[ep1t][ep1y]  [ep4][op1] [op1g] [op1r]
 ;[op1std][op1stdbu] [op1t][op1y] [op4] [op4p][op4r]     
@@ -493,6 +493,7 @@ global ext1 := []
 global ext2 := []
 global ext3 := []
 global apps1 := []
+global apps7 := []
 global apps2 := []
 global os1 := []
 global os2 := []
@@ -547,36 +548,52 @@ x := "Var" . Chr(160)           ; x will contain a non-existing variable name
 showMenu(m){
   if (m=[]){
 
+    return 
   } else {
     if (showMenuEnable = 1){
 s := ""
-     for k,v in m
-       s .= k "     " v "`n"
-         gui new 
-         gui font ,s20
-         Gui, Add, Text,, %s% 
-         Gui, Show
+     llll := m.Length()
+     if (llll <= 1 ){
+       for k,v in m
+         s .= k "     " v "`n"
+           gui new 
+           gui font ,s20
+           Gui, Add, Text,, %s% 
+           Gui, Show
+     }
+     else {
+
+       for k,v in m
+         s .= k "  " v  "`n"
+           gui new 
+           gui font ,s20
+           Gui, Add, Text,, %s% 
+           Gui, Show
+
+     }
+
     }
   }
+  return 
 }
 addMenuy(m,r,a*){
-  m[a] := r
+  m[a*] := r
     return m
 }
 addMenuz(m,r,a*){
-l := a.length() - 1
-loop l  {
+l := a.Length() - 1
+     loop l  {
 aa := l - 1 
-  m[aa] := r
-}
-    return m
+      m[aa] := r
+     }
+   return m
 }
 addMenux(m,r,a*){
-for index, param in a* {
+  for index, param in a* {
 
-  m[aa] := r
-}
-    return m
+    m[a*] := r
+  }
+  return m
 }
 hideMenu(m){
   gui, destroy 
@@ -596,9 +613,9 @@ mab1 := m[a]
 addMenu2(m,a,b,r){
   if m[a,b] {
 mab2 := m[a,b]
-       ; Transform, mab , Deref,  %kkk%
-       allmab2 := allmab2 . " " . a . " - " . b . " - " . mab2 . " = " . r . " `n"   
-       return m 
+        ; Transform, mab , Deref,  %kkk%
+        allmab2 := allmab2 . " " . a . " - " . b . " - " . mab2 . " = " . r . " `n"   
+        return m 
   } 
   m[a,b] := r
     return m
@@ -645,48 +662,48 @@ wb1 := wb
     ;      input,kk2, L1 c 
     ;msgbox, %k
     if (kk ="["){
-        hideMenu("")
-      keymenu2(dirs1)
+      hideMenu("")
+        keymenu2(dirs1)
     }   
     else if (kk ="0"){
-        hideMenu("")
-      keymenu2(cons1)
+      hideMenu("")
+        keymenu2(cons1)
     }   
     else if (kk ="."){
-        hideMenu("")
-      keymenu2(tvs1)
+      hideMenu("")
+        keymenu2(tvs1)
     }   
     else if (kk =";"){
-        hideMenu("")
-      keymenu2(apps1)
+      hideMenu("")
+        keymenu2(apps1)
     }   
     else if (kk ="'"){
-        hideMenu("")
-      keymenu2(apps2)
+      hideMenu("")
+        keymenu2(apps2)
     }   
     else if (kk ="-"){
-        hideMenu("")
-      winkeymenu1(wincmds)
+      hideMenu("")
+        winkeymenu1(wincmds)
     } 
     else if (kk ="="){
-        hideMenu("")
-      winkeymenu1(wincmds2)
+      hideMenu("")
+        winkeymenu1(wincmds2)
     } 
     else if (kk ="\\"){
-        hideMenu("")
-      keymenu1(wincmds3)
+      hideMenu("")
+        keymenu1(wincmds3)
     } 
     else if (kk ="]"){
-        hideMenu("")
-      keymenu2(apps7)
+      hideMenu("")
+        keymenu2(apps7)
     } 
     else if (kk =","){
-        hideMenu("")
-      keymenu2(urls1)
+      hideMenu("")
+        keymenu2(urls1)
     } 
     else if (kk ="/"){
-        hideMenu("")
-      keymenu1(ext3)
+      hideMenu("")
+        keymenu1(ext3)
     } 
     else {
 
@@ -696,6 +713,7 @@ wb1 := wb
         ;thisworksfrom,so
         ;msgbox, %kkk%
         hideMenu("")
+        ;/nmsgbox %kkk% 
         Transform, kkk, Deref,  %kkk%
         run %kkk%
         soundbeep
@@ -776,7 +794,7 @@ wb1 := wb
 keymenu2(mm,wb="",mn:="")
 {
   if (mn=""){
-   showMenu(mm)
+    showMenu(mm)
   } else {
     showMenu(mn)
   }
@@ -879,61 +897,73 @@ runcmd(c)
   }
 
 }
+varIsArray(variabl)
+{
+	if !(variabl[1])
+	{
+		Return 0
+	}
+	Return 1
+}
 
+global kkkkk := ""
+global lll := -3
 keymenux(mm,wb="",mn:="")
 {
-  if (mn=""){
-   showMenu(mm)
+if (!mm){
+ return 
+}
+       if (mn=""){
+    showMenu(mm)
   } else {
     showMenu(mn)
   }
   soundbeep
     Input, kk, L1 c
-    ;msgbox, %kk%     
-    ;      input,kk2, L1 c 
+
     hideMenu("")
-    if (kk ="["){
-      keymenux(os1)
-    }   
-    else if (kk ="]"){
-      keymenux(tvs1)
-    }   
-    else if (kk =";"){
-      keymenux(apps1)
-    }   
-    else if (kk ="'"){
-      keymenux(apps2)
-    }   
-    else if (kk ="-"){
-      winkeymenu1(wincmds)
-    } 
-    else if (kk ="="){
-      winkeymenu1(wincmds2)
-    } 
-    else if (kk ="\\"){
-      keymenux(wincmds3)
-    } 
-    else if (kk =","){
-      keymenux(apps7)
-    } 
-    else if (kk ="."){
-      keymenux(urls1)
-    } 
-    else if (kk ="/"){
-      keymenux(ext3)
-    } 
-    else {
-lll := mm[kk].Length()
+       kkkkk :=  mm[kk]
+       if (kkkkk is string) {
 
-      if (lll <= 1) {
+    
+         Transform, kkkkk, Deref,  %kkkkk%
+        ; msgbox %kkkkk% %wme%
 
-      keymenu1(mm[kk],wb)
-      }
-      else {
-      keymenux(mm[kk],wb)
-      }
-      } 
-  return ; 
+           run %kkkkk%
+        soundbeep
+        return ; 
+       }
+       else {
+           keymenux(mm[kk],wb)
+           return
+       }
+  return  
+
+}
+keymenuy(mm,wb="",mn:="")
+{
+if (!mm){
+ return 
+}
+       if (mn=""){
+    showMenu(mm)
+  } else {
+    showMenu(mn)
+  }
+  soundbeep
+    Input, kk, L1 c
+
+    hideMenu("")
+       kkkkk :=  mm[kk]
+       if (kkkkk is string) {
+           keymenu1(mm[kk],wb)
+         return 
+       }
+       else {
+           keymenuy(mm[kk],wb)
+           return
+       }
+  return  
 
 }
 global menu2 := []
@@ -969,58 +999,69 @@ global menu22 := []
 
 menu22["n"] := "news"
 
-lvl1["0"] := "cons1"
-lvl1["-"] := "wincmd1"
-lvl1["="] := "wincmd2"
-lvl1["\"] := "games1"
-lvl1["["] := "dirs1"
-lvl1[","] := "urls1"
-lvl1[";"] := "apps1"
-lvl1["'"] := "apps2"
-lvl1["]"] := "apps7"
-lvl1["."] := "tvs1"
-lvl1["/"] := "extra3"
+lvl1["0"] := cons1
+lvl1["-"] := wincmd1
+lvl1["="] := wincmd2
+lvl1["\"] := games1
+lvl1["["] := dirs1
+lvl1[","] := urls1
+lvl1[";"] := apps1
+lvl1["'"] := apps2
+lvl1["]"] := apps7
+lvl1["."] := tvs1
+lvl1["/"] := extra3
 
 global mmmm := []
-;(mmmm, eg, "a" ,"g" )
-
-;addMenuy(mmmm, eg, "b" ,"g","g" )
-;addMenuy(mmmm, eg, "c" ,"g" )
-;addMenuy(mmmm, eg, "d" ,"g" )
-;addMenuy(mmmm, eg, "e" ,"g" )
 
 
-mmmm["a","g"] := eg 
-mmmm["b","g"] := eg
-mmmm["c","b","g"] := eg
+lvl2["1","t"] := "%predir%tight\tvnviewer.exe -host=192.168.1.1 -password=yo"
 
 
 
-addMenu2(lvl2,"k","x" ,"powershell.exe -Command 'Start-Process cmd /k cd /d c:\a\' -Verb RunAs")
-addMenu2(lvl2,"k","o" ,"powershell.exe -Command 'Start-Process powershell' -Verb RunAs")
-addMenu2(lvl2,"k","i" ,"%windir%\system32\WindowsPowerShell\v1.0\PowerShell_ISE.exe")
-addMenu2(lvl2,"k","e" ,"explorer")
-addMenu2(lvl2,"k","c" ,"cmd")
-addMenu2(lvl2,"k","l","%cmddir%login.bat")
-addMenu2(lvl2,"k","a","%cmddir%ra.bat %cmddir%login.bat")
-addMenu2(lvl2,"k","k" ,"%predir%clink\clink.bat")
-addMenu2(lvl2,"k","p" ,"powershell")
+mmmm["c"] := cons1
+mmmm["-"] := wincmd1
+mmmm["="] := wincmd2
+mmmm["g"] := games1
+mmmm["f"] := dirs1
+mmmm["u"] := urls1
+mmmm["i"] := urls2
+mmmm["a"] := apps1
+mmmm["s"] := apps2
+mmmm["d"] := apps7
+mmmm["t"] := tvs1
+mmmm["y"] := tvs2
+mmmm["e"] := extra3
+mmmm["q"] := extra1
+mmmm["w"] := extra2
 
-addMenu2(lvl2,"w","t",getwb("tb","1",""))
-addMenu2(lvl2,"w","m",wme)
-addMenu2(lvl2,"w","f",wff1puser)
-addMenu2(lvl2,"w","d" ,wff1puser . " --url  about:about")
 
-addMenu2(lvl2,"e","e",ee271)
-addMenu2(lvl2,"e","g",eg)
-addMenu2(lvl2,"e","n",env)
-addMenu2(lvl2,"e","b",envq)
-addMenu2(lvl2,"e","v",ev)
-addMenu2(lvl2,"y","y" ,"%predir%wb\ep1\application\epic.exe --user-data-dir=%profdir%ep1y https://youtube.com")
+lvl2[","] := mmmm
+addMenu2(lvl2,";","x" ,"powershell.exe -Command 'Start-Process cmd /k cd /d c:\a\' -Verb RunAs")
+addMenu2(lvl2,";","o" ,"powershell.exe -Command 'Start-Process powershell' -Verb RunAs")
+addMenu2(lvl2,";","i" ,"%windir%\system32\WindowsPowerShell\v1.0\PowerShell_ISE.exe")
+addMenu2(lvl2,";","e" ,"explorer")
+addMenu2(lvl2,";","c" ,"cmd")
+addMenu2(lvl2,";","l","%cmddir%login.bat")
+addMenu2(lvl2,";","a","%cmddir%ra.bat %cmddir%login.bat")
+addMenu2(lvl2,";",";" ,"%predir%clink\clink.bat")
+addMenu2(lvl2,";","p" ,"powershell")
+
+addMenu2(lvl2,"[","t",getwb("tb","1",""))
+addMenu2(lvl2,"[","m",wme)
+addMenu2(lvl2,"[","f",wff1puser)
+addMenu2(lvl2,"[","d" ,wff1puser . " --url  about:about")
+
+addMenu2(lvl2,"]","e",ee271)
+addMenu2(lvl2,"]","g",eg)
+addMenu2(lvl2,"]","n",env)
+addMenu2(lvl2,"]","b",envq)
+addMenu2(lvl2,"]","v",ev)
+addMenu2(lvl2,"[","y" ,"%predir%wb\ep1\application\epic.exe --user-data-dir=%profdir%ep1y https://youtube.com")
 addMenu1(lvl1,"w" ,"C:\Program Files\Everything\Everything.exe -connect z@192.168.1.2")
 addMenu1(lvl1,"q" ,"C:\Program Files\Everything\Everything.exe")
-addMenu2(lvl2,"q","q" ,"C:\Program Files\Everything\Everything.exe")
-addMenu2(lvl2,"q","2" ,"C:\Program Files\Everything\Everything.exe -connect z@192.168.1.2")
+addMenu2(lvl2,"/","/" ,"C:\Program Files\Everything\Everything.exe")
+addMenu2(lvl2,"/","v" ,"C:\a\vifm\vifm")
+addMenu2(lvl2,"/","2" ,"C:\Program Files\Everything\Everything.exe -connect z@192.168.1.2")
 addMenu1(lvl1,"g" ,eg)
 addMenu1(lvl1,"n" ,env)
 addMenu1(lvl1,"b" ,envq)
@@ -1159,28 +1200,28 @@ addMenu2(tvs1,"=","p","%wf1% https://pcoptimum.ca")
 addMenu2(tvs1,"t","o","%wop1t% https://ustvgo.tv/one-america-news-network/")
 addMenu2(tvs1,"t","m","%wop1t% https://www.tvguide.com/listings/#movies")
 addMenu2(tvs1,"r","6","%wop1t% http://player.680news.com/")
-addMenu2(tvs1,"r","2","%wm1% https://www.iheart.com/live/cp24-7796/")
-addMenu2(tvs1,"r","1","%wm1% https://www.iheart.com/live/ctv-news-7798/")
-addMenu2(tvs1,"r","t","%wm1% https://www.iheart.com/live/country/CA/city/toronto-on-584/")
-addMenu2(tvs1,"r","5","%wm1% https://www.cbc.ca/player/news/tv``%20shows/the``%20national/latest``%20broadcast")
-addMenu2(tvs1,"t","1","%wm1% https://www.ctvnews.ca/live?autoPlay=true") 
+addMenu2(tvs1,"r","2","%wme% https://www.iheart.com/live/cp24-7796/")
+addMenu2(tvs1,"r","1","%wme% https://www.iheart.com/live/ctv-news-7798/")
+addMenu2(tvs1,"r","t","%wme% https://www.iheart.com/live/country/CA/city/toronto-on-584/")
+addMenu2(tvs1,"r","5","%wme% https://www.cbc.ca/player/news/tv``%20shows/the``%20national/latest``%20broadcast")
+addMenu2(tvs1,"t","1","%wme% https://www.ctvnews.ca/live?autoPlay=true") 
 addMenu2(tvs1,"r","9","%wt1% https://www.iheart.com/podcast/962-ctv-news-toronto-at-six-po-53782987/episode/ctv-news-at-six-for-april-61894489/")
 addMenu2(tvs1,"r","w","%wop1t% http://worldradiomap.com/list/")
 addMenu2(tvs1,"r","y","%wop1t% http://worldradiomap.com/ca/toronto")
-addMenu2(tvs1,"n","c","%wm1% https://www.cbc.ca/news")
-addMenu2(urls1,"n","5","%wm1% https://www.cbc.ca/player/news/tv``%20shows/the``%20national/latest``%20broadcast")
+addMenu2(tvs1,"n","c","%wme% https://www.cbc.ca/news")
+addMenu2(urls1,"n","5","%wme% https://www.cbc.ca/player/news/tv``%20shows/the``%20national/latest``%20broadcast")
 
-addMenu2(tvs1,"t","8","%wm1% https://toronto.ctvnews.ca/video?clipId=1899996")
-addMenu2(tvs1,"t","0","%wm1% https://www.ctvnews.ca/video?binId=1.810415")
-addMenu2(tvs1,"r","8","%wm1% https://www.iheart.com/live/iheart80s-radio-5060/")
-addMenu2(tvs1,"r","1","%wm1% https://www.iheart.com/live/2010s-the-decade-8465/")
-addMenu2(tvs1,"r","2","%wm1% https://www.iheart.com/live/iheart2010s-radio-8478/")
-addMenu2(tvs1,"r","l","%wm1% https://www.iheart.com/live/b-1073-6731/")
-;addMenu2(tvs1,"t","","%wm1% https://www.ctvnews.ca/live?autoPlay=true")
-addMenu2(tvs1,"t","7","%wm1% https://www.ctvnews.ca/ctv-national-news")
-;addMenu2(tvs1,"t","","%wm1% https://toronto.ctvnews.ca/video?clipId=1899996")
-;addMenu2(tvs1,"","","%wm1% https://toronto.ctvnews.ca/video?clipId=1899996")
-;addMenu2(tvs1,"","","%wm1% https://www.iheart.com/live/2010s-the-decade-8465/")
+addMenu2(tvs1,"t","8","%wme% https://toronto.ctvnews.ca/video?clipId=1899996")
+addMenu2(tvs1,"t","0","%wme% https://www.ctvnews.ca/video?binId=1.810415")
+addMenu2(tvs1,"r","8","%wme% https://www.iheart.com/live/iheart80s-radio-5060/")
+addMenu2(tvs1,"r","1","%wme% https://www.iheart.com/live/2010s-the-decade-8465/")
+addMenu2(tvs1,"r","2","%wme% https://www.iheart.com/live/iheart2010s-radio-8478/")
+addMenu2(tvs1,"r","l","%wme% https://www.iheart.com/live/b-1073-6731/")
+;addMenu2(tvs1,"t","","%wme% https://www.ctvnews.ca/live?autoPlay=true")
+addMenu2(tvs1,"t","7","%wme% https://www.ctvnews.ca/ctv-national-news")
+;addMenu2(tvs1,"t","","%wme% https://toronto.ctvnews.ca/video?clipId=1899996")
+;addMenu2(tvs1,"","","%wme% https://toronto.ctvnews.ca/video?clipId=1899996")
+;addMenu2(tvs1,"","","%wme% https://www.iheart.com/live/2010s-the-decade-8465/")
 addMenu1(ext3,"g","%wt1% https://www.google.ca/")
 addMenu1(ext3,"m","%wt1% https://www.google.ca/maps/@43.6314075,-79.3941305,14z")
 addMenu1(ext3,"w","%wt1% https://www.wikipedia.org/")
@@ -1206,7 +1247,7 @@ addMenu2(tvs1,"y","t","%wop1t% https://www.youtube.com/user/ThunderboltsProject/
 ;addMenu1(ext3,"i","%wt1% https://www.igdb.com/discover")
 addMenu2(tvs1,"y","h","%wop1t% https://www.instagram.com/heatherjrock/?hl=en")
 addMenu1(ext3,"","%wt1% https://duckduckgo.com/")
-addMenu2(tvs1,"s","s","%wm1% http://thesocial.ca/")
+addMenu2(tvs1,"s","s","%wme% http://thesocial.ca/")
 ;addMenu2(tvs1,"","","%wt1% https://duckduckgo.com/?t=ffab&q=weather+&ia=weather")
 ;addMenu2(tvs1,"","","%wt1% https://www.startpage.com/#q=toronto+weather&*")
 addMenu2(tvs1,"m","y","%wf1% https://mail.yahoo.com")
@@ -1233,18 +1274,18 @@ addMenu2(tvs1,"v","u","%wop1t% https://video.search.yahoo.com/search/video;_ylt=
 addMenu2(tvs1,"v","v","%wt1% https://www.bing.com/videos/search?q=")
 addMenu2(tvs1,"v","b","%wop1t% https://www.bing.com/videos/browsing?q=")
 addMenu2(tvs1,"c","k","%wop1t% http://www.k4it.de/index.php?topic=egtb&lang=en")
-addMenu2(tvs1,"f","s","%wm1% http://www.espn.com/nfl/statistics/team/_/stat/total")
-addMenu2(tvs1,"f","t","%wm1% https://www.teamrankings.com/nfl/stat/touchdowns-per-game")
-addMenu2(tvs1,"f","m","%wm1% https://www.covers.com/sports/nfl/matchups")
-addMenu2(tvs1,"b","m","%wm1% https://www.covers.com/sports/nba/matchups")
-addMenu2(tvs1,"b","o","%wm1% https://www.covers.com/pageLoader/pageLoader.aspx?page=/data/nba/statistics/2018-2019/offense_pt_regular.html")
-addMenu2(tvs1,"b","s","%wm1% https://www.covers.com/pageLoader/pageLoader.aspx?page=/data/nba/statistics/2018-2019/statistics_regular.html")
-addMenu2(tvs1,"b","d","%wm1% https://www.covers.com/pageLoader/pageLoader.aspx?page=/data/nba/statistics/2018-2019/defense_pt_regular.html")
-addMenu2(tvs1,"h","m","%wm1% https://www.covers.com/sports/nhl/matchups")
-addMenu2(tvs1,"h","o","%wm1% https://www.covers.com/sport/hockey/nhl/2018-2019/statistics/team-scoring")
-addMenu2(tvs1,"h","d","%wm1% https://www.covers.com/sport/hockey/nhl/2018-2019/statistics/team-defense")
-addMenu2(tvs1,"h","s","%wm1% https://www.covers.com/sport/hockey/nhl/statistics")
-addMenu2(tvs1,"h","r","%wm1% https://www.covers.com/sport/hockey/nhl/standings")
+addMenu2(tvs1,"f","s","%wme% http://www.espn.com/nfl/statistics/team/_/stat/total")
+addMenu2(tvs1,"f","t","%wme% https://www.teamrankings.com/nfl/stat/touchdowns-per-game")
+addMenu2(tvs1,"f","m","%wme% https://www.covers.com/sports/nfl/matchups")
+addMenu2(tvs1,"b","m","%wme% https://www.covers.com/sports/nba/matchups")
+addMenu2(tvs1,"b","o","%wme% https://www.covers.com/pageLoader/pageLoader.aspx?page=/data/nba/statistics/2018-2019/offense_pt_regular.html")
+addMenu2(tvs1,"b","s","%wme% https://www.covers.com/pageLoader/pageLoader.aspx?page=/data/nba/statistics/2018-2019/statistics_regular.html")
+addMenu2(tvs1,"b","d","%wme% https://www.covers.com/pageLoader/pageLoader.aspx?page=/data/nba/statistics/2018-2019/defense_pt_regular.html")
+addMenu2(tvs1,"h","m","%wme% https://www.covers.com/sports/nhl/matchups")
+addMenu2(tvs1,"h","o","%wme% https://www.covers.com/sport/hockey/nhl/2018-2019/statistics/team-scoring")
+addMenu2(tvs1,"h","d","%wme% https://www.covers.com/sport/hockey/nhl/2018-2019/statistics/team-defense")
+addMenu2(tvs1,"h","s","%wme% https://www.covers.com/sport/hockey/nhl/statistics")
+addMenu2(tvs1,"h","r","%wme% https://www.covers.com/sport/hockey/nhl/standings")
 addMenu1(ext3,"n","%wt1% https://ndb.nal.usda.gov/ndb/nutrients/index")
 ;addMenu2("/","","%wt1% https://ndb.nal.usda.gov/ndb/search/list") 
 ;addMenu2("","","%wt1% https://www.google.ca/maps/?hl=en") 
@@ -1632,7 +1673,7 @@ addMenu2(urls1,"t","w","%wop1t% https://ustvgo.tv/we-tv")
 addMenu2(urls1,"t","b","%wop1t% https://ustvgo.tv/bbc-america-live/")
 addMenu2(urls1,"m","s","%wop1t% https://ustvgo.tv/syfy-channel-live/")
 addMenu2(urls1,"t","s","%wop1t% https://ustvgo.tv/sundance-tv/")
-addMenu2(urls1,"t","2","%wm1% https://www.cp24.com/video?")
+addMenu2(urls1,"t","2","%wme% https://www.cp24.com/video?")
 ;addMenu2(urls1,"t","2","%wt% https://www.cp24.com/video?clipId=1921747")
 addMenu2(urls1,"n","e","%wop1t% https://www.euronews.com/live")
 addMenu2(urls1,"n","w","%wop1t% http://www.live-tv-radio.com/tv/europe.shtml")
@@ -1767,7 +1808,7 @@ addMenu2(urls1,"l","t","%pnewstor% https://www.iheart.com/live/country/CA/city/t
 addMenu2(urls1,"n","%","%pnewstor% https://www.cbc.ca/player/play/2670346028")
 addMenu2(urls1,"n","9","%pnewstor% https://www.ctvnews.ca/live?autoPlay=true") 
 addMenu2(urls1,"r","w","%wop1t% http://worldradiomap.com/list/")
-addMenu2(urls1,"r","t","worldradiomap.com/ca/toronto")
+addMenu2(urls1,"r","t","%wop1t% worldradiomap.com/ca/toronto")
 ;addMenu2(urls1,"n","$","%wt% https://www.cbc.ca/player/play/1711321155969")
 addMenu2(urls1,"n","4","%pnewstor% https://www.cbc.ca/")
 addMenu2(urls1,"n","5","%pnewstor% https://www.cbc.ca/player/news/tv``%20shows/the``%20national/latest``%20broadcast")
@@ -2191,16 +2232,16 @@ addMenu2(cons1,"]","e","%wt% https://www.erasingtheliberty.com/")
 #f10:: reload  
 >!#^f10:: run %ev% %A_ScriptFullPath%
   ; nowork <^f5:: run hi()
-  appskey:: keymenu2(lvl2,wtb1)
+  appskey:: keymenux(lvl2,wtb1)
   >^appskey:: keymenux(mmmm,wtb1)
-  !appskey:: keymenu1(lvl1,wtb1)
-  ^+appskey:: keymenu2(apps7,wt,menu2)
-!+appskey:: keymenu2(apps1,wt,menu2)
-#+appskey:: keymenu2(apps2,wt,menu2)
-#appskey:: keymenu2(urls1,wt,menu2)
-  >^!#appskey:: keymenu2(tvs1,wt,menu2)
-  >#appskey:: keymenu2(tvs1,wt,menu2)
-  >!appskey:: keymenu2(tvs1,wo,menu2)
->#!appskey:: keymenu2(tvs1,we,menu2)
+  >#appskey:: keymenux(lvl1,wtb1)
+  >!appskey:: keymenu2(lvl1,wtb1)
+  >^+appskey:: keymenux(apps7,wt,menu2)
+!+appskey:: keymenux(apps1,wt,menu2)
+#+appskey:: keymenux(apps2,wt,menu2)
+#appskey:: keymenux(urls1,wt,menu2)
+  >^!#appskey:: keymenux(tvs1,wt,menu2)
+;  >#appskey:: keymenux(tvs1,wt,menu2)
+>#!appskey:: keymenux(tvs1,we,menu2)
   ;msgbox %allmab2%
   ;msgbox %allmab1%

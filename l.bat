@@ -1,1 +1,1 @@
-dir /w %1 |more
+dir %1 |more
