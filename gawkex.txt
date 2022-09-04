@@ -1,0 +1,799 @@
+SA+VegDitto lockscreen kbdin pis0852polsiren
+
+Skip to content
+
+    Courses
+    Tutorials
+    Jobs
+    Practice
+
+    Write
+    Write
+    Come write articles for us and get featured
+    Practice
+    Practice
+    Learn and code with the best industry experts
+    Premium
+    Premium
+    Get access to ad-free content, doubt assistance and more!
+    Jobs
+    Jobs
+    Come and find your dream job with us
+        Geeks Digest
+        Quizzes
+        Geeks Campus
+        Gblog Articles
+        IDE
+        Campus Mantri
+    Sign In
+
+    Sign In
+    Home
+    Saved Videos
+    Courses
+        For Working Professionals
+        LIVE
+        Self-Paced
+        For Students
+        LIVE
+        Self-Paced
+        School Courses
+        Algorithms
+        Analysis of Algorithms
+        Data Structures
+        Interview Corner
+        Languages
+        ML & Data Science
+        CS Subjects
+        GATE
+        Web Development
+        CSS Frameworks
+        JavaScript Frameworks
+        JavaScript Libraries
+        Software Designs
+        GFG Sheets
+        Web Dev Cheat Sheets
+        Company-Wise SDE Sheets
+        DSA Sheets
+        School Learning
+        Mathematics
+        Maths Notes (Class 8-12)
+        NCERT Solutions
+        RD Sharma Solutions
+        Physics Notes (Class 8-11)
+        Chemistry Notes
+        CS Exams/PSUs
+        ISRO
+        UGC NET
+        Student
+        Post a Job
+        Curated DSA Lists
+        Tutorials
+        Jobs
+        Practice 
+    GBlog
+    Puzzles
+    What's New ?
+
+    Data Structures
+    Algorithms
+    Interview Preparation
+    Topic-wise Practice
+    C++
+    Java
+    Python
+    Competitive Programming
+    Machine Learning
+    HTML
+    SDE Sheet
+    Puzzles
+    GFG School
+    Projects
+
+Related Articles
+
+    Sed Command in Linux/Unix with examples
+    AWK command in Unix/Linux with examples
+    grep command in Unix/Linux
+    cut command in Linux with examples
+    cp command in Linux with examples
+    ZIP command in Linux with examples
+    SORT command in Linux/Unix with examples
+    TCP Server-Client implementation in C
+    curl command in Linux with Examples
+    diff command in Linux with examples
+    tar command in Linux with examples
+    touch command in Linux with Examples
+    Cat command in Linux with examples
+    'crontab' in Linux with Examples
+    UDP Server-Client implementation in C
+    Conditional Statements | Shell Script
+    echo command in Linux with Examples
+    Compiling with g++
+    Tail command in Linux with examples
+    date command in Linux with examples
+    tr command in Unix/Linux with examples
+    Mutex lock for Linux Thread Synchronization
+    top command in Linux with Examples
+    wc command in Linux with examples
+    How to Hack WPA/WPA2 WiFi Using Kali Linux?
+    Piping in Unix or Linux
+    ps command in Linux with Examples
+    Head command in Linux with examples
+    tee command in Linux with examples
+    mv command in Linux with examples
+
+    Sed Command in Linux/Unix with examples
+    AWK command in Unix/Linux with examples
+    grep command in Unix/Linux
+    cut command in Linux with examples
+    cp command in Linux with examples
+    ZIP command in Linux with examples
+    SORT command in Linux/Unix with examples
+    TCP Server-Client implementation in C
+    curl command in Linux with Examples
+    diff command in Linux with examples
+    tar command in Linux with examples
+    touch command in Linux with Examples
+    Cat command in Linux with examples
+    'crontab' in Linux with Examples
+    UDP Server-Client implementation in C
+    Conditional Statements | Shell Script
+    echo command in Linux with Examples
+    Compiling with g++
+    Tail command in Linux with examples
+    date command in Linux with examples
+    tr command in Unix/Linux with examples
+    Mutex lock for Linux Thread Synchronization
+    top command in Linux with Examples
+    wc command in Linux with examples
+    How to Hack WPA/WPA2 WiFi Using Kali Linux?
+    Piping in Unix or Linux
+    ps command in Linux with Examples
+    Head command in Linux with examples
+    tee command in Linux with examples
+    mv command in Linux with examples
+
+gawk command in Linux with Examples
+
+    Last Updated : 20 Jan, 2022
+
+Read
+Discuss
+
+gawk command in Linux is used for pattern scanning and processing language. The awk command requires no compiling and allows the user to use variables, numeric functions, string functions, and logical operators. It is a utility that enables programmers to write tiny and effective programs in the form of statements that define text patterns that are to be searched for, in a text document and the action that is to be taken when a match is found within a line. 
+
+gawk command can be used to : 
+ 
+
+    Scans a file line by line.
+    Splits each input line into fields.
+    Compares input line/fields to pattern.
+    Performs action(s) on matched lines.
+    Transform data files.
+    Produce formatted reports.
+    Format output lines.
+    Arithmetic and string operations.
+    Conditionals and loops.
+
+Syntax: 
+ 
+
+gawk [POSIX / GNU style options] -f progfile [--] file ...
+gawk [POSIX / GNU style options] [--] 'program' file ...
+
+Some Important Options: 
+
+ 
+
+    -f progfile, –file=progfile: Read the AWK program source from the file program-file, instead of from the first command line argument. Multiple -f (or –file) options may be used.
+    -F fs, –field-separator=fs: It uses FS for the input field separator (the value of the FS predefined variable).
+    -v var=val, –assign=var=val: Assign the value val to the variable var, before execution of the program begins.
+
+Examples: 
+
+ 
+
+    -F: It uses FS for the input field separator (the value of the FS predefined variable). 
+
+     
+
+gawk -F: '{print $1}' /etc/passwd
+
+     
+
+    -f: Read the AWK program source from the file program-file, instead of from the first command line argument. Multiple -f (or –file) options may be used. 
+
+     
+
+gawk -F: -f mobile.txt /etc/passwd
+
+     
+
+Some Built In Variables: 
+
+ 
+
+    NR: It keeps a current count of the number of input line.
+    NF: It keeps a count of the number of fields within the current input record.
+    FS: It contains the field separator character which is used to divide fields on the input line.
+    RS: It stores the current record separator character.
+    OFS: It stores the output field separator, which separates the fields when Awk prints them.
+    ORS: It stores the output record separator, which separates the output lines when Awk prints them.
+
+Examples: 
+
+ 
+
+    NR: 
+
+     
+
+gawk '{print NR "-" $1 }' mobile.txt
+
+     
+
+    RS: 
+
+     
+
+gawk 'BEGIN{FS=":"; RS="-"} {print $1, $6, $7}' /etc/passwd
+
+     
+
+    OFS: 
+
+     
+
+gawk 'BEGIN{FS=":"; OFS="-"} {print $1, $6, $7}' /etc/passwd
+
+     
+
+Sample More Commands with Examples: 
+
+ 
+
+    Consider the following sample text file as the input file for all cases below. 
+
+    To create a text file: 
+
+     
+
+cat > mobile.txt
+
+     
+
+    Default behavior of gawk: By default gawk prints every line of data from the specified file. 
+
+     
+
+gawk '{print}' mobile.txt
+
+     
+
+    To print the lines matching with the given pattern: 
+
+     
+
+gawk '/Sunil/ {print}' mobile.txt 
+
+     
+
+    In the above example, the gawk command prints all the line which matches the ‘Sunil’.
+    To Split a line into fields: For each line, the gawk command splits the record delimited by whitespace character by default and stores it in the $n variables. If the line has 3 words, it will be stored in $1, $2 and $3 respectively. $0 represents the whole line. 
+
+     
+
+gawk '{print $2}' mobile.txt
+
+     
+
+    In the above example, $2 represents Mobile no. field.
+    To display count of lines: 
+
+     
+
+gawk '{print NR, $0}' mobile.txt
+
+     
+
+    To find the length of the longest line present in the file: 
+
+     
+
+gawk '{ if (length($0) > max) max = length($0) } END { print max }' mobile.txt
+
+     
+
+    To count the lines in a file: 
+
+     
+
+gawk 'END { print NR }' mobile.txt
+
+     
+
+    To print lines with more than 5 characters: 
+
+     
+
+gawk 'length($0) > 5' mobile.txt
+
+     
+
+Note: 
+
+ 
+
+    To check for the manual page of gawk command, use the following command: 
+
+     
+
+man gawk
+
+    To check the help page of gawk command, use the following command: 
+
+     
+
+gawk --help
+
+     
+
+ 
+Previous
+dosfsck command in Linux with Examples
+Next
+How to create a Shared Folder between two Local User in Linux?
+Recommended Articles
+Page :
+1
+2
+3
+Ccat – Colorize Cat Command Output command in Linux with Examples
+20, Sep 21
+'IPCS' command in Linux with examples
+21, Jun 17
+select command in Linux with examples
+09, Jan 19
+Sed Command in Linux/Unix with examples
+21, Aug 17
+ZIP command in Linux with examples
+29, Aug 17
+SORT command in Linux/Unix with examples
+29, Aug 17
+Cat command in Linux with examples
+14, Sep 17
+Head command in Linux with examples
+19, Sep 17
+Tail command in Linux with examples
+21, Sep 17
+tar command in Linux with examples
+04, Oct 17
+atrm command in Linux with examples
+01, Mar 19
+bc command in Linux with examples
+09, Oct 17
+tr command in Unix/Linux with examples
+13, Oct 17
+mv command in Linux with examples
+09, Jan 18
+Paste command in Linux with examples
+13, Nov 17
+comm command in Linux with examples
+16, Nov 17
+cut command in Linux with examples
+17, Nov 17
+cp command in Linux with examples
+24, Nov 17
+uniq Command in LINUX with examples
+24, Nov 17
+expand Command in LINUX with examples
+27, Nov 17
+date command in Linux with examples
+01, Dec 17
+df Command in Linux with examples
+04, Dec 17
+tee command in Linux with examples
+05, Dec 17
+free Command in Linux with examples
+07, Dec 17
+Article Contributed By :
+https://media.geeksforgeeks.org/auth/avatar.png
+Mandeep_Sheoran
+@Mandeep_Sheoran
+Vote for difficulty
+Improved By :
+
+    avtarkumar719
+
+Article Tags :
+
+    linux-command
+    Linux-text-processing-commands
+    Picked
+    Linux-Unix
+
+Report Issue
+What's New
+Data Structures & Algorithms- Self Paced Course
+View Details
+Complete Interview Preparation- Self Paced Course
+View Details
+Practice Problems, POTD Streak, Weekly Contests & More!
+View Details
+A-143, 9th Floor, Sovereign Corporate Tower,
+Sector-136, Noida, Uttar Pradesh - 201305
+feedback@geeksforgeeks.org
+
+    Company
+    About Us
+    Careers
+    In Media
+    Contact Us
+    Privacy Policy
+    Copyright Policy
+
+    Learn
+    Algorithms
+    Data Structures
+    SDE Cheat Sheet
+    Machine learning
+    CS Subjects
+    Video Tutorials
+    Courses
+
+    News
+    Top News
+    Technology
+    Work & Career
+    Business
+    Finance
+    Lifestyle
+    Knowledge
+
+    Languages
+    Python
+    Java
+    CPP
+    Golang
+    C#
+    SQL
+    Kotlin
+
+    Web Development
+    Web Tutorials
+    Django Tutorial
+    HTML
+    JavaScript
+    Bootstrap
+    ReactJS
+    NodeJS
+
+    Contribute
+    Write an Article
+    Improve an Article
+    Pick Topics to Write
+    Write Interview Experience
+    Internships
+    Video Internship
+
+@geeksforgeeks , Some rights reserved
+Lightbox
+Start Your Coding Journey Now!
+
+
+SA+VEgdiTTo lockscreen kbdin pis0852polsiren
+
+
+Skip to main content
+Red Hat logo
+Enable Sysadmin  
+
+    Articles
+    About
+    Welcome
+
+Subscribe to our RSS feed or Email newsletter.
+A beginner's guide to gawk
+The gawk command is a standard sysadmin tool. Learn to use it to extract information from files and your system.
+
+Posted: September 30, 2020 | %t min read |
+by
+Ricardo Gerardi (Red Hat, Sudoer)
+Image
+Beginner's guide to awk
+Image by Free-Photos from Pixabay
+
+gawk is the GNU implementation of the Awk programming language, first developed for the UNIX operating system in the 1970s. The Awk programming language specializes in dealing with data formatting in text files, particularly text data organized in columns.
+More Linux resources
+
+    Advanced Linux commands cheat sheet
+    Download RHEL 9 at no charge through the Red Hat Developer program
+    A guide to installing applications on Linux
+    Linux system administration skills assessment
+
+Using the Awk programming language, you can manipulate or extract data, generate reports, match patterns, perform calculations, and more, with great flexibility. Awk allows you to accomplish somewhat difficult tasks with a single line of code. To achieve the same results using traditional programming languages such as C or Python would require additional effort and many lines of code.
+
+gawk also refers to the command-line utility available by default with most Linux distributions. Most distributions also provide a symbolic link for awk pointing to gawk. For simplicity, from now on, we'll refer to the utility only as awk.
+
+awk processes data straight from standard input - STDIN. A common pattern is to pipe the output of other programs into awk to extract and print data, but awk can also process data from files.
+
+In this article, you'll use awk to analyze data from a file with space-separated columns. Let's start by reviewing the sample data.
+Example data
+
+For the examples in this guide, let's use the output of the command ps ux saved in the file psux.out. Here's a sample of the data in the file:
+
+$ head psux.out
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+ricardo     1446  0.0  0.2  21644 11536 ?        Ss   Sep10   0:00 /usr/lib/systemd/systemd --user
+ricardo     1448  0.0  0.1  49212  5848 ?        S    Sep10   0:00 (sd-pam)
+ricardo     1459  0.0  0.1 447560  7148 ?        Sl   Sep10   0:00 /usr/bin/gnome-keyring-daemon --daemonize --login
+ricardo     1467  0.0  0.1 369144  6080 tty2     Ssl+ Sep10   0:00 /usr/libexec/gdm-wayland-session /usr/bin/gnome-session
+ricardo     1469  0.0  0.1 277692  4112 ?        Ss   Sep10   0:00 /usr/bin/dbus-broker-launch --scope user
+ricardo     1471  0.0  0.1   6836  4408 ?        S    Sep10   0:00 dbus-broker --log 4 --controller 11 --machine-id 16355057c7274843823dd747f8e2978b --max-bytes 100000000000000 --max-fds 25000000000000 --max-matches 5000000000
+ricardo     1474  0.0  0.3 467744 14132 tty2     Sl+  Sep10   0:00 /usr/libexec/gnome-session-binary
+ricardo     1531  0.0  0.1 297456  4280 ?        Ssl  Sep10   0:00 /usr/libexec/gnome-session-ctl --monitor
+ricardo     1532  0.0  0.3 1230908 12920 ?       S<sl Sep10   0:01 /usr/bin/pulseaudio --daemonize=no
+
+You can download the complete file from here, using this command:
+
+$ curl -o psux.out https://gitlab.com/-/snippets/2013935/raw\?inline\=false
+
+If you decide to use the output of ps ux on your system, adjust the values shown in the examples to match your results.
+
+Next, let's use awk to view data from the sample file.
+Basic usage
+
+A basic awk program consists of a pattern followed by an action enclosed in curly braces. You can provide a program to the awk utility inline by enclosing it in single quotation marks, like this:
+
+$ awk 'pattern { action }'
+
+awk processes the input data—standard input or file—line by line, executing the given action for each line—or record—that matches the pattern. If the pattern is omitted, awk executes the action on all records. An action can be as simple as printing data from the line or as complex as a full program. For example, to print all lines from the example file, use this command:
+
+$ awk '{ print }' psux.out
+USER         PID %CPU %MEM    VSZ   RSS TTY      STAT START   TIME COMMAND
+ricardo     1446  0.0  0.2  21644 11536 ?        Ss   Sep10   0:00 /usr/lib/systemd/systemd --user
+.... OUTPUT TRUNCATED ....
+
+While this example is not really useful, it illustrates the awk command's basic utilization.
+
+If you're using the command ps ux on your machine, you can pipe its output directly into awk, instead of providing the input file name:
+
+$ ps ux | awk '{ print }'
+
+Next, let's use awk column processing capabilities to extract part of the data from the sample file.
+Printing fields
+
+The power of awk starts to become evident when you use its column processing features. awk automatically splits each line—or record—into fields. By default, it uses the space character to separate each field, but you can change that by providing the command line parameter -F followed by the desired separator.
+
+After splitting, awk assigns each field to a numbered variable, starting with the character $. For example, the first field is $1, the second $2, and so on. The special variable $0 contains the entire record before splitting.
+
+By using the field variables, you can extract data from the input. For example, to print only the command name from the sample file, use the variable $11 because the command name is the eleventh column on each line:
+
+$ awk '{ print $11 }' psux.out
+COMMAND
+/usr/lib/systemd/systemd
+(sd-pam)
+/usr/bin/gnome-keyring-daemon
+.... OUTPUT TRUNCATED ....
+
+You can also print multiple fields by separating them with commas. For example, to print the command name and the CPU utilization on column three, use this command:
+
+$ awk '{ print $11, $3 }' psux.out
+COMMAND %CPU
+/usr/lib/systemd/systemd 0.0
+(sd-pam) 0.0
+/usr/bin/gnome-keyring-daemon 0.0
+.... OUTPUT TRUNCATED ....
+
+Finally, use the built-in printf function to format the output and align the columns. Provide a 40 character padding to the right of first columns to accommodate longer command names:
+
+$ awk '{ printf("%-40s %s\n", $11, $3) }' psux.out
+COMMAND                                  %CPU
+/usr/lib/systemd/systemd                 0.0
+(sd-pam)                                 0.0
+/usr/bin/gnome-keyring-daemon            0.0
+/usr/libexec/gdm-wayland-session         0.0
+.... OUTPUT TRUNCATED ....
+
+Now that you can manipulate and extract individual fields from each record, let's apply the pattern feature to filter the records.
+
+[ You might also like: Manipulating text at the command line with sed ]
+Pattern matching
+
+In addition to manipulating fields, awk allows you to filter which records to execute actions on through a powerful pattern matching feature. In its most basic usage, provide a regular expression enclosed by slash / characters to match records. For example, to filter by records that match firefox, use /firefox/:
+
+$ awk '/firefox/ { print $11, $3 }' psux.out
+/usr/lib64/firefox/firefox 66.2
+/usr/lib64/firefox/firefox 8.3
+/usr/lib64/firefox/firefox 15.6
+/usr/lib64/firefox/firefox 9.0
+/usr/lib64/firefox/firefox 31.5
+/usr/lib64/firefox/firefox 20.6
+/usr/lib64/firefox/firefox 31.0
+/usr/lib64/firefox/firefox 0.0
+/usr/lib64/firefox/firefox 0.0
+/usr/lib64/firefox/firefox 0.0
+/usr/lib64/firefox/firefox 0.0
+/usr/lib64/firefox/firefox 0.0
+/usr/lib64/firefox/firefox 0.0
+
+You can also use fields and a comparison expression as pattern matching criteria. For example, to print data from the process that matches PID 6685, compare field $2, like this:
+
+$ awk '$2==6685 { print $11, $3 }' psux.out
+/usr/lib64/firefox/firefox 0.0
+
+awk is smart enough to understand numeric fields, allowing you to use relative comparisons like greater than or less than. For example, to show all process that use over 5% CPU, use $3 > 5:
+
+$ awk '$3 > 5 { print $11, $3 }' psux.out
+/usr/bin/gnome-shell 5.1
+/usr/lib64/firefox/firefox 66.2
+/usr/lib64/firefox/firefox 8.3
+/usr/lib64/firefox/firefox 15.6
+/usr/lib64/firefox/firefox 9.0
+/usr/lib64/firefox/firefox 31.5
+/usr/lib64/firefox/firefox 20.6
+/usr/lib64/firefox/firefox 31.0
+
+You can combine patterns with operators. For example, to show all processes that match firefox and use over 5% CPU, combine both patterns with the && operator for a logical AND:
+
+$ awk '/firefox/ && $3 > 5 { print $11, $3 }' psux.out
+/usr/lib64/firefox/firefox 66.2
+/usr/lib64/firefox/firefox 8.3
+/usr/lib64/firefox/firefox 15.6
+/usr/lib64/firefox/firefox 9.0
+/usr/lib64/firefox/firefox 31.5
+/usr/lib64/firefox/firefox 20.6
+/usr/lib64/firefox/firefox 31.0
+
+Finally, because you're using pattern matching, awk no longer prints the header line. You can add your own header line by using the BEGIN pattern to execute a single action before processing any records:
+
+$ awk 'BEGIN { printf("%-26s %s\n", "Command", "CPU%")} $3 > 10 { print $11, $3 }' psux.out
+Command                    CPU%
+/usr/lib64/firefox/firefox 66.2
+/usr/lib64/firefox/firefox 15.6
+/usr/lib64/firefox/firefox 31.5
+/usr/lib64/firefox/firefox 20.6
+/usr/lib64/firefox/firefox 31.0
+
+Next, let's manipulate the data in individual fields.
+Field manipulation
+
+As we discussed in the previous section, awk understands numeric fields. This allows you to perform data manipulation, including numeric calculations. For example, consider printing the memory utilization on column six for all firefox processes:
+
+$ awk '/firefox/ { print $11, $6 }' psux.out
+/usr/lib64/firefox/firefox 301212
+/usr/lib64/firefox/firefox 118220
+/usr/lib64/firefox/firefox 168468
+/usr/lib64/firefox/firefox 101520
+/usr/lib64/firefox/firefox 194336
+/usr/lib64/firefox/firefox 111864
+/usr/lib64/firefox/firefox 163440
+/usr/lib64/firefox/firefox 38496
+/usr/lib64/firefox/firefox 174636
+/usr/lib64/firefox/firefox 37264
+/usr/lib64/firefox/firefox 30608
+/usr/lib64/firefox/firefox 174636
+/usr/lib64/firefox/firefox 174660
+
+The command ps ux displays the memory utilization in Kilobytes, which is hard to read. Let's convert it to Megabytes by diving the field value by 1024:
+
+$ awk '/firefox/ { print $11, $6/1024 }' psux.out
+/usr/lib64/firefox/firefox 294.152
+/usr/lib64/firefox/firefox 115.449
+/usr/lib64/firefox/firefox 164.52
+/usr/lib64/firefox/firefox 99.1406
+/usr/lib64/firefox/firefox 189.781
+/usr/lib64/firefox/firefox 109.242
+/usr/lib64/firefox/firefox 159.609
+/usr/lib64/firefox/firefox 37.5938
+/usr/lib64/firefox/firefox 170.543
+/usr/lib64/firefox/firefox 36.3906
+/usr/lib64/firefox/firefox 29.8906
+/usr/lib64/firefox/firefox 170.543
+/usr/lib64/firefox/firefox 170.566
+
+You can also round numbers up and add the suffix MB using printf to improve readability:
+
+$ awk '/firefox/ { printf("%s %4.0f MB\n", $11, $6/1024) }' psux.out
+/usr/lib64/firefox/firefox  294 MB
+/usr/lib64/firefox/firefox  115 MB
+/usr/lib64/firefox/firefox  165 MB
+/usr/lib64/firefox/firefox   99 MB
+/usr/lib64/firefox/firefox  190 MB
+/usr/lib64/firefox/firefox  109 MB
+/usr/lib64/firefox/firefox  160 MB
+/usr/lib64/firefox/firefox   38 MB
+/usr/lib64/firefox/firefox  171 MB
+/usr/lib64/firefox/firefox   36 MB
+/usr/lib64/firefox/firefox   30 MB
+/usr/lib64/firefox/firefox  171 MB
+/usr/lib64/firefox/firefox  171 MB
+
+Finally, combine this idea with the BEGIN and END patterns to perform more advanced data manipulation. For example, let's calculate the total memory utilization for all firefox processes by defining a variable sum in the BEGIN action, adding the value of column six $6 for each line that matches firefox to the sum variable, and then printing it out with the END action in Megabytes:
+
+$ awk 'BEGIN { sum=0 } /firefox/ { sum+=$6 } END { printf("Total Firefox memory: %.0f MB\n", sum/1024) }' psux.out
+Total Firefox memory: 1747 MB
+
+[ Download now: A sysadmin's guide to Bash scripting. ] 
+What's next?
+
+gawk is a powerful and flexible tool to process text data, particularly data arranged in columns. This article provided a few useful examples of using this tool to extract and manipulate data, but gawk can do much more. For additional information about gawk, consult the manual pages in your Linux distribution.
+
+The Awk language has many more resources than what we explored in this guide. For detailed information about it, consult the official GNU Awk User's Guide.
+Check out these related articles on Enable Sysadmin
+Image
+Manipulating text with sed and grep
+Manipulating text at the command line with sed
+Still trying to figure out how to use sed? Check out these examples.
+Posted: November 22, 2019
+Author: Valentin Bajrami (Red Hat Accelerator)
+Image
+Manipulating text with sed and grep
+Manipulating text at the command line with grep
+Want to get more out of grep? Check this out.
+Posted: November 15, 2019
+Author: Valentin Bajrami (Red Hat Accelerator)
+Image
+10 more essential Linux commands you need to know
+10 more essential Linux commands you need to know
+You've mastered installation and the basics of filesystem navigation. Now you're ready to take your skills to the next level with 10 more essential Linux commands.
+Posted: September 17, 2019
+Author: Ken Hess (Red Hat)
+Topics:  
+  
+  
+Author’s photo
+Ricardo Gerardi
+
+Ricardo Gerardi is a Senior Consultant at Red Hat Canada where he specializes in IT automation with Ansible and OpenShift.  More about me
+Red Hat Summit 2022: On Demand
+
+Get the latest on Ansible, Red Hat Enterprise Linux, OpenShift, and more from our virtual event on demand.
+Related Content
+Image
+Tuning and mixing board
+How to tune the Linux kernel with the /proc filesystem
+The Linux kernel is a tunable marvel that allows you to make changes to its parameters while it is running and without requiring a reboot.
+Posted: August 25, 2022
+Author: David Both
+Image
+Laptop with sticky note, phone, notepad, and coffee
+Display more user-friendly Linux man pages with the tldr command
+The tldr command provides a short list and examples of the most common ways to use Linux commands.
+Posted: August 19, 2022
+Author: Ricardo Gerardi (Red Hat, Sudoer)
+Image
+Man listening to music while he works
+What's your favorite way to edit remote files?
+As a sysadmin, you spend a lot of time on somebody else's computer. Choose your remote file-editing tools wisely!
+Posted: August 15, 2022
+Author: Seth Kenlon (Red Hat)
+
+OUR BEST CONTENT, DELIVERED TO YOUR INBOX
+
+The opinions expressed on this website are those of each author, not of the author's employer or of Red Hat. The content published on this site are community contributions and are for informational purpose only AND ARE NOT, AND ARE NOT INTENDED TO BE, RED HAT DOCUMENTATION, SUPPORT, OR ADVICE.
+
+Red Hat and the Red Hat logo are trademarks of Red Hat, Inc., registered in the United States and other countries.
+Red Hat logo
+
+Copyright ©2022 Red Hat, Inc.
+
+    Privacy Policy
+    Terms of Use
+    All policies and guidelines
+
+Red Hat Summit
+Twitter
+Facebook
+LinkedIn
+Reddit
+Email
+x
+Subscribe now
+
+Get the highlights in your inbox every week.
+
+
+
+

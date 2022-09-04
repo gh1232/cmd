@@ -280,7 +280,7 @@ wmove(0,0,1,.7)
   ;>!f7::WinMove,A,,415,0,1050,%wph%
   >!f7:: wmove(0.336,-.01,.665,1)
   >!+f5:: wmove(0.67,0,.3,1)
-  >^f9:: wmove(0,0,.32,.5) 
+  >^f9:: wmove(-.025,0,.32,.5) 
   >^f6:: wmove(-.025,0.40,.32,.7) 
   >^f7:: wmove(-.025,0.604,.32,.7) 
   >^f5:: wmove(-.025,0.27,.32,.8) 
@@ -301,63 +301,63 @@ wmove(0,0,1,.7)
   >!>#f8:: winmove,A,,0,180,%A_ScreenWidth%,730
   >!>#f7:: winmove,A,,300,0,1140,%wph%
   f1:: winclose, A
-  >+~::  ; 20180728Jul28,Sat20180728Jul28 Sat
+  <+~::  ; 20180728Jul28,Sat20180728Jul28 Sat
   FormatTime, CurrentDateTime,, yyyyMMddMMMdd''ddd-hhmmtt-'finthnote'   ; 20190222043950 oc20190222043955 20190222Feb22Fri
   send, %CurrentDateTime%
   return
-  >+1::
+  <+1::
   FormatTime, CurrentDateTime,, hhmm
-  send, %CurrentDateTime%wtr1st&chknsaltbutr
+  send, %CurrentDateTime%wtr1st&beeburgerksalt
   return
 #!^>+2::
   FormatTime, CurrentDateTime,, hhmm
-  send, %CurrentDateTime%wtr2nd&chknsaltbutr
+  send, %CurrentDateTime%wtr2nd&beefburgerksalt
   return
-  >+e::
+  <+e::
   FormatTime, CurrentDateTime,, hhmm
-  send, %CurrentDateTime%wtr3rd&chknsaltbutr
+  send, %CurrentDateTime%wtr3rd&beefburgerksalt
   return
-  >+i::
+  <+i::
   FormatTime, CurrentDateTime,, hhmm
-  send, %CurrentDateTime%pisfl10xx4
+  send, %CurrentDateTime%pisfl4xx4
   return
-  >+l::
+  <+l::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%loudfridgoff
   return
-  >+n::
+  <+n::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%bangup
   return
-  >+c::
+  <+c::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%chrup
   return
-  >+g::
+  <+g::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%grumbling
   return
-  >+p::
+  <+p::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%polsiren
   return
-  >+x::
+  <+x::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%choomup
   return
-  >+m::
+  <+m::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%boomup
   return
-  >+k::
+  <+k::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%closup
   return
-  >+z::
+  <+z::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%scrape
   return
-  >+w::
+  <+w::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%fart
   return
@@ -365,92 +365,92 @@ wmove(0,0,1,.7)
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%htron
   return
-  >+7::
+  <+7::
   FormatTime, CurrentDateTime,, hhmm
   send, habovnew
   return
-  >+y::
+  <+y::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%yawn
   return
-  >+j::
+  <+j::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%gungup
   return
-  >+s::
+  <+s::
   formattime, currentdatetime,, hhmm
   send, %currentdatetime%smbarku
   return
-  >+d::
+  <+d::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%drbang
   return
-  >+5::
+  <+5::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%tap303.
   return
-  >+6::
+  <+6::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%dropup
   return
-  >+9::
+  <+9::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%drbang290.
   return
-  >+8::
+  <+8::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%drbang308.
   return
-  >+3::
+  <+3::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%drbangchutedrbang303.
   return
-  >+2::
+  <+2::
   FormatTime, CurrentDateTime,, hhmm
-  send, %CurrentDateTime%wtr2nd&chknbeefpsalt
+  send, %CurrentDateTime%wtr2nd&beef
   return
-  >+4::
+  <+4::
   FormatTime, CurrentDateTime,, hhmm
-  send, %CurrentDateTime%drbang304.
+  send, %CurrentDateTime%drbang303.
   return
-  >+f::
+  <+f::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%drflap
   return
-  >+b::
+  <+b::
   FormatTime, CurrentDateTime,, hhmm
-  send, %CurrentDateTime%bigbarkh
+  send, %CurrentDateTime%bigbarko
   return
-  >+v::
+  <+v::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%vroom
   return
-  >+o::
+  <+o::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%fridgonvsl
   return
-  >+u::
+  <+u::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%burp
   return
-  >+t::
+  <+t::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%hwaytalk
   return
-  >+r::
+  <+r::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%rmfdelrsid 
   return
-  >+q::
+  <+q::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%==
   return
-  >+a::
+  <+a::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%airpl
   return
   ;>#+f12:: msgbox booted at: %bootDa22teTime%
-  >+h::
+  <+h::
   FormatTime, CurrentDateTime,, hhmm
   send, %CurrentDateTime%helic
   return
@@ -466,7 +466,11 @@ wmove(0,0,1,.7)
   FormatTime, CurrentDateTime,,'soc'yyyyMMddhhmmss 
   send, %CurrentDateTime%
   return
-  >^f12:: 
+  >+f10:: 
+  FormatTime, CurrentDateTime,, yyyyMMddMMMdd''ddd ---  
+  send, %CurrentDateTime%
+  return
+  >+f9:: 
   FormatTime, CurrentDateTime,, yyyyMMddMMMdd''ddd 
   send, %CurrentDateTime%
   return
@@ -477,26 +481,37 @@ wmove(0,0,1,.7)
   ^f10:: run, c:\cmd\keymenu.ahk 
   ^f11:: run, c:\cmd\ahk.ahk 
 #f11:: reload  
-  >^f:: send, lpfkflighton stdclk rmfkfaucon lpf
-  >^o:: Send rmfkfaucoff4x4xx2 lpfkflightoff
-  >^w:: 
-  send,    1st sides xx4 fast 
-  send,    2nd sides xx1 fast
-  send,    3rd sides xx4 fast
-  send,    4th sides xx1 fast
-  return 
-  >^p:: send, pprsinbags 
-  >^h:: send, lh2sht4x4xx4 rh2sht4x4xx4
-  >^7:: send, habovnew 4x2 h4x2 habovnew h1s1s xx2 habovnew h6x1s
+  <+;:: send, lif,rif,lp,rp 
+  <+':: send, saveditto lockscreen kbdin pis 
 
-  >^b:: send, 4bigbwls 
-
-  >^t:: send, throwboxchknlid
-  >^s:: send, saveditto lockscreen kbdin pis, 
-
-  >^u:: send, mthbutr 
-
-  >^c:: send, crmchees
-  >^4:: send, 4x2s h4x2s
-
-
+   <+0::
+   send, alarm1122a up pis `n 
+   send, 4x2 h2x2s4x1s h4x2s m3x2s1s1s2s e2x1 f1  h4x1s2s2s  `n
+   send, lpfkllighton stdclk rmfkfaucon  cf hf  lookarnd4e lpfwarm `n
+   send, bigbwls4 `n
+   send,    1st xx1 xx1 xx4 xxx4  sidesfaster 4 4 vsmfly0`n
+   send,    2nd xx1  xx1 xx4  sides 4 4 vsmfly0`n
+   send,    3rd xx1 xx1 xx4 xxx4 swoosh sidesfaster 4 4 vsmfly0`n
+   send,   4th xx1 xx1 xx4   sides 4 4 vsmfly0`n
+   send, habovnew throwplastics,pprs,beef habovnew washplate4x4xx4;tbl 
+   send, Habovnew  beefburger `n
+   send,  washsciss4x4xx4bsides`n
+send,  cutarndbag,thro sevcutarndplpkg,thro `n
+send, scissonksaltonledge `n
+send, ksaltmedonbeef1 
+   send, Habovnew pprsinbag `n
+   send, lif,rif,lp,rp Habovnew 4x2 h4x2 `n
+   send, Habovnew h1s1s xx `n
+   send, Habovnew h4x1s1s2s rmfkfaucoff4x4xx2 lpfkllightoff `n
+   send, h4x1  shrton panton h6x1s m4x1s1s2s `n
+   send, e1 f1 a1e lh2sht4x4xx5 rh2sht4x4xx5 `n
+   return
+  <+[::
+  FormatTime, CurrentDateTime,, hhmm
+  send, %CurrentDateTime%liedn 
+  return
+  <+]::
+  FormatTime, CurrentDateTime,, hhmm
+  send, %CurrentDateTime%up 
+  return
+  <+,:: send, newrollorbig 

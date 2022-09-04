@@ -380,6 +380,7 @@ getwb(wb,num,wp)
     } else {
 
       wbr = %predir%wb\ep%num%\application\epic.exe --user-data-dir=%profdir%%wp%
+        return wbr
     }
 
 
@@ -589,10 +590,18 @@ aa := l - 1
    return m
 }
 addMenux(m,r,a*){
+  tempm := []
+  tempm := r 
   for index, param in a* {
 
-    m[a*] := r
+    tempm[param] := tempm 
+      msgbox %tempm%
   }
+  for index, param in tempm {
+
+    m[param] := tempm[param]  
+  }
+
   return m
 }
 hideMenu(m){
@@ -929,7 +938,7 @@ if (!mm){
          Transform, kkkkk, Deref,  %kkkkk%
         ; msgbox %kkkkk% %wme%
 
-           run %kkkkk%
+           run, % kkkkk
         soundbeep
         return ; 
        }
@@ -1014,7 +1023,6 @@ lvl1["/"] := extra3
 global mmmm := []
 
 
-lvl2["1","t"] := "%predir%tight\tvnviewer.exe -host=192.168.1.1 -password=yo"
 
 
 
@@ -1034,7 +1042,12 @@ mmmm["e"] := extra3
 mmmm["q"] := extra1
 mmmm["w"] := extra2
 
+;tempyy:= ""
+;tempzz :=" % getexec(""Tight\tvnviewer.exe"") "
 
+addMenu2(lvl2,"x","x" ,"getexec(""Tight\tvnviewer.exe"")")
+;transform, tempyy, Deref, %tempzz% 
+;run, %tempyy%
 lvl2[","] := mmmm
 addMenu2(lvl2,";","x" ,"powershell.exe -Command 'Start-Process cmd /k cd /d c:\a\' -Verb RunAs")
 addMenu2(lvl2,";","o" ,"powershell.exe -Command 'Start-Process powershell' -Verb RunAs")
@@ -1043,13 +1056,41 @@ addMenu2(lvl2,";","e" ,"explorer")
 addMenu2(lvl2,";","c" ,"cmd")
 addMenu2(lvl2,";","l","%cmddir%login.bat")
 addMenu2(lvl2,";","a","%cmddir%ra.bat %cmddir%login.bat")
-addMenu2(lvl2,";",";" ,"%predir%clink\clink.bat")
+addMenu2(lvl2,";","k" ,"%predir%clink\clink.bat")
 addMenu2(lvl2,";","p" ,"powershell")
 
+;addMenux(lvl2,getwb("op","4","op4r"),"8","p","2","3","4","5","[" )
+    
+;lvl2["1","r"]:=getexec("mstsc","/v:192.168.1.1 ","x")
+addMenu2(lvl2,"2","t", "%predir%tight\tvnviewer.exe -host=192.168.1.2 -password=yo")
+addMenu2(lvl2,"7","t", "%predir%tight\tvnviewer.exe -host=192.168.1.7 -password=yo")
+addMenu2(lvl2,"6","t", "%predir%tight\tvnviewer.exe -host=192.168.1.6 -password=yo")
+addMenu2(lvl2,"8","t", "%predir%tight\tvnviewer.exe -host=192.168.1.8 -password=yo")
+addMenu2(lvl2,"4","t", "%predir%tight\tvnviewer.exe -host=192.168.1.4 -password=yo")
+addMenu2(lvl2,"3","t", "%predir%tight\tvnviewer.exe -host=192.168.1.3 -password=yo")
+addMenu2(lvl2,"5","t", "%predir%tight\tvnviewer.exe -host=192.168.1.5 -password=yo")
+addMenu2(lvl2,"7","t", "%predir%tight\tvnviewer.exe -host=192.168.1.7 -password=yo")
+addMenu2(lvl2,"9","t", "%predir%tight\tvnviewer.exe -host=192.168.1.9 -password=yo")
+;lvl2["1","t"] := "%predir%tight\tvnviewer.exe -host=192.168.1.1 -password=yo"
+lvl2["[","o","c"]:=getwb("op","4","op4r")
+global tempa := lvl2["[","o","4","r"]
+;msgbox %tempa%
+lvl2["[","o","p"]:=getwb("op","4","op4p")
+lvl2["[","o","g"]:=getwb("op","1","op1g")
+lvl2["[","o","r"]:=getwb("op","1","op1r")
+lvl2["[","o","t"]:=getwb("op","1","op1t")
+lvl2["[","o","y"]:=getwb("op","1","op1y")
+lvl2["[","e","r"]:=getwb("ep","1","ep1r")
+
+lvl2["[","e","t"]:=getwb("ep","1","ep1t")
+lvl2["[","e","y"]:=getwb("ep","1","ep1y")
+;tempa := lvl2["[","e","y"]
+;msgbox %tempa%
 addMenu2(lvl2,"[","t",getwb("tb","1",""))
 addMenu2(lvl2,"[","m",wme)
 addMenu2(lvl2,"[","f",wff1puser)
-addMenu2(lvl2,"[","d" ,wff1puser . " --url  about:about")
+addMenu2(lvl2,"[","d" ,wff1puser)
+addMenu2(lvl2,"[","a" ,wff1puser . " --url  about:about")
 
 addMenu2(lvl2,"]","e",ee271)
 addMenu2(lvl2,"]","g",eg)
@@ -1059,6 +1100,7 @@ addMenu2(lvl2,"]","v",ev)
 addMenu2(lvl2,"[","y" ,"%predir%wb\ep1\application\epic.exe --user-data-dir=%profdir%ep1y https://youtube.com")
 addMenu1(lvl1,"w" ,"C:\Program Files\Everything\Everything.exe -connect z@192.168.1.2")
 addMenu1(lvl1,"q" ,"C:\Program Files\Everything\Everything.exe")
+addMenu2(lvl2,"/","d" ,"C:\a\Free Download Manager\fdm.exe")
 addMenu2(lvl2,"/","/" ,"C:\Program Files\Everything\Everything.exe")
 addMenu2(lvl2,"/","v" ,"C:\a\vifm\vifm")
 addMenu2(lvl2,"/","2" ,"C:\Program Files\Everything\Everything.exe -connect z@192.168.1.2")
