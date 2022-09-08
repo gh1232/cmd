@@ -455,7 +455,7 @@ wmove(0,0,1,.7)
   send, %CurrentDateTime%helic
   return
   >+f12::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%
   return
   >^+f12::
