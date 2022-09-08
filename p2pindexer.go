@@ -6,8 +6,8 @@ import (
     "bufio"
 )
  
-func main() {
-    file, err := os.Open("text.txt")
+func printtextfile(file1 string) {
+    file, err := os.Open(file1)
     if err != nil {
         fmt.Println(err)
     }
@@ -24,7 +24,6 @@ func main() {
     }
 }
 
-package main
  
 import (
     "fmt"
@@ -32,111 +31,18 @@ import (
     "bufio"
 )
  
-func main() {
-    file, err := os.Open("text.txt")
-    if err != nil {
-        fmt.Println(err)
-    }
-    defer file.Close()
- 
-    scanner := bufio.NewScanner(file)
-    scanner.Split(bufio.ScanWords)    // use scanwords
-    for scanner.Scan() {
-        fmt.Println(scanner.Text())
-    }
- 
-    if err := scanner.Err(); err != nil {
-        fmt.Println(err)
-    }
-}
-
-
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-package main
- 
-import (
-    "fmt"
-    "os"
-    "bufio"
-)
- 
-func main() {
-    file, err := os.Open("text.txt")
-    if err != nil {
-        fmt.Println(err)
-    }
-    defer file.Close()
- 
-    scanner := bufio.NewScanner(file)
-    scanner.Split(bufio.ScanWords)    // use scanwords
-    for scanner.Scan() {
-        fmt.Println(scanner.Text())
-    }
- 
-    if err := scanner.Err(); err != nil {
-        fmt.Println(err)
-    }
-}
-
-
-//-------------
-
-
-
-SA+VegdItto lockscreen kbdin pis1103polsiren
-
-
-
-ipconfig /flushdns
-
-netsh winsock reset catalog
-
-netsh int ipv4 reset reset.log
-
-
-Sa+VgeDitto lockscreen kbdin pis1103polsiren
-
-package main
-
 import (
    "fmt"
    "path/filepath"
 )
 
-func main() {
-   abs,err := filepath.Abs("./hello.go")
+func printabspathfile(file1 string) {
+   abs,err := filepath.Abs(file1)
    if err == nil {
       fmt.Println("Absolute:", abs)
    }
 }
 
-
-Sa+VgeDitto lockscreen kbdin pis1103polsiren
-package main
 
 import (
 	"fmt"
@@ -173,7 +79,8 @@ func (wc WriteCounter) PrintProgress() {
 	fmt.Printf("\rDownloading... %s complete", humanize.Bytes(wc.Total))
 }
 
-func main() {
+
+func DownloadFileMain(){
 	if len(os.Args) != 3 {
 		fmt.Println("usage: download url filename")
 		os.Exit(1)
@@ -232,9 +139,6 @@ func DownloadFile(url string, filepath string) error {
 
 
 
-A+VgeDitto lockscreen kbdin pis1104polsiren
-package main
-
 import (
 	"fmt"
 	"io"
@@ -272,7 +176,7 @@ func downloadFromUrl(url string) {
 	fmt.Println(n, "bytes downloaded.")
 }
 
-func main() {
+func downloadFromUrlMain() {
 	countries := []string{"GB", "FR", "ES", "DE", "CN", "CA", "ID", "US"}
 	for i := 0; i < len(countries); i++ {
 		url := "http://download.geonames.org/export/dump/" + countries[i] + ".zip"
@@ -281,11 +185,6 @@ func main() {
 }
 
 
-
-
-SA+gveDitto lockscreen kbdin pis1104polsiren
-package main
- 
 import (
     "io"
     "log"
@@ -293,7 +192,7 @@ import (
     "os"
 )
  
-func downloadFile(filepath, url string) error {
+func downloadHttpFile(filepath, url string) error {
     resp, err := http.Get(url)
     if err != nil {
         return err
@@ -313,17 +212,13 @@ func downloadFile(filepath, url string) error {
     return nil
 }
  
-func main() {
-    e := downloadFile("centos.torrent", "http://mirror.nus.edu.sg/centos/7.8.2003/isos/x86_64/CentOS-7-x86_64-LiveKDE-2003.torrent")
+func downloadHttpFileMain() {
+    e := downloadHttpFile("centos.torrent", "http://mirror.nus.edu.sg/centos/7.8.2003/isos/x86_64/CentOS-7-x86_64-LiveKDE-2003.torrent")
     if e != nil {
         log.Fatal(e)
     }
 }
 
-
-SA+VgeDItto lockscreen kbdin pis1104polsiren
-
-package main
 
 import (
     "fmt"
@@ -331,8 +226,8 @@ import (
     "net/http"
 )
 
-func main() {
-    resp, err := http.Get("https://api.github.com/users/KrunalLathiya")
+func printHttpFileAll(url1 string) {
+    resp, err := http.Get(url1)
     if err != nil {
         print(err)
     }
@@ -343,32 +238,13 @@ func main() {
     }
     fmt.Print(string(body))
 }
-
-SA+VgeDItto lockscreen kbdin pis1105polsiren
-
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-package main 
- 
 import (
     "fmt"
     "io/ioutil"
 )
  
-func main() {
-    content, err := ioutil.ReadFile("text.txt")     // the file is inside the local directory
+func printFile(file1 string) {
+    content, err := ioutil.ReadFile(file1)     // the file is inside the local directory
     if err != nil {
         fmt.Println("Err")
     }
@@ -376,53 +252,14 @@ func main() {
 }
 
 
-SA+VegDItto lockscreen kbdin pis1105polsiren
-
-read large files in chunk to avoid out of memory errors.
-
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-package main 
- 
 import (
     "fmt"
     "io"
     "os"
 )
  
-func main() {
-    file, err := os.Open("text.txt")
+func printFileBuffer(file1 string) {
+    file, err := os.Open(file1)
     if err != nil {
         fmt.Println("Error opening file!!!")
     }
@@ -447,89 +284,18 @@ func main() {
     }
 }
 
-Sa+VgeDitto lockscreen kbdin pis1105polsiren
 
- to Programming in Go”.
-
-1
-2
-3
-4
-5
-6
-7
-8
 import "github.com/cavaliercoder/grab"
- 
-resp, err := grab.Get(".", "http://www.golang-book.com/public/pdf/gobook.pdf")
+func grabFileUrl(url1 string){
+resp, err := grab.Get(".", url1)
 if err != nil {
     log.Fatal(err)
 }
  
-fmt.Println("Download saved to", resp.Filename)
+// fmt.Println("Download saved to", resp.Filename)
+}
 
 
-
-
-SA+VEgDItto lockscreen kbdin pis1106polsiren
-
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-package main
- 
 import (
     "fmt"
     "io"
@@ -545,9 +311,9 @@ var (
     fullURLFile string
 )
  
-func main() {
+func dlFileUrl(url1 string) {
  
-    fullURLFile = "put_your_url_here"
+    fullURLFile = url1
  
     // Build fileName from fullPath
     fileURL, err := url.Parse(fullURLFile)
@@ -580,63 +346,18 @@ func main() {
  
     defer file.Close()
  
-    fmt.Printf("Downloaded a file %s with size %d", fileName, size)
+//    fmt.Printf("Downloaded a file %s with size %d", fileName, size)
  
 }
 
-
-SAV+egdItto lockscreen kbdin pis1106polsiren
-
-ated in assignment3.
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-	
-package main
- 
 import (
     "fmt"
     "log"
     "os"
 )
-/*
-The contents of myfile.txt is below:
-*****************************************
-This is the content of the file.
-Try to see if I can use os.Open to open it.
- */
-func main() {
+func readFile(file1 string) {
     // Open the text file.
-    file, err := os.Open("myfile.txt")
+    file, err := os.Open(file1)
     // Check for file open error
     if err != nil {
         log.Fatal("Error:", err)
@@ -651,11 +372,9 @@ func main() {
         log.Fatal("File read error:", e)
     }
     // print out the bytes read and the contents of myfile.txt
-    fmt.Println("Number of bytes read:",n,"\n",string(bs))
+//    fmt.Println("Number of bytes read:",n,"\n",string(bs))
 }
-
-SA+vgeDitto lockscreen kbdin pis1106polsiren
-func DownloadFile(url string, filepath string) error {
+func DownloadFileUrl(url string, filepath string) error {
 
 	// Create the file with .tmp extension, so that we won't overwrite a
 	// file until it's downloaded fully
@@ -690,45 +409,6 @@ func DownloadFile(url string, filepath string) error {
 	return nil
 }
 
-
-S+AVgEDitto lockscreen kbdin pis1106polsiren
-
-Fatal() not only logs the problem but also do os.Exit(1)
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-	
-package main
- 
 import (
     "fmt"
     "io/ioutil"
@@ -736,9 +416,9 @@ import (
     "os"
 )
  
-func main() {
+func printFileOpen(file1 string) {
     // evaluate the error, if not nil means error occur exit 
-    if contents, e := openFile("log.txt"); e != nil {
+    if contents, e := openFile(file1); e != nil {
         log.Fatal(e)
     } else {
         // because the contents is byte slice.
@@ -748,7 +428,7 @@ func main() {
     }
 }
  
-func openFile(fn string) ([]byte, error) {
+func readOpenFile(fn string) ([]byte, error) {
     // check if the file exists.
     if _, err := os.Stat(fn); os.IsNotExist(err) {
         return nil, err
@@ -759,39 +439,6 @@ func openFile(fn string) ([]byte, error) {
         return b, e
     }
 }
-
-SA+VgeDitto lockscreen kbdin pis1107polsiren
-
-.Println.
-1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-	
-package main
  
 import (
     "fmt"
@@ -801,8 +448,8 @@ import (
     "strings"
 )
  
-func main() {
-    resp, err := http.Get("http://google.com")
+func printFileHttp(url1 string) {
+    resp, err := http.Get(url1)
     // error handling
     if err != nil {
         log.Fatal(err)
@@ -819,10 +466,6 @@ func main() {
     fmt.Println(strings.TrimSpace(string(b)))
 }
 
-SAV+egdItto lockscreen kbdin pis1107polsiren
-
-package main
-
 import (
 	"fmt"
 	"io"
@@ -830,7 +473,7 @@ import (
 	"os"
 )
 
-func main() {
+func DownloadFileUrlMainArgs(url1 string) {
 	if len(os.Args) != 3 {
 		fmt.Println("usage: download url filename")
 		os.Exit(1)
@@ -838,7 +481,7 @@ func main() {
 	url := os.Args[1]
 	filename := os.Args[2]
 
-	err := DownloadFile(url, filename)
+	err := DownloadFile(url1, filename)
 	if err != nil {
 		panic(err)
 	}
@@ -848,7 +491,7 @@ func main() {
 // DownloadFile will download a url and store it in local filepath.
 // It writes to the destination file as it downloads it, without
 // loading the entire file into memory.
-func DownloadFile(url string, filepath string) error {
+func DownloadFileUrl(url string, filepath string) error {
 	// Create the file
 	out, err := os.Create(filepath)
 	if err != nil {
@@ -873,11 +516,10 @@ func DownloadFile(url string, filepath string) error {
 }
 
 
-SA+VEgDItto lockscreen kbdin pis1107polsiren
-func UploadFile(w http.ResponseWriter, r *http.Request) {
+func UploadFile(url1 string,w http.ResponseWriter, r *http.Request) {
 
 	//Path for storing image in server
-	path := "C://Users/User/Desktop/Upload/"
+	path := url1 
 
 	mr, err := r.MultipartReader()
 	if err != nil {
@@ -923,8 +565,8 @@ func UploadFile(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode("done")
 }
 
-func DownloadFile(w http.ResponseWriter, r *http.Request) {
-	Openfile, err := os.Open("C://Users/User/Desktop/Download/Download.xlsx") //Open the file to be downloaded later
+func DownloadFileHttp(url1 string,w http.ResponseWriter, r *http.Request) {
+	Openfile, err := os.Open(url1) //Open the file to be downloaded later
 	defer Openfile.Close() //Close after function return
 
 	if err != nil {		
@@ -950,10 +592,6 @@ func DownloadFile(w http.ResponseWriter, r *http.Request) {
 }
 
 
-
-SA+VgeDItto lockscreen kbdin pis1109polsiren
-package main
-
 import (
 	"flag"
 	"fmt"
@@ -963,8 +601,8 @@ import (
 	"path"
 )
 
-func download(url, filename string) (err error) {
-	fmt.Println("Downloading ", url, " to ", filename)
+func dlFileUrl(url, filename string) (err error) {
+	//fmt.Println("Downloading ", url, " to ", filename)
 
 	resp, err := http.Get(url)
 	if err != nil {
@@ -982,7 +620,7 @@ func download(url, filename string) (err error) {
 	return
 }
 
-func main() {
+func dlFileUrlMain() {
 	pUrl := flag.String("url", "", "URL to be processed")
 	flag.Parse()
 	url := *pUrl
@@ -994,7 +632,7 @@ func main() {
 	filename := path.Base(url)
 	fmt.Println("Checking if " + filename + " exists ...")
 	if _, err := os.Stat(filename); os.IsNotExist(err) {
-		err := download(url, filename)
+		err := dlFileUrl(url, filename)
 		if err != nil {
 			panic(err)
 		}
@@ -1004,10 +642,6 @@ func main() {
 	}
 }
 
-SA+VgeDitto lockscreen kbdin pis1109polsiren
-
-
-
 import (
       "fmt"
       "io"
@@ -1016,11 +650,11 @@ import (
       "path"
 )
 
-func download(url string) (err error) {
-      filename := path.Base(url)
-      fmt.Println("Downloading ", url, " to ", filename)
+func downloadUrl(url1 string) (err error) {
+      filename := path.Base(url1)
+     // fmt.Println("Downloading ", url1, " to ", filename)
 
-      resp, err := http.Get(url)
+      resp, err := http.Get(url1)
       if err != nil {
               return
       }
@@ -1052,7 +686,7 @@ import (
       "path"
 )
 
-func download(url string) (err error) {
+func downloadUrl(url string) (err error) {
       filename := path.Base(url)
       fmt.Println("Downloading ", url, " to ", filename)
 
@@ -1072,10 +706,6 @@ func download(url string) (err error) {
       return
 }
 
-
-Sa+VegDItto lockscreen kbdin pis1110polsiren
-
-package main
 
 import (
 	"fmt"
@@ -1111,10 +741,10 @@ func downloadFromUrl(url string) {
 		return
 	}
 
-	fmt.Println(n, "bytes downloaded.")
+//	fmt.Println(n, "bytes downloaded.")
 }
 
-func main() {
+func downloadFromUrlMain() {
 	countries := []string{"GB", "FR", "ES", "DE", "CN", "CA", "ID", "US"}
 	for i := 0; i < len(countries); i++ {
 		url := "http://download.geonames.org/export/dump/" + countries[i] + ".zip"
@@ -1122,10 +752,6 @@ func main() {
 	}
 }
 
-
-SA+VgeDItto lockscreen kbdin pis1110polsiren
-
-package main
 
 import (
 	"fmt"
@@ -1135,15 +761,15 @@ import (
 	"github.com/cavaliergopher/grab/v3"
 )
 
-func main() {
+func grabUrlMain(url1 string) {
 	// create client
 	client := grab.NewClient()
-	req, _ := grab.NewRequest(".", "http://www.golang-book.com/public/pdf/gobook.pdf")
+	req, _ := grab.NewRequest(".", url1)
 
 	// start download
-	fmt.Printf("Downloading %v...\n", req.URL())
+	//fmt.Printf("Downloading %v...\n", req.URL())
 	resp := client.Do(req)
-	fmt.Printf("  %v\n", resp.HTTPResponse.Status)
+//	fmt.Printf("  %v\n", resp.HTTPResponse.Status)
 
 	// start UI loop
 	t := time.NewTicker(500 * time.Millisecond)
@@ -1181,19 +807,15 @@ Loop:
 	// Download saved to ./gobook.pdf
 }
 
-
-Sa+VegDitto lockscreen kbdin pis1110polsiren
-
-resp, err := grab.Get(".", "http://www.golang-book.com/public/pdf/gobook.pdf")
+func grabFileUrl(url1 string){
+resp, err := grab.Get(".", url1)
 if err != nil {
 	log.Fatal(err)
 }
 
 fmt.Println("Download saved to", resp.Filename)
+}
 
-
-
-SA+VgEDitto lockscreen kbdin pis1111polsiren
 
 import (
     "os"
@@ -1201,7 +823,7 @@ import (
     "io"
 )
 
-func downloadFile(filepath string, url string) (err error) {
+func downloadFileUrl2(filepath string, url string) (err error) {
 
   // Create the file
   out, err := os.Create(filepath)
@@ -1231,23 +853,16 @@ func downloadFile(filepath string, url string) (err error) {
   return nil
 }
 
-SA+VgeDitto lockscreen kbdin pis1111polsiren
-
-
 import ("net/http"; "io"; "os")
-...
+
+func copyFileUrl(url1 string){
 out, err := os.Create("output.txt")
 defer out.Close()
 ...
-resp, err := http.Get("http://example.com/")
+resp, err := http.Get(url1)
 defer resp.Body.Close()
-...
 n, err := io.Copy(out, resp.Body)
-
-The http.Response's Body is a Reader, so you can use any func
-
-SA+VEgDItto lockscreen kbdin pis1112polsiren
-
+}
 
 func HTTPDownload(uri string) ([]byte, error) {
     fmt.Printf("HTTPDownload From: %s.\n", uri)
@@ -1283,7 +898,6 @@ func DownloadToFile(uri string, dst string) {
     }
 }
 
-SA+VegDItto lockscreen kbdin pis1112polsiren
 
 import (
     "os"
@@ -1291,7 +905,7 @@ import (
     "io"
 )
 
-func downloadFile(filepath string, url string) (err error) {
+func downloadFileUrl3(filepath string, url string) (err error) {
 
   // Create the file
   out, err := os.Create(filepath)
@@ -1322,38 +936,29 @@ func downloadFile(filepath string, url string) (err error) {
 }
 
 
-SA+vgeDitto lockscreen kbdin pis1113polsiren
 
-you can use this to cancel the download after the given timeout client := http.Client{Timeout: 10 * time.Second,}     client.Get("http://example.com/")  
-
-
-SA+VgeDItto lockscreen kbdin pis1113polsiren
-
-
+func getHttp(url1 string){
+client := http.Client{ 
+  Timeout: 10 * time.Second,}
+client.Get(url1)  
+}
 
 import ("net/http"; "io"; "os")
-...
+
+func copyFileUrl2(url1 string){
 out, err := os.Create("output.txt")
 defer out.Close()
-...
-resp, err := http.Get("http://example.com/")
+resp, err := http.Get(url1)
 defer resp.Body.Close()
-...
 n, err := io.Copy(out, resp.Body)
-
-The http.
-
-
-SA+VegdItto lockscreen kbdin pis1113polsiren
-
-
+}
 import (
     "os"
     "net/http"
     "io"
 )
 
-func downloadFile(filepath string, url string) (err error) {
+func downloadFileUrl4(filepath string, url string) (err error) {
 
   // Create the file
   out, err := os.Create(filepath)
@@ -1378,11 +983,6 @@ func downloadFile(filepath string, url string) (err error) {
   return nil
 }
 
-Sa+VgeDItto lockscreen kbdin pis1113polsiren
-
-
-package main
-
 import (
     "bytes"
     "encoding/json"
@@ -1391,7 +991,7 @@ import (
     "net/http"
 )
 
-func main() {
+func readFileUrlMain() {
     reqBody, err := json.Marshal(map[string]string{
         "username": "Krunal Lathiya",
         "email":    "krunal@appdividend.com",
@@ -1411,13 +1011,6 @@ func main() {
     }
     fmt.Println(string(body))
 }
-
-Output
-
-
-
-
-
 
 
 
