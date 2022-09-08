@@ -306,152 +306,152 @@ wmove(0,0,1,.7)
   send, %CurrentDateTime%
   return
   <+1::
-  FormatTime, CurrentDateTime,, hhmm
-  send, %CurrentDateTime%wtr1st&beeburgerksalt
+  FormatTime, CurrentDateTime,, hmmt
+  send, %CurrentDateTime%wtr1st&beefburgerksalt
   return
 #!^>+2::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%wtr2nd&beefburgerksalt
   return
   <+e::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%wtr3rd&beefburgerksalt
   return
   <+i::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%pisfl4xx4
   return
   <+l::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%loudfridgoff
   return
   <+n::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%bangup
   return
   <+c::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%chrup
   return
   <+g::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%grumbling
   return
   <+p::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%polsiren
   return
   <+x::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%choomup
   return
   <+m::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%boomup
   return
   <+k::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%closup
   return
   <+z::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%scrape
   return
   <+w::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%fart
   return
   !>+j::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%htron
   return
   <+7::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, habovnew
   return
   <+y::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%yawn
   return
   <+j::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%gungup
   return
   <+s::
-  formattime, currentdatetime,, hhmm
+  formattime, currentdatetime,, hmmt
   send, %currentdatetime%smbarku
   return
   <+d::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%drbang
   return
   <+5::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%tap303.
   return
   <+6::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%dropup
   return
   <+9::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%drbang290.
   return
   <+8::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%drbang308.
   return
   <+3::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%drbangchutedrbang303.
   return
   <+2::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%wtr2nd&beef
   return
   <+4::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%drbang303.
   return
   <+f::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%drflap
   return
   <+b::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%bigbarko
   return
   <+v::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%vroom
   return
   <+o::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%fridgonvsl
   return
   <+u::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%burp
   return
   <+t::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%hwaytalk
   return
   <+r::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%rmfdelrsid 
   return
   <+q::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%==
   return
   <+a::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%airpl
   return
   ;>#+f12:: msgbox booted at: %bootDa22teTime%
   <+h::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%helic
   return
   >+f12::
@@ -507,11 +507,11 @@ send, ksaltmedonbeef1
    send, e1 f1 a1e lh2sht4x4xx5 rh2sht4x4xx5 `n
    return
   <+[::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%liedn 
   return
   <+]::
-  FormatTime, CurrentDateTime,, hhmm
+  FormatTime, CurrentDateTime,, hmmt
   send, %CurrentDateTime%up 
   return
   <+,:: send, newrollorbig 
