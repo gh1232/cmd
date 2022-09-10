@@ -486,25 +486,24 @@ wmove(0,0,1,.7)
 
    <+0::
    send, alarm1122a up pis `n 
-   send, 4x2 h2x2s4x1s h4x2s m3x2s1s1s2s e2x1 f1  h4x1s2s2s  `n
-   send, lpfkllighton stdclk rmfkfaucon  cf hf  lookarnd4e lpfwarm `n
+   send, -4x2s h2x2s4x1s h4x2s m3x2s1s1s2s e2x1 f1  h4x1s2s2s -1rollor `n
+   send, lpfkflighton stdclk rmfkfaucon  cf hf  lookarnd4e lpfwarm `n
    send, bigbwls4 `n
-   send,    1st xx1 xx1 xx4 xxx4  sidesfaster 4 4 vsmfly0`n
-   send,    2nd xx1  xx1 xx4  sides 4 4 vsmfly0`n
-   send,    3rd xx1 xx1 xx4 xxx4 swoosh sidesfaster 4 4 vsmfly0`n
-   send,   4th xx1 xx1 xx4   sides 4 4 vsmfly0`n
-   send, habovnew throwplastics,pprs,beef habovnew washplate4x4xx4;tbl 
-   send, Habovnew  beefburger `n
-   send,  washsciss4x4xx4bsides`n
+   send,    1st 4x4xx4 xxx2 xxx4 xxx4 xxx4  sides 4x4 vsmfly0`n
+   send,    2nd 4x4xx4 xx2   sides 4x4 vsmfly0`n
+   send,    3rd abov sides 4x4 vsmfly0`n
+   send,   4th 4x4xx4 xx2   sides 4x4 vsmfly0`n
+   send, habovnew throwplastics,pprs,beef `n 
+   send, Lif,rif,lp,rp  habovnew washplate4x4xx4;tbl `n 
+   send, Habovnew  beefburger  washsciss4x4xx4bsides`n
 send,  cutarndbag,thro sevcutarndplpkg,thro `n
 send, scissonksaltonledge `n
-send, ksaltmedonbeef1 
-   send, Habovnew pprsinbag `n
-   send, lif,rif,lp,rp Habovnew 4x2 h4x2 `n
+send, ksaltmedonbeeftopsid Habovnew pprsinbag `n
+   send, lif,rif,lp,rp Habovnew -4x2s h4x2 `n
    send, Habovnew h1s1s xx `n
-   send, Habovnew h4x1s1s2s rmfkfaucoff4x4xx2 lpfkllightoff `n
+   send, Habovnew h4x1s1s2s rmfkfaucoff lpfkflightoff `n
    send, h4x1  shrton panton h6x1s m4x1s1s2s `n
-   send, e1 f1 a1e lh2sht4x4xx5 rh2sht4x4xx5 `n
+   send, e1 f1 a1e lh2sht4x4vv,4x4xx5 rh2sht4x4vvv,4x4xx5 -1rollb `n
    return
   <+[::
   FormatTime, CurrentDateTime,, hmmt

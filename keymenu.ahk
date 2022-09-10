@@ -450,6 +450,7 @@ global wop1y := getwb("op","1","op1y")
 
 ;correcthisprof
 global wff1puser := getwb("mf",1,"puser")  
+global wff1panon := getwb("mf",1,"panon")  
 global wtb1 := getwb("tb",1,"")  
 global wm := "MicrosoftEdge"
 
@@ -1045,8 +1046,33 @@ mmmm["w"] := extra2
 ;tempyy:= ""
 ;tempzz :=" % getexec(""Tight\tvnviewer.exe"") "
 
+addMenu2(lvl2,"'","1" ,"PowerShell.exe -NoProfile -Command ""& {Start-Process PowerShell.exe -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File """"%~dpn0.ps1""""' -Verb RunAs}""")
+addMenu2(lvl2,"'","2" ,"PowerShell.exe -NoProfile -Command ""& {Start-Process PowerShell.exe -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File """"%~dpn0.ps1""""' -Verb RunAs}""")
+addMenu2(lvl2,"'","3" ,"PowerShell.exe -Command ""& {Start-Process PowerShell.exe -ArgumentList '-ExecutionPolicy Bypass -File """"%~dpn0.ps1""""' -Verb RunAs}""")
+ addMenu2(lvl2,"'","4" ,"PowerShell.exe -ExecutionPolicy Bypass -Command ""& '%~dpn0.ps1'""")
+
+
+addMenu2(lvl2,"'","5" ,"PowerShell.exe -Command ""& '%~dpn0.ps1'""")
+addMenu2(lvl2,"'","6" ,"start-process powershell -verb runas")
+addMenu2(lvl2,"'","7" ,"RunAs ""c:\windows\system\cmd.exe""")
+addMenu2(lvl2,"'","8" ,"runas /user:Administrator ""cmd.exe /k echo admin """)
+addMenu2(lvl2,"'","9" ,"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -command Start-Process -verb RunAs ")
+addMenu2(lvl2,"'","0" ,"runas /profile /user:administrator ""cmd""")
+addMenu2(lvl2,"'","-" ,"runas /profile /user:AAA ""cmd""")
+addMenu2(lvl2,"'","=" ,"runas.exe /savecred /user:administrator cmd")
+addMenu2(lvl2,"'","\" ,"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -command Start-Process cmd  -verb RunAs ")
 addMenu2(lvl2,"x","x" ,"getexec(""Tight\tvnviewer.exe"")")
+
+addMenu2(lvl2,"'","p" ,"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -command Start-Process powershell  -verb RunAs ")
+addMenu2(lvl2,"'","i" ,"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -command Start-Process %windir%\system32\WindowsPowerShell\v1.0\PowerShell_ISE.exe -verb RunAs ")
+
+addMenu2(lvl2,"'","o" ,"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -command Start-Process C:\a\PowerShell\7-preview\pwsh.exe -verb RunAs ")
+addMenu2(lvl2,"'","t" ,"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -command Start-Process taskmgr  -verb RunAs ")
+addMenu2(lvl2,"'","\" ,"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -command Start-Process cmd  -verb RunAs ")
+addMenu2(lvl2,"'","k" ,"C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -command Start-Process cmd  -verb RunAs ")
 ;transform, tempyy, Deref, %tempzz% 
+
+
 ;run, %tempyy%
 lvl2[","] := mmmm
 addMenu2(lvl2,";","x" ,"powershell.exe -Command 'Start-Process cmd /k cd /d c:\a\' -Verb RunAs")
@@ -1089,8 +1115,8 @@ lvl2["[","e","y"]:=getwb("ep","1","ep1y")
 addMenu2(lvl2,"[","t",getwb("tb","1",""))
 addMenu2(lvl2,"[","m",wme)
 addMenu2(lvl2,"[","f",wff1puser)
-addMenu2(lvl2,"[","d" ,wff1puser)
-addMenu2(lvl2,"[","a" ,wff1puser . " --url  about:about")
+addMenu2(lvl2,"[","d" ,wff1panon)
+addMenu2(lvl2,"[","a" ,wff1panon . " --url  about:about")
 
 addMenu2(lvl2,"]","e",ee271)
 addMenu2(lvl2,"]","g",eg)
@@ -1118,7 +1144,7 @@ wep1y = %predir%wb\ep1\application\epic.exe --user-data-dir=%profdir%ep1y
 addMenu1(lvl1,"y" ,"%predir%wb\ep1\application\epic.exe --user-data-dir=%profdir%ep1y https://youtube.com")
 
 addMenu1(lvl1,"f" ,wff1puser)
-addMenu1(lvl1,"d" ,wff1puser . " --url  about:about")
+addMenu1(lvl1,"d" ,wff1panon . " --url  about:about")
 addMenu1(lvl1,"x" ,"powershell.exe -Command 'Start-Process cmd /k cd /d c:\a\' -Verb RunAs")
 addMenu1(lvl1,"o" ,"powershell.exe -Command 'Start-Process powershell' -Verb RunAs")
 addMenu1(lvl1,"i" ,"%windir%\system32\WindowsPowerShell\v1.0\PowerShell_ISE.exe")
@@ -2106,7 +2132,7 @@ addMenu2(cons1,"x","h","%wt% http://www.hangthebankers.com/")
 addMenu2(cons1,"x","w","%wt% http://thewatchers.adorraeli.com/")
 addMenu2(cons1,"x","q","%wt% http://www.damagedearth.com/")
 addMenu2(cons1,"x","h","%wt% http://hisz.rsoe.hu/alertmap/index2.php")
-addMenu2(cons1,"x","p","%wt% http://preventdisease.com/")
+addMenu2(cons1,"x","p","%wt% http://preventdsease.com/")
 addMenu2(cons1,"x","f","%wt% http://foodfreedomgroup.com/")
 addMenu2(cons1,"x","w","%wt% http://www.wired.com/category/dangerroom")
 addMenu2(cons1,"x","n","%wt% http://motherboard.vice.com/en_us")
