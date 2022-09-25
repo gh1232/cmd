@@ -1045,6 +1045,175 @@ mmmm["w"] := extra2
 
 ;tempyy:= ""
 ;tempzz :=" % getexec(""Tight\tvnviewer.exe"") "
+global storestor := []
+
+
+global radio := []
+global tvus := []
+global tvlive  := []
+global tvuslive  := []
+global streamlive  := []
+
+
+
+addMenu1(tvlive,"a" ,"https://www.youtube.com/watch?v=w_Ma8oQLmSM")
+addMenu1(streamlive,"n" ,"https://www.youtube.com/watch?v=onWCZTEB1-s")
+addMenu1(tvlive,"n" ,"https://www.youtube.com/watch?v=bXIzXGZsJcY")
+addMenu1(tvlive,"s" ,"https://www.youtube.com/watch?v=9Auq9mYxFEE")
+addMenu2(tvuslive,"f" ,"t","https://www.youtube.com/watch?v=QHnkMPa9P5E")
+addMenu1(tvlive,"" ,"")
+addMenu2(tvuslive,"" ,"","")
+addMenu2(tvuslive,"" ,"","")
+addMenu2(tvuslive,"" ,"","")
+addMenu2(tvuslive,"" ,"","")
+addMenu2(tvuslive,"" ,"","")
+addMenu2(tvuslive,"" ,"","")
+addMenu2(tvuslive,"" ,"","")
+addMenu1(tvlive,"d" ,"https://www.youtube.com/watch?v=GE_SfNVNyqk")
+addMenu1(tvlive,"f" ,"https://www.youtube.com/watch?v=h3MuIUNCCzI")
+addMenu1(tvlive,"z" ,"https://www.youtube.com/watch?v=vOTiJkg1voo")
+addMenu1(tvlive,"q" ,"https://www.youtube.com/watch?v=F-POY4Q0QSI")
+addMenu1(tvlive,"i" ,"https://www.youtube.com/watch?v=WB-y7_ymPJ4")
+addMenu1(tvlive,"bloom" ,"https://www.youtube.com/watch?v=dp8PhLsUcFE")
+addMenu1(tvlive,"ind" ,"https://www.youtube.com/watch?v=lyeyoqwXm5o")
+addMenu1(tvlive,"singcna" ,"https://www.youtube.com/watch?v=XWq5kBlakcQ")
+addMenu1(tvlive,"miamwlpg" ,"https://www.youtube.com/watch?v=PsGTi4bcUKA")
+addMenu1(tvlive,"nbcny" ,"https://www.youtube.com/watch?v=xwYkdwFKQ_o")
+addMenu1(tvlive,"cnnn18" ,"https://www.youtube.com/watch?v=VbD-1P4wziY")
+addMenu1(tvlive,"nasa" ,"https://www.youtube.com/watch?v=86YLFOog4GM")
+addMenu1(tvlive,"namib" ,"https://www.youtube.com/watch?v=ydYDqZQpim8")
+addMenu1(tvlive,"nasaafar" ,"https://www.youtube.com/watch?v=CjRNdPMRGpE")
+addMenu1(tvlive,"phildzr" ,"https://www.youtube.com/watch?v=Vk1K0PJ-GMU")
+addMenu1(tvlive,"indbharat" ,"https://www.youtube.com/watch?v=kIiZUlJYAuM")
+addMenu1(tvlive,"" ,"")
+addMenu1(tvlive,"" ,"")
+addMenu1(tvlive,"" ,"")
+addMenu1(tvlive,"a" ,"https://www.youtube.com/watch?v=w_Ma8oQLmSM")
+addMenu1(tvlive,"a" ,"https://www.youtube.com/watch?v=w_Ma8oQLmSM")
+addMenu1(tvlive,"a" ,"https://www.youtube.com/watch?v=w_Ma8oQLmSM")
+
+
+addMenu2(tvus,"f","f" ,"https://ustv247.tv/food-network/")
+
+addMenu2(tvus,"n","f" ,"https://ustv247.tv/watch-fox-channel-live-stream/")
+addMenu2(tvus,"t","w" ,"https://ustv247.tv/we-tv/")
+addMenu2(tvus,"m","c" ,"https://ustv247.tv/cinemax/")
+addMenu2(tvus,"n","m" ,"https://ustv247.tv/msnbclive/")
+addMenu2(tvus,"l","t" ,"https://ustv247.tv/telemundo/")
+addMenu2(tvus,"t","l" ,"https://ustv247.tv/tv-land/")
+addMenu2(tvus,"m","s" ,"https://ustv247.tv/syfy/")
+addMenu2(tvus,"s","s" ,"https://ustv247.tv/science/")
+addMenu2(tvus,"g","g" ,"https://ustv247.tv/game-show-network/")
+addMenu2(tvus,"n","f" ,"https://ustv247.tv/foxnewslive/")
+addMenu2(tvus,"t","e" ,"https://ustv247.tv/eonline/")
+addMenu2(tvus,"","" ,"")
+addMenu2(tvus,"n","c" ,"https://ustv247.tv/cnn-live-stream/")
+
+
+addMenu2(tvus,"m","a" ,"https://ustv247.tv/amc-live-stream/")
+addMenu2(tvus,"t","p" ,"https://ustv247.tv/pbs-live-stream/")
+
+addMenu2(tvus,"n","n" ,"https://ustv247.tv/watch-nbc-live-stream/")
+addMenu2(tvus,"n","c" ,"https://ustv247.tv/watch-cbs-live-stream/")
+addMenu1(storestor,"2", "https://www.thesource.ca/en-ca")
+addMenu1(storestor,"4", "https://rabba.com/")
+addMenu1(storestor,";", "https://www.longos.com/")
+addMenu1(storestor,"n", "https://www.nofrills.ca/")
+addMenu1(storestor,"3", "https://www.save.ca/flyers/food-basics")
+addMenu1(storestor,"f", "https://www.foodbasics.ca/index.en.html")
+
+addMenu1(storestor,"q", "https://www.wholefoodsmarket.com/")
+
+addMenu1(storestor,"s", "https://www.shoppersdrugmart.ca/en/home")
+
+addMenu1(storestor,"j", "https://www.circlek.com/")
+
+addMenu1(storestor,"7", "https://7-eleven.ca/")
+
+addMenu1(storestor,"m", "https://www.mcdonalds.com/ca/en-ca.html")
+
+addMenu1(storestor,"n", "https://www.burgerking.ca/")
+
+addMenu1(storestor,"[", "https://www.popeyes.com/menu")
+
+addMenu1(storestor,"q", "https://www.wendys.com/")
+
+addMenu1(storestor,"-", "https://www.popeyescanada.com/")
+
+addMenu1(storestor,"p", "https://www.popeyeschicken.ca/")
+addMenu1(storestor,"d","https://www.dufferinmall.ca/")
+addMenu1(storestor,"1", "https://shops.cadillacfairview.com/property/cf-toronto-eaton-centre/store#/")
+addMenu1(storestor,"5", "https://www.rona.ca/en")
+
+addMenu1(storestor,"h", "https://www.homedepot.ca/en/home.html")
+addMenu1(storestor,";", "https://www.lowescanada.ca/")
+
+addMenu1(storestor,"'", "https://www.lowes.ca/")
+
+addMenu1(storestor,"o", "https://www.homehardware.ca/en")
+addMenu1(storestor,"v", "https://www.costco.ca/")
+
+addMenu1(storestor,"k", "https://www.kijiji.ca/")
+
+addMenu1(storestor,"e", "https://www.ebay.ca/")
+
+addMenu1(storestor,"w", "https://www.walmart.ca/en")
+
+addMenu1(storestor,"c", "https://toronto.craigslist.org/search/sss?")
+
+addMenu1(storestor,"b", "https://www.bestbuy.ca/")
+
+addMenu1(storestor,"t", "https://www.canadiantire.ca/en.html")
+
+addMenu1(storestor,"l", "https://www.loblaws.ca/")
+
+
+
+
+addMenu2(radio,"a","g" ,"https://www.iheart.com/genre/")
+addMenu2(radio,"a","l" ,"https://www.iheart.com/playlist/")
+addMenu2(radio,"a","p" ,"https://www.iheart.com/podcast/")
+addMenu2(radio,"c","p" ,"https://www.iheart.com/live/pure-country-countdown-8916/")
+addMenu2(radio,"o","r" ,"https://www.iheart.com/live/the-roger-ashby-oldies-show-8506/")
+addMenu2(radio,"","" ,"https://www.iheart.com/live/ctv-news-7798/")
+addMenu2(radio,"n","2" ,"https://www.iheart.com/live/cp24-7796/")
+addMenu2(radio,"g","p" ,"https://www.iheart.com/live/proud-fm-7758/")
+addMenu2(radio,"s","t" ,"https://www.iheart.com/live/tsn-1050-7495/")
+addMenu2(radio,"t","n" ,"https://www.iheart.com/live/newstalk-1010-7499/")
+addMenu2(radio,"a","a" ,"https://www.iheart.com/artist/")
+addMenu2(radio,"m","l" ,"https://www.iheart.com/live/lite-885-7764/")
+addMenu2(radio,"m","t" ,"https://www.iheart.com/live/iheartradio-top-20-7556/")
+addMenu2(radio,"m","z" ,"https://www.iheart.com/live/z1035-7757/")
+addMenu2(radio,"t","r" ,"https://www.iheart.com/live/radio-regent-8119/")
+addMenu2(radio,"m","2" ,"https://www.iheart.com/live/chum-1045-6270/")
+addMenu2(radio,"m","c" ,"https://www.iheart.com/live/cfur-9357/")
+addMenu2(radio,"m","0" ,"https://www.iheart.com/live/1003-wnic-1153/")
+
+addMenu2(radio,"m","n" ,"https://www.iheart.com/live/iheart-new-music-8852/")
+
+addMenu2(radio,"m","1" ,"https://www.iheart.com/live/2010s-the-decade-8465/")
+addMenu2(radio,"m","x" ,"https://www.iheart.com/live/iheart-the-holidays-8451/")
+
+addMenu2(radio,"m","j" ,"https://www.iheart.com/live/cjru-8164/")
+
+addMenu2(radio,"f","b" ,"https://www.iheart.com/live/bnn-bloomberg-7797/")
+addMenu2(radio,"m","k" ,"https://www.iheart.com/live/kost-1035-193/")
+addMenu2(radio,"m","3" ,"https://www.iheart.com/live/1035-ktu-1473/")
+addMenu2(radio,"m","s" ,"https://www.iheart.com/live/sunny-991-houston-2273/")
+addMenu2(radio,"m","f" ,"https://www.iheart.com/favorites/your-favorites-radio-5749540544/")
+addMenu2(radio,"m","r" ,"https://www.iheart.com/live/heavy-rock-7554/")
+addMenu2(radio,"m","i" ,"https://www.iheart.com/live/the-hit-mix-7553/")
+
+addMenu2(radio,"m","v" ,"https://www.iheart.com/live/999-virgin-radio-7481/")
+addMenu2(radio,"m","m" ,"https://www.iheart.com/live/iheart-new-music-8852/")
+
+addMenu2(radio,"m","9" ,"https://www.iheart.com/live/star-941-253/")
+
+
+addMenu1(lvl2,"t",tvus)
+addMenu1(lvl2,"r",radio)
+addMenu1(lvl2,"z",storestor)
+
 
 addMenu2(lvl2,"'","1" ,"PowerShell.exe -NoProfile -Command ""& {Start-Process PowerShell.exe -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File """"%~dpn0.ps1""""' -Verb RunAs}""")
 addMenu2(lvl2,"'","2" ,"PowerShell.exe -NoProfile -Command ""& {Start-Process PowerShell.exe -ArgumentList '-NoProfile -ExecutionPolicy Bypass -File """"%~dpn0.ps1""""' -Verb RunAs}""")
@@ -1126,7 +1295,9 @@ addMenu2(lvl2,"]","v",ev)
 addMenu2(lvl2,"[","y" ,"%predir%wb\ep1\application\epic.exe --user-data-dir=%profdir%ep1y https://youtube.com")
 addMenu1(lvl1,"w" ,"C:\Program Files\Everything\Everything.exe -connect z@192.168.1.2")
 addMenu1(lvl1,"q" ,"C:\Program Files\Everything\Everything.exe")
+addMenu2(lvl2,".","k" ,"C:\a\vsc\Code.exe")
 addMenu2(lvl2,".","e" ,"explorer")
+addMenu2(lvl2,".","j" ,"C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\IDE\devenv.exe")
 addMenu2(lvl2,".","n" ,"notepad")
 addMenu2(lvl2,".","c" ,"calc")
 addMenu2(lvl2,".","b" ,"c:\a\virtualbox\virtualbox")

@@ -194,7 +194,7 @@ return
 f4:: send ^+r 
 >^backspace:: send {Browser_Back}
 >+backspace:: send  {Browser_Forward}
-#f7:: 
+#!^f7:: 
 send ^c 
 fff="%clipboard%"
 run,   %predir%vim82\gvim.exe -u c:\cmd\vimkeys.vim   -f %fff% 
@@ -264,26 +264,33 @@ return
 >#!^SPACE:: Winset, Alwaysontop, , A
   ;;;  wpw :=500 
   >!f5:: wmove(0,0,.7,1) 
->#f8:: wmove(.63,.66,.32,.66)
+>#^f8:: wmove(.63,.66,.32,.66)
   >#!^f8::
 wmove(0,0,1,.7)
   send {>!f6^l}
   send {^l}
   return  
->#f6:: wmove(0,0.52,.32,.7) 
+>#^f6:: wmove(0,0.52,.32,.7) 
   ;>#f6:: wmove(0,0.5,1,.7) 
 >!f6:: wmove(0,0,1,.7) 
   ;>!f6::WinMove,A,,%wpx%,%wpy%,%A_ScreenWidth%,700
-  >#f5:: wmove(0,0.37,.32,.66)
-  >#f7:: wmove(-.03,0.46,.32,.66)
+  >#^f5:: wmove(0,0.37,.32,.66)
+  >#!f7:: wmove(-.03,0.46,.32,.66)
 >!f8:: wmove(0,.3,1,.7)
   ;>!f7::WinMove,A,,415,0,1050,%wph%
   >!f7:: wmove(0.336,-.01,.665,1)
   >!+f5:: wmove(0.67,0,.3,1)
   >^f9:: wmove(-.025,0,.32,.5) 
   >^f6:: wmove(-.025,0.40,.32,.7) 
+  >#f7:: wmove(.35,0.40,.32,.7) 
+  >#f8:: wmove(.65,0.40,.32,.7) 
+  >#f6:: wmove(.65,0.604,.32,.7) 
   >^f7:: wmove(-.025,0.604,.32,.7) 
+  >#f5:: wmove(.35,0.604,.32,.7) 
   >^f5:: wmove(-.025,0.27,.32,.8) 
+  >^f4:: wmove(-.025,-.025,.32,1.03) 
+  >^f3:: wmove(0.34,-0.025,.45,1.5) 
+  >^f2:: wmove(0,-0.025,.45,1.5) 
 >^f8:: wmove(-.0056,-.01,1.05,.775) 
   ;WinMove,A,,960,0,390,%wph%
   >!+f6:: wmove(0,0.37,.32,.66)
@@ -387,7 +394,7 @@ wmove(0,0,1,.7)
   return
   <+5::
   FormatTime, CurrentDateTime,, hmmt
-  send, %CurrentDateTime%tap303.
+  send, %CurrentDateTime%tap303m
   return
   <+6::
   FormatTime, CurrentDateTime,, hmmt
@@ -395,15 +402,15 @@ wmove(0,0,1,.7)
   return
   <+9::
   FormatTime, CurrentDateTime,, hmmt
-  send, %CurrentDateTime%drbang290.
+  send, %CurrentDateTime%drbang290v
   return
   <+8::
   FormatTime, CurrentDateTime,, hmmt
-  send, %CurrentDateTime%drbang308.
+  send, %CurrentDateTime%drbang308l
   return
   <+3::
   FormatTime, CurrentDateTime,, hmmt
-  send, %CurrentDateTime%drbangchutedrbang303.
+  send, %CurrentDateTime%drbangchutedrbang303l
   return
   <+2::
   FormatTime, CurrentDateTime,, hmmt
@@ -411,7 +418,7 @@ wmove(0,0,1,.7)
   return
   <+4::
   FormatTime, CurrentDateTime,, hmmt
-  send, %CurrentDateTime%drbang303.
+  send, %CurrentDateTime%drbang303l
   return
   <+f::
   FormatTime, CurrentDateTime,, hmmt
@@ -486,8 +493,10 @@ wmove(0,0,1,.7)
 
    <+0::
    send, alarm1122a up pis `n 
+send, =me2x==uu =zuu den=hong zuudocusu1.4 batdocusu1.4 teirdocusu1.4 tbl
+send, mfin=zuudocusu1.4 =dee 
    send, -4x2s h2x2s4x1s h4x2s m3x2s1s1s2s e2x1 f1  h4x1s2s2s -1rollor `n
-   send, lpfkflighton stdclk rmfkfaucon  cf hf  lookarnd4e lpfwarm `n
+   send, lpfkflighton stdclk rmfkfaucon  cf hf  lookarnd4,4e,ceiling lpfwarm `n
    send, bigbwls4 `n
    send,    1st 4x4xx4 xxx2 xxx4 xxx4 xxx4  sides 4x4 vsmfly0`n
    send,    2nd 4x4xx4 xx2   sides 4x4 vsmfly0`n
@@ -495,14 +504,14 @@ wmove(0,0,1,.7)
    send,   4th 4x4xx4 xx2   sides 4x4 vsmfly0`n
    send, habovnew throwplastics,pprs,beef `n 
    send, Lif,rif,lp,rp  habovnew washplate4x4xx4;tbl `n 
-   send, Habovnew  beefburger  washsciss4x4xx4bsides`n
+   send,  beefburger  washsciss4x4xx4bsides`n
 send,  cutarndbag,thro sevcutarndplpkg,thro `n
-send, scissonksaltonledge `n
-send, ksaltmedonbeeftopsid Habovnew pprsinbag `n
+send, scissonksaltonledge olivoil `n
+send, ksaltmedonbeeftopsid  chkok  Habovnew pprsinbag chkok `n
    send, lif,rif,lp,rp Habovnew -4x2s h4x2 `n
    send, Habovnew h1s1s xx `n
-   send, Habovnew h4x1s1s2s rmfkfaucoff lpfkflightoff `n
-   send, h4x1  shrton panton h6x1s m4x1s1s2s `n
+   send, Habovnew h4x1s1s1s rmfkfaucoff lpfkflightoff `n
+   send, h4x1  shrton panton tieup2x h6x1s m4x1s1s2s `n
    send, e1 f1 a1e lh2sht4x4vv,4x4xx5 rh2sht4x4vvv,4x4xx5 -1rollb `n
    return
   <+[::
@@ -514,3 +523,7 @@ send, ksaltmedonbeeftopsid Habovnew pprsinbag `n
   send, %CurrentDateTime%up 
   return
   <+,:: send, newrollorbig 
+
+;>+f1:: run % send hi
+
+

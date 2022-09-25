@@ -3,7 +3,7 @@ set nocompatible
 "source g:\bin\extras.vim
 source $VIMRUNTIME/mswin.vim
 behave mswin
-
+set statusline=%F\ %m\ %r\ %h\ %y\ %n\ %l,%c\ %v\ %L\ %p%%   
 set diffexpr=MyDiff()
 function MyDiff()
   let opt = '-a --binary '
@@ -101,6 +101,8 @@ let mapleader = "\\"
 "let g:mapleader=\
 set timeoutlen=1000
 nnoremap <silent> <leader> :WhichKey '\'<CR>
+noremap! <silent> <f5> <esc>:WhichKey '<f5>'<CR>
+" nnoremap <silent> :h :WhichKey ':h'<CR>
 nnoremap <silent> <f5> :WhichKey '<f5>'<CR>
 "nnoremap <silent> <leader> :WhichKey '<tab>'<CR>
 :set viminfo='500
@@ -124,7 +126,8 @@ autocmd FileType javascript setlocal equalprg=js-beautify\ --stdin
 
 filetype plugin indent on
 hi Normal guifg=White guibg=Black
-set titlestring=%F_%l/%L
+set titlestring=%F 
+"_%l/%L
 au GUIEnter * simalt ~x
 nnoremap q <esc>:q<cr> 
 nnoremap <space> <c-f> 
@@ -157,19 +160,21 @@ nmap <m-f> :set guifont=* <enter>
 nnoremap <leader>f0 :set gfn=Lucida_Console:h30:cANSI<cr>
 set hi=20
 set gfn=Lucida_Console:h30:cANSI
-nmap <f5>- :hi Normal guifg=White guibg=Black<cr>
+nnoremap <f5> i<f5>
+map! <f5>- <esc>:hi Normal guifg=White guibg=Black<cr>a
 
-nmap <f5>= :hi Normal guifg=Black guibg=White<cr>
-
-nnoremap <f5><f5> <esc>:q<cr>
-nnoremap <f5>8 :set gfn=Lucida_Console:h32:cANSI<cr>
-nnoremap <f5>7 :set gfn=Lucida_Console:h30:cANSI<cr>
-nnoremap <f5>5 :set gfn=Lucida_Console:h26:cANSI<cr>
-nnoremap <f5>6 :set gfn=Lucida_Console:h28:cANSI<cr>
-nnoremap <f5>3 :set gfn=Lucida_Console:h15:cANSI<cr>
-nnoremap <f5>4 :set gfn=Lucida_Console:h20:cANSI<cr>
-nnoremap <f5>2 :set gfn=Lucida_Console:h14:cANSI<cr>
-nnoremap <f5>1 :set gfn=Lucida_Console:h9:cANSI<cr>
+map! <f5>= <esc>:hi Normal guifg=Black guibg=White<cr>a
+noremap! <f5><f5> <esc>:q<cr>a
+noremap! <f5>0 <esc>:set gfn=Lucida_Console:h42:cANSI<cr>a
+noremap! <f5>9 <esc>:set gfn=Lucida_Console:h38:cANSI<cr>a
+noremap! <f5>8 <esc>:set gfn=Lucida_Console:h32:cANSI<cr>a
+noremap! <f5>7 <esc>:set gfn=Lucida_Console:h30:cANSI<cr>a
+noremap! <f5>5 <esc>:set gfn=Lucida_Console:h26:cANSI<cr>a
+noremap! <f5>6 <esc>:set gfn=Lucida_Console:h28:cANSI<cr>a
+noremap! <f5>3 <esc>:set gfn=Lucida_Console:h15:cANSI<cr>a
+noremap! <f5>4 <esc>:set gfn=Lucida_Console:h20:cANSI<cr>a
+noremap! <f5>2 <esc>:set gfn=Lucida_Console:h14:cANSI<cr>a
+noremap! <f5>1 <esc>:set gfn=Lucida_Console:h9:cANSI<cr>a
 
 "set number
 
@@ -259,5 +264,8 @@ function Download(url1,dir1)
 
 
 endfunction 
+
+ syntax enable
+filetype plugin indent on
 
 
